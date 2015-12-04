@@ -68,4 +68,8 @@ theme: landscape
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/wingjay/wingjay.github.io
+  branch: master
+  message: 
+
