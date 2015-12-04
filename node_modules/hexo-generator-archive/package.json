@@ -1,0 +1,72 @@
+{
+  "name": "hexo-generator-archive",
+  "version": "0.1.3",
+  "description": "Archive generator for Hexo.",
+  "main": "index",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hexojs/hexo-generator-archive.git"
+  },
+  "homepage": "http://hexo.io/",
+  "keywords": [
+    "hexo",
+    "generator",
+    "archive"
+  ],
+  "author": {
+    "name": "Tommy Chen",
+    "email": "tommy351@gmail.com",
+    "url": "http://zespia.tw"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "coveralls": "^2.11.2",
+    "gulp": "^3.8.9",
+    "gulp-istanbul": "^0.5.0",
+    "gulp-jshint": "^1.8.6",
+    "gulp-load-plugins": "^0.8.0",
+    "gulp-mocha": "^2.0.0",
+    "hexo": "^3.0.0-rc.3",
+    "jshint-stylish": "^1.0.0",
+    "mocha": "^2.0.1",
+    "rimraf": "^2.2.8"
+  },
+  "dependencies": {
+    "hexo-pagination": "0.0.2",
+    "object-assign": "^2.0.0"
+  },
+  "gitHead": "65c86368eb89b313490774b9aa827d4277632bca",
+  "bugs": {
+    "url": "https://github.com/hexojs/hexo-generator-archive/issues"
+  },
+  "_id": "hexo-generator-archive@0.1.3",
+  "_shasum": "61bfb2dc2149044787980a822db91e5c1e835b45",
+  "_from": "hexo-generator-archive@>=0.1.2 <0.2.0",
+  "_npmVersion": "2.10.1",
+  "_nodeVersion": "0.12.4",
+  "_npmUser": {
+    "name": "tommy351",
+    "email": "tommy351@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "tommy351",
+      "email": "tommy351@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "61bfb2dc2149044787980a822db91e5c1e835b45",
+    "tarball": "http://registry.npmjs.org/hexo-generator-archive/-/hexo-generator-archive-0.1.3.tgz"
+  },
+  "_resolved": "https://registry.npmjs.org/hexo-generator-archive/-/hexo-generator-archive-0.1.3.tgz"
+}
