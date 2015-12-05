@@ -2,6 +2,10 @@
 ## Docs: http://hexo.io/docs/configuration.html
 ## Source: https://github.com/hexojs/hexo/
 
+## Deploy command and repo management
+## hexo deploy --generate   is used to deploy changes
+## In backup branch, push whole code for version management
+
 # Site
 title: 仗剑天涯
 subtitle: iam_wingjay
@@ -67,9 +71,18 @@ pagination_dir: page
 theme: next
 ## next tranquilpeak
 
-# duoshuo comment system
-# admin url: http://wingjay.duoshuo.com/
-duoshuo_shortname: wingjay
+
+# third party 
+## duoshuo comment system
+## admin url: http://wingjay.duoshuo.com/
+#duoshuo_shortname: wingjay
+
+## Disqus comment system
+## If you want to forbid comment in some page, add 'comments: false' in front-matter of .md file
+disqus_shortname: wingjay
+
+## baidu analytics
+baidu_analytics: 5bbd26412404683ce820c9bf65201e84
 
 plugins:
 - hexo-generator-cname
