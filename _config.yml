@@ -48,7 +48,15 @@ highlight:
   line_number: true
   auto_detect: true
   tab_replace:
-
+marked:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+  
 # Category & Tag
 default_category: uncategorized
 category_map:
