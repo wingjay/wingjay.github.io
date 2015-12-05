@@ -56,7 +56,6 @@ marked:
   breaks: true
   smartLists: true
   smartypants: true
-  
 # Category & Tag
 default_category: uncategorized
 category_map:
@@ -101,9 +100,8 @@ plugins:
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
-deploy:
+deploy: 
   type: git
-  repo: https://github.com/wingjay/wingjay.github.io
-  branch: master
-  message: 
-
+  repo: 
+    github: https://github.com/wingjay/wingjay.github.io.git,master
+    gitcafe: https://gitcafe.com/wingjay/wingjay.git,gitcafe-pages
