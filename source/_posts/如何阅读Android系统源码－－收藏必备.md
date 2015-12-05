@@ -1,6 +1,6 @@
 title: 如何阅读Android系统源码－－收藏必备
 date: 2015-12-05 18:30:10
-tags: Android, 安卓
+tags: [Android, 安卓]
 ---
 ![](http://upload-images.jianshu.io/upload_images/281665-a6044ffcc74bf7ae.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 对于任何一个对Android开发感兴趣的人而言，对于android系统的学习必不可少。而学习系统最佳的方法就如linus所言:"RTFSC"(Read The Fucking Source Code)。
