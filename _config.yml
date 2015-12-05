@@ -5,10 +5,11 @@
 # Site
 title: 仗剑天涯
 subtitle: iam_wingjay
-description:
+description: 用艺术的眼光发现技术的美
 author: wingjay
-language: 
+language: zh-hk
 timezone: 
+avatar: https://avatars2.githubusercontent.com/u/9619875?v=3&s=400
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
