@@ -1,4 +1,4 @@
-title: Hey folkshahaha
+title: Hey folks
 tags: welcome
 ---
 Hi, I'm Jay! Welcome!
