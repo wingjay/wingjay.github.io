@@ -11,8 +11,9 @@ title: 仗剑天涯
 subtitle: iam_wingjay
 description: 用艺术的眼光发现技术的美
 author: wingjay
-language: zh-hk
+language: zh-Hans
 timezone: 
+keywords: android, github, 技术博客, 移动开发, 干货
 avatar: https://avatars2.githubusercontent.com/u/9619875?v=3&s=400
 
 # URL
@@ -83,6 +84,9 @@ disqus_shortname: wingjay
 
 ## baidu analytics
 baidu_analytics: 5bbd26412404683ce820c9bf65201e84
+
+## Swiftype search engine
+swiftype_key: dy8yyns4r9yK2d_PJbVM
 
 plugins:
 - hexo-generator-cname
