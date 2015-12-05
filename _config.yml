@@ -79,7 +79,7 @@ theme: next
 #duoshuo_shortname: wingjay
 
 ## Disqus comment system
-## If you want to forbid comment in some page, add 'comments: false' in front-matter of .md file
+## If you want to forbid comment in some page, add 'comments: false' in .md file top
 disqus_shortname: wingjay
 
 ## baidu analytics
