@@ -457,12 +457,12 @@ td {
 }
 pre,
 .highlight {
-  background: highlight-background;
+  background: #f7f7f7;
   margin: 20px 0;
   padding: 15px;
   overflow: auto;
   font-size: 13px;
-  color: highlight-foreground;
+  color: #4d4d4c;
   line-height: 1.6;
 }
 .highlight .gutter pre,
@@ -500,7 +500,7 @@ pre code {
 }
 .highlight figcaption {
   font-size: 0.85em;
-  color: highlight-comment;
+  color: #8e908c;
   line-height: 1em;
   margin-bottom: 1em;
 }
@@ -527,7 +527,7 @@ pre code {
   border-style: solid;
   border-color: #ccc;
   border-width: 1px 0;
-  background: highlight-background;
+  background: #f7f7f7;
   padding: 15px 40px 15px 15px;
 }
 .gist .gist-file {
@@ -553,8 +553,8 @@ pre code {
   border: none;
 }
 .gist .gist-file .gist-meta {
-  background: highlight-background;
-  color: highlight-comment;
+  background: #f7f7f7;
+  color: #8e908c;
   font: 13px Lato, "PingFang SC", "Microsoft YaHei", sans-serif;
   text-shadow: 0 0;
   padding: 0;
@@ -569,7 +569,7 @@ pre code {
   text-decoration: underline;
 }
 pre .comment {
-  color: highlight-comment;
+  color: #8e908c;
 }
 pre .variable,
 pre .attribute,
@@ -583,7 +583,7 @@ pre .html .doctype,
 pre .css .id,
 pre .css .class,
 pre .css .pseudo {
-  color: highlight-red;
+  color: #c82829;
 }
 pre .number,
 pre .preprocessor,
@@ -591,11 +591,11 @@ pre .built_in,
 pre .literal,
 pre .params,
 pre .constant {
-  color: highlight-orange;
+  color: #f5871f;
 }
 pre .ruby .class .title,
 pre .css .rules .attribute {
-  color: highlight-green;
+  color: #718c00;
 }
 pre .string,
 pre .value,
@@ -603,11 +603,11 @@ pre .inheritance,
 pre .header,
 pre .ruby .symbol,
 pre .xml .cdata {
-  color: highlight-green;
+  color: #718c00;
 }
 pre .title,
 pre .css .hexcolor {
-  color: highlight-aqua;
+  color: #3e999f;
 }
 pre .function,
 pre .python .decorator,
@@ -617,11 +617,11 @@ pre .ruby .title .keyword,
 pre .perl .sub,
 pre .javascript .title,
 pre .coffeescript .title {
-  color: highlight-blue;
+  color: #4271ae;
 }
 pre .keyword,
 pre .javascript .function {
-  color: highlight-purple;
+  color: #8959a8;
 }
 html,
 body {
@@ -965,7 +965,7 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d538fc;
+  background: #1b4e91;
 }
 .sidebar-nav {
   margin: 0 0 20px;
