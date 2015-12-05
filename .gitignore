@@ -1,3 +1,4 @@
+.DS_Store
 .deploy_git
 db.json
 public/*
