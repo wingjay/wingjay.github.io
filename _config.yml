@@ -67,6 +67,10 @@ pagination_dir: page
 theme: next
 ## next tranquilpeak
 
+# duoshuo comment system
+# admin url: http://wingjay.duoshuo.com/
+duoshuo_shortname: wingjay
+
 plugins:
 - hexo-generator-cname
 
