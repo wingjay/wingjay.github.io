@@ -262,6 +262,146 @@
 
 
     
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2015/12/05/如何阅读Android系统源码－－收藏必备/" itemprop="url">
+                  如何阅读Android系统源码－－收藏必备
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2015-12-05T18:30:10+08:00" content="2015-12-05">
+              2015-12-05
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/12/05/如何阅读Android系统源码－－收藏必备/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/12/05/如何阅读Android系统源码－－收藏必备/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+              <p><img src="http://upload-images.jianshu.io/upload_images/281665-a6044ffcc74bf7ae.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>对于任何一个对Android开发感兴趣的人而言，对于android系统的学习必不可少。而学习系统最佳的方法就如linus所言:”RTFSC”(Read The Fucking Source Code)。<br>下面从知乎整理了一些优质回答，以飨读者。</p>
+<p>##巨人的肩膀</p>
+<ul>
+<li><p>AOSP项目官方: <a href="https://source.android.com/source/index.html" target="_blank" rel="external">https://source.android.com/source/index.html</a><br><strong>这个一定要先读</strong>. 项目介绍, 代码下载, 环境搭建, 刷机方法, Eclipse配置都在这里. 这是一切的基础.</p>
+</li>
+<li><p>Android官方手册: <a href="https://developer.android.com/training/index.html" target="_blank" rel="external">https://developer.android.com/training/index.html</a><br>这个其实是给App开发者看的. 但是里面也有不少关于系统机制的介绍, 值得细读.</p>
+</li>
+<li><p>老罗的Android之旅: <a href="http://blog.csdn.net/luoshengyang" target="_blank" rel="external">http://blog.csdn.net/luoshengyang</a><br>此老罗非彼老罗. 罗升阳老师的博客非常有营养, 基本可以作为<strong>指引你开始阅读AOSP源码的教程</strong>. 你可以按照博客的时间顺序一篇篇挑需要的看.但这个系列的博客有些问题:<br>早期的博客是基于旧版本的Android;<br>大量的代码流程追踪. 读文章时你一定要清楚你在看的东西在整个系统处于什么样的位置.</p>
+</li>
+<li><p>Innost的专栏: <a href="http://blog.csdn.net/innost" target="_blank" rel="external">http://blog.csdn.net/innost</a><br>邓凡平老师也是为Android大牛, 博客同样很有营养. 但是不像罗升阳老师的那么系统. 更多的是一些技术点的深入探讨.</p>
+</li>
+<li><p>Android Issues: <a href="http://code.google.com/p/android/issues/list" target="_blank" rel="external">http://code.google.com/p/android/issues/list</a><br>Android官方Issue列表. 我在开发过程中发现过一些奇怪的bug, 最后发现这里基本都有记录. 当然你可以提一些新的, 有没有人改就是另外一回事了.</p>
+</li>
+<li><p>Google: <a href="https://www.google.com/" target="_blank" rel="external">https://www.google.com</a><br>一定要能流畅的使用这个工具. 大量的相关知识是没有人系统的总结的, 你需要自己搞定.</p>
+</li>
+</ul>
+<p>##阅读方法</p>
+<blockquote>
+<p>假设我想研究Android的<code>UI系统</code>，首先要找什么和UI有亲戚关系吧！<br><code>View</code>大神跳出来了，沿着它往下找找看，发现它在贴图在画各种形状，但是它在哪里画呢，马良也要纸吧？<br>开发Android的同学逃不掉<code>Activity</code>吧！它有个<code>setcontentview()</code>的方法，从这个名字看好像它是把view和activity结合的地方。赶紧看它的实现和被调用，然后我们就发现了<code>Window</code>，<code>ViewRoot</code>和<code>WindowManager</code>的身影，沿着WM和WMS我们就惊喜会发现了<code>Surface</code>，以及<code>draw</code>的函数，它居然在一个<code>DeCorView</code>上画东西哈。借助<code>Source Insight</code>， UI<code>Java</code>层的横向静态图呼之欲出了。<br>完成这个<code>静态UML</code>，我觉得我可以开始功能实现上追踪了，这部分主要是C++的代码（这也是我坚定劝阻的放弃Eclipse的原因），我沿着draw函数，看到了各个层级的关系，<code>SurfaceSession</code>的控制和事务处理，<code>SharedBuffer</code>读写控制，彪悍的<code>SurfaceFlinger</code>主宰一切，<code>OpenGL ES</code>的神笔马良。<code>FrameBuffer</code>和<code>FrameBufferDevice</code>的图像输出，LCD设备打开后，开始接收FBD发过来的一帧帧图像，神奇吧。<br>好吧，就这样，再往底层我爱莫能助了！</p>
+</blockquote>
+<p>##软件<br>当我决定要阅读源码，要具备一款好用的阅读器、下载源码等</p>
+<ul>
+<li><p>Windows阅读器:  <a href="http://www.sourceinsight.com/" target="_blank" rel="external"><strong>Source Insight</strong></a></p>
+<blockquote>
+<p>在这个工具帮助下，你才可以驾驭巨大数量的Android 源码，你可以从容在Java，C++,C代码间遨游，你可以很快找到你需要的继承和调用关系。</p>
+</blockquote>
+</li>
+<li><p>Mac OS阅读器:  <a href="http://www.scitools.com/" target="_blank" rel="external"><strong>Understand</strong></a>,</p>
+<blockquote>
+<p>参考：<a href="http://www.v2ex.com/t/103051" target="_blank" rel="external">OS X 下真怀念 Source Insight</a></p>
+</blockquote>
+</li>
+<li><p>源码下载：<br>如果你有梯子：<br><a href="https://source.android.com/source/building.html" target="_blank" rel="external">官方下载</a><br><a href="https://android.googlesource.com/" target="_blank" rel="external">git路径</a><br>如果没有:<br><a href="https://github.com/android/platform_frameworks_base" target="_blank" rel="external">github路径</a> （可以直接download zip或者使用git clone）</p>
+<blockquote>
+<p><strong>欢迎读者提供优质下载路径(镜像等)来共享</strong></p>
+</blockquote>
+</li>
+</ul>
+<p>##相关知识</p>
+<ul>
+<li><strong>Java</strong><br>Java是AOSP的主要语言之一. 没得说, 必需熟练掌握.<br>熟练的Android App开发</li>
+<li><strong>Linux</strong><br>Android基于Linux的, 并且AOSP的推荐编译环境是Ubuntu 12.04. 所以熟练的使用并了解Linux这个系统是必不可少的. 如果你想了解偏底层的代码, 那么必需了解基本的Linux环境下的程序开发. 如果再深入到驱动层, 那么Kernel相关的知识也要具备.</li>
+<li><strong>设计模式</strong><br>去学习一下，android系统里的代码很多地方都闪烁着设计模式的光芒，这也是你成为大牛的必经之路.当然你只要先了解一下，在阅读中慢慢感受就行。</li>
+<li><strong>Make</strong><br>AOSP使用Make系统进行编译. 了解基本的Makefile编写会让你更清晰了解AOSP这个庞大的项目是如何构建起来的.</li>
+<li><strong>Git</strong><br>AOSP使用git+repo进行源码管理. 这应该是程序员必备技能吧.</li>
+<li><strong>C++</strong><br>Android系统的一些性能敏感模块及第三方库是用C++实现的, 比如: Input系统, Chromium项目(WebView的底层实现).</li>
+</ul>
+<p>##感谢知乎及知乎er<br><a href="http://www.zhihu.com/question/19759722" target="_blank" rel="external">大牛们是怎么阅读 Android 系统源码的？</a></p>
+<p>##彩蛋<br>最后，很多优秀资源来源于国外，如果android学习者连android官网都打不开的话，那就有点。。。<br>关于vpn要<strong>委婉吐槽</strong>一句：</p>
+<blockquote>
+<p>与其像本人以前一样花一大堆时间去搜索各种不稳定的<strong>免费vpn</strong>，还真心不如花个十几块钱省一个月心来的实在。学习技术总要支付学费，但购买优质vpn这点个人觉得是性价比极高也极机智的做法。</p>
+</blockquote>
+<p>##关于作者<br>欢迎关注本人的<a href="https://github.com/wingjay" target="_blank" rel="external">Github</a> <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a>, 及阅读本人相关文章<br><a href="http://www.jianshu.com/p/cf496fc408b2" target="_blank" rel="external">《如何在一天之内完成一款具备cool属性的Android产品&lt;简诗&gt;》</a></p>
+
+            
+          </span>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
 
   </section>
 
