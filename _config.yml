@@ -63,8 +63,8 @@ pagination_dir: page
 # Extensions
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
-theme: hexo-theme-next
-## hexo-theme-next tranquilpeak
+theme: next
+## next tranquilpeak
 
 plugins:
 - hexo-generator-cname
