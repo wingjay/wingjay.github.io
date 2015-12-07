@@ -36,7 +36,7 @@ tags: [<一天变cool>系列, 个人博客]
 下文以搭建 https://wingjay.com 个人博客为例。
 
 ### 1. GitHub Pages
-在不购买服务器的前提下，我们的网站需要挂在GitHub Pages上。
+在不购买服务器的前提下，我们的网站需要挂在GitHub Pages上。GitHub Pages是面向用户、组织和项目开放的公共静态页面搭建托管服务，可用于搭建个人博客。
 
 0. 你需要拥有一个[GitHub账号](https://github.com)，去完成新手任务吧。
 1. 进入[GitHub Pages](https://pages.github.com/)，一步步做，完成后就能在浏览器打开[http://wingjay.github.io](http://wingjay.github.io)了。
@@ -63,6 +63,8 @@ git clone https://github.com/wingjay/wingjay.github.io
 
 ##### iv. 熟悉Hexo
 为了让读者快速了解`Hexo`，我作几个简单介绍吧。当然，更多的还是需要仔细阅读[文档](https://hexo.io/docs/writing.html)才能了解更详细。
+
+![hexo目录结构](/img/hexo目录)
 
  - `_config.yml`是整体的配置文件，很多基础配置、插件配置等都需要在里面进行。要注意的是，该文件格式要求极为严格，缺少一个空格都会导致运行错误。小提示：不要用Tab缩进，用两个空格符。
  - `layout`，包括`draft、page、post`。这个就是三种文件的基本格式，其中`post`是你发表的文章，会显示在你的网站里，一篇post会包括`title标题、date日期、tags标签`等信息；`draft`是草稿，只有你在本地能看到，必须要`publish`后才能成为`post`，draft和post差别是date，因为draft没有发表，所以不需要指定日期。`page`是一个页面，对应一个新的html页面，比如[博客内容展示页](http://wingjay.com/2015/12/06/%E8%AF%B4%E4%B8%80%E8%AF%B4%E5%8D%9A%E5%AE%A2/)是一个页面，[留言本](http://wingjay.com/guestbook/)也是一个页面。
