@@ -13,7 +13,7 @@ description: 用艺术的眼光发现技术的美
 author: wingjay
 language: zh-Hans
 timezone: 
-keywords: [android, github, 技术博客, 移动开发, 干货]
+keywords: [android, github, 技术博客, 移动开发, google]
 avatar: https://avatars2.githubusercontent.com/u/9619875?v=3&s=400
 
 # URL
@@ -48,14 +48,6 @@ highlight:
   line_number: true
   auto_detect: true
   tab_replace:
-marked:
-  gfm: true
-  pedantic: false
-  sanitize: false
-  tables: true
-  breaks: true
-  smartLists: true
-  smartypants: true
 # Category & Tag
 default_category: uncategorized
 category_map:
@@ -92,8 +84,21 @@ disqus_shortname: wingjay
 ## baidu analytics
 baidu_analytics: 5bbd26412404683ce820c9bf65201e84
 
+## google analytics
+google_analytics: UA-71080154-1
+
 ## Swiftype search engine
 swiftype_key: dy8yyns4r9yK2d_PJbVM
+
+# markdown
+marked:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
 
 plugins:
 - hexo-generator-cname
