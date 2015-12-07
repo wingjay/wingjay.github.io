@@ -18,7 +18,8 @@ avatar: https://avatars2.githubusercontent.com/u/9619875?v=3&s=400
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yinjie.me/
+url: https://wingjay.com/
+enforce_ssl: wingjay.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -109,11 +110,10 @@ sitemap:
 baidusitemap:
   path: baidusitemap.xml
 
-
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy: 
   type: git
   repo: 
     github: https://github.com/wingjay/wingjay.github.io.git,master
-    gitcafe: https://gitcafe.com/wingjay/wingjay.git,gitcafe-pages
+    gitcafe: https://gitcafe.com/wingjay/wingjay.git,gh-pages
