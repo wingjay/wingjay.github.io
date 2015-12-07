@@ -103,6 +103,13 @@ marked:
 plugins:
 - hexo-generator-cname
 
+# Sitemap
+sitemap:
+  path: sitemap.xml
+baidusitemap:
+  path: baidusitemap.xml
+
+
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy: 
