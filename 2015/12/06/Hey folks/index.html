@@ -56,7 +56,7 @@ This is my first post here and I will write more here. Interested with me? Keep 
 Thanks!">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hey folks">
-<meta property="og:url" content="http://yinjie.me/2015/12/06/Hey folks/index.html">
+<meta property="og:url" content="https://wingjay.com/2015/12/06/Hey folks/index.html">
 <meta property="og:site_name" content="wingjay">
 <meta property="og:description" content="Hi, I’m Jay! Welcome!
 This is my first post here and I will write more here. Interested with me? Keep your eyes here!
@@ -79,6 +79,15 @@ Thanks!">
 </script>
 
   <title> Hey folks | wingjay </title>
+  <link rel="canonical" href=" { { site.url } }{ { page.url } }" />
+  <script type="text/javascript">
+    var host = "wingjay.com";
+    if ((host == window.location.host) && (window.location.protocol != "https:"))
+        window.location.protocol = "https";
+    var host = "yinjie.me";
+    if ((host == window.location.host) && (window.location.protocol != "https:"))
+        window.location.protocol = "https";
+  </script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -520,7 +529,7 @@ Thanks!">
       var disqus_shortname = 'wingjay';
       var disqus_identifier = '2015/12/06/Hey folks/';
       var disqus_title = 'Hey folks';
-      var disqus_url = 'http://yinjie.me/2015/12/06/Hey folks/';
+      var disqus_url = 'https://wingjay.com/2015/12/06/Hey folks/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
