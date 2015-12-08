@@ -236,15 +236,6 @@
 
     
     
-      
-      
-        
-        
-        
-      
-
-      
-    
 
     
       
@@ -311,79 +302,17 @@
 
       
         
-          <span itemprop="articleBody">
-            
-              <p><img src="/img/我的博客.png" alt="个人博客"></p>
+          <p><img src="/img/我的博客.png" alt="个人博客"></p>
 <blockquote>
 <p>对程序员而言，最好的简历就是个人博客和GitHub</p>
 </blockquote>
 <h2 id="u96F6_u3001_u4E2A_u4EBA_u535A_u5BA2"><a href="#u96F6_u3001_u4E2A_u4EBA_u535A_u5BA2" class="headerlink" title="零、个人博客"></a>零、个人博客</h2><p>每个优秀的程序员都会有个人独占的一方网络空间，那里是他个人的舞台，听说过他的人会逐渐汇聚进来，认识他，熟悉他，鼓励他，赞扬他。而对他个人而言，他有了一个可以畅所欲言的小房间，他可以专研学术，聊聊情怀。同时和喜爱他的读者成为好友，共同成长。</p>
 <p>这难道不是一件很cool的事情吗？</p>
-<h2 id="u4E00_u3001_u5148_u770B_u6210_u679C"><a href="#u4E00_u3001_u5148_u770B_u6210_u679C" class="headerlink" title="一、先看成果"></a>一、先看成果</h2><p>教方法前先来看看最终的效果吧。<a href="http://wingjay.com">http://wingjay.com</a>是本人搭建的个人博客，主要有以下几点：</p>
-<pre><code>1. 个人域名: wingjay.com
-2. 无需购置服务器，本站同时挂载在Github Pages 和 GitCafe Pages上，免服务器费的同时还能做负载均衡，想想还有点小激动
-3. 在GitHub上同时管理你的博客和相应代码，再也不用担心博客遗失
-4. SSL支持，即&quot;http://&quot; -&gt; &quot;https://&quot;，更安全也更高大上
-</code></pre><h2 id="u4E8C_u3001_u518D_u770B_u5175_u5668"><a href="#u4E8C_u3001_u518D_u770B_u5175_u5668" class="headerlink" title="二、再看兵器"></a>二、再看兵器</h2><ul>
-<li>博客框架：<a href="https://hexo.io" target="_blank" rel="external">Hexo 3</a>，这是一款能快速、简洁且高效的博客框架，支持<a href="https://help.github.com/articles/markdown-basics/" target="_blank" rel="external">Markdown编辑</a>，自动渲染出漂亮的静态页面。</li>
-<li>前端主题：<a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="external">Next</a>，效果参考<a href="http://wingjay.com">http://wingjay.com</a></li>
-<li>域名购买：<a href="http://wanwang.aliyun.com/" target="_blank" rel="external">万网</a>，你可以选购自己名字的域名，一年几十元左右，两杯咖啡的钱。</li>
-<li>SSL：<a href="https://www.cloudflare.com" target="_blank" rel="external">CloudFlare</a></li>
-</ul>
-<h2 id="u4E09_u3001_u6284_u8D77_u5BB6_u4F19"><a href="#u4E09_u3001_u6284_u8D77_u5BB6_u4F19" class="headerlink" title="三、抄起家伙"></a>三、抄起家伙</h2><p>本文写作方式是<code>安装流程主线</code> + <code>优质参考文章</code>。由于网络上关于Hexo搭建博客的教程玲琅满目，若读者完全自己动手则要一篇篇找，浪费时间走弯路；相反，若作者悉数摘抄进来，反倒未必符合各人情况，且不利阅读。</p>
-<p>所以，<code>主线</code>讲解思路，<code>参考</code>深入阅读。</p>
-<p>下文以搭建 <a href="http://wingjay.com">http://wingjay.com</a> 个人博客为例。</p>
-<h3 id="1-_GitHub_Pages"><a href="#1-_GitHub_Pages" class="headerlink" title="1. GitHub Pages"></a>1. GitHub Pages</h3><p>在不购买服务器的前提下，我们的网站需要挂在GitHub Pages上。GitHub Pages是面向用户、组织和项目开放的公共静态页面搭建托管服务，可用于搭建个人博客。</p>
-<ol>
-<li>你需要拥有一个<a href="https://github.com" target="_blank" rel="external">GitHub账号</a>，去完成新手任务吧。</li>
-<li>进入<a href="https://pages.github.com/" target="_blank" rel="external">GitHub Pages</a>，一步步做，完成后就能在浏览器打开<a href="http://wingjay.github.io" target="_blank" rel="external">http://wingjay.github.io</a>了。</li>
-</ol>
-<p>至此，我们已经利用GitHub Pages搭建好了个人博客雏形了。下面要做的，就是个性化了。</p>
-<h3 id="2-__u5B89_u88C5Hexo_u535A_u5BA2_u6846_u67B6"><a href="#2-__u5B89_u88C5Hexo_u535A_u5BA2_u6846_u67B6" class="headerlink" title="2. 安装Hexo博客框架"></a>2. 安装Hexo博客框架</h3><p>经过上面步骤，我们已经拥有了一个初步域名：<a href="http://username.github.io" target="_blank" rel="external">http://username.github.io</a> 加一个免费网络空间了。好比房间有了，但还没有任何家具。所以下面我们需要把空白的博客丰富起来。</p>
-<p>放心，不需要你手写一大堆html、css文件，也不用找jQuery来实现酷炫的页面效果。<a href="https://hexo.io" target="_blank" rel="external">Hexo</a>是一款博客框架，它会帮我们搭建。</p>
-<h5 id="i-__u5B89_u88C5Hexo"><a href="#i-__u5B89_u88C5Hexo" class="headerlink" title="i. 安装Hexo"></a>i. 安装Hexo</h5><p>参考<a href="https://hexo.io/docs/" target="_blank" rel="external">中文文档</a>或<a href="https://hexo.io/zh-cn/docs/index.html" target="_blank" rel="external">英文文档</a>。完成该步后，你的电脑便拥有了Git、Node.js和Hexo。</p>
-<h5 id="ii-_GitHub_u7BA1_u7406"><a href="#ii-_GitHub_u7BA1_u7406" class="headerlink" title="ii. GitHub管理"></a>ii. GitHub管理</h5><p>为了让自己未来的博客和代码处在git管理之下，我们要把刚刚在Github上博客项目拉到本地。如本人创建的<a href="https://github.com/wingjay/wingjay.github.io" target="_blank" rel="external">https://github.com/wingjay/wingjay.github.io</a>，在本地创建文件夹，名字任意，此处设为<code>myblog</code>，进入该文件夹，把项目代码clone下来。<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">https</span>://github.com/wingjay/wingjay.github.io</span><br></pre></td></tr></table></figure></p>
-<p>好了，此时会自动在<code>myblog</code>目录下创建子文件夹<code>wingjay.github.io</code>,那里就是我们博客的代码，以后的操作都在git的管理之下了，此时默认的branch为<code>master</code>。</p>
-<h5 id="iii-__u521D_u59CB_u5316Hexo"><a href="#iii-__u521D_u59CB_u5316Hexo" class="headerlink" title="iii. 初始化Hexo"></a>iii. 初始化Hexo</h5><p>请参考<a href="https://hexo.io/docs/setup.html" target="_blank" rel="external">文档</a>。init命令中的<code>&lt;folder&gt;</code>就是文件夹<code>wingjay.github.io</code>。初始化后，<code>wingjay.github.io</code>里面就已经有完整的Hexo框架了。</p>
-<h5 id="iv-__u719F_u6089Hexo"><a href="#iv-__u719F_u6089Hexo" class="headerlink" title="iv. 熟悉Hexo"></a>iv. 熟悉Hexo</h5><p>为了让读者快速了解<code>Hexo</code>，我作几个简单介绍吧。当然，更多的还是需要仔细阅读<a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">文档</a>才能了解更详细。</p>
-<p><img src="/img/hexo目录.png" alt="hexo目录结构"></p>
-<ul>
-<li><code>_config.yml</code>是整体的配置文件，很多基础配置、插件配置等都需要在里面进行。要注意的是，该文件格式要求极为严格，缺少一个空格都会导致运行错误。小提示：不要用Tab缩进，用两个空格符。</li>
-<li><code>layout</code>，包括<code>draft(草稿)、page(页面)、post(文章)</code>。这个就是三种文件的基本格式，其中<code>post</code>是你发表的文章，会显示在你的网站里，一篇post会包括<code>title标题、date日期、tags标签</code>等信息；<code>draft</code>是草稿，只有你在本地能看到，必须要<code>publish</code>后才能成为<code>post</code>，draft和post差别是date，因为draft没有发表，所以不需要指定日期。<code>page</code>是一个页面，对应一个新的html页面，比如<a href="http://wingjay.com/2015/12/06/%E8%AF%B4%E4%B8%80%E8%AF%B4%E5%8D%9A%E5%AE%A2/">博客内容展示页</a>是一个页面，<a href="http://wingjay.com/guestbook/">留言本</a>也是一个页面。</li>
-<li><code>public文件夹</code>，这个文件夹是最终会发布到网站上的真实内容。怎么理解呢？我们可以把<code>public</code>文件夹当作是真正的被用户看到的，而其他的<code>source、themes</code>等都是为<code>public</code>服务的。Hexo里有一个很重要的指令<code>hexo generate</code>，这个指令就是利用所有代码里的配置信息、source里写的文章、themes里的样式，共同生成最终的<code>静态html文件</code>，存入<code>public</code>文件夹内。在我们执行了发布指令<code>hexo deploy</code>后，就会把<code>public</code>的内容部署到<code>GitHub Pages</code>上。当用户在访问我们的博客时，他们会看到public里生成的html文件。这个概念非常重要，即<code>代码和真实静态页面是独立的</code>。</li>
-<li><code>generate和deploy</code>，<code>generate</code>会把我们的配置、文章和主题结合起来生成一堆酷炫的html静态文件放在public里面。但此时用户还看不到<code>本地public文件</code>里的页面，我们必须用后一个指令<code>deploy</code>才能把静态文件部署到<code>GitHub Pages</code>上。不过，在部署前，需要配置让它自动部署到我们前面创建的<a href="https://github.com/wingjay/wingjay.github.io" target="_blank" rel="external">Github项目</a>中。</li>
-<li><code>deploy</code>相关配置。为了能够让项目自动把public文件夹的内容部署到<a href="https://github.com/wingjay/wingjay.github.io" target="_blank" rel="external">GitHub项目</a>中，我们可以按<a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">部署文档</a>进行配置，其中选择的<code>branch</code>为<code>master</code>。此后，每次运行deploy后，项目就会自动把public文件夹内容全部覆盖到<a href="https://github.com/wingjay/wingjay.github.io/tree/master" target="_blank" rel="external">当前的GitHub项目master分支上</a>。</li>
-<li><code>代码</code>和<code>静态文件</code>分开管理。根据上面知道，每次部署后，public文件内容会<code>覆盖</code>掉项目整个master分支。这样可以实现网站<code>静态文件</code>的版本控制，但是，仔细对比这个master分支，我们会发现里面<strong>只剩下静态文件</strong>了，我们的代码比如source、themes统统没有了，这就导致无法对代码进行版本管理了。这意味着我换一台电脑，我就再也找不到<code>代码</code>了，只剩下一堆之前编译出来的静态文件。所以，为了对代码也进行版本控制，我们创建一个<a href="https://github.com/wingjay/wingjay.github.io/tree/code" target="_blank" rel="external">新的分支：code</a>，然后在这个分支里进行代码控制，master里则保存部署的新的静态文件。大家可以自行比对这两个branch的内容差异。</li>
-</ul>
-<h5 id="v-__u914D_u7F6EHexo"><a href="#v-__u914D_u7F6EHexo" class="headerlink" title="v. 配置Hexo"></a>v. 配置Hexo</h5><p>做一些基础配置即可，请参考<a href="https://hexo.io/docs/configuration.html" target="_blank" rel="external">配置文档</a></p>
-<h5 id="vi-__u5C0F_u7ED3"><a href="#vi-__u5C0F_u7ED3" class="headerlink" title="vi. 小结"></a>vi. 小结</h5><p>到这里，我们已经完成了hexo的配置，我们可以在GitHub用不同branch分别管理代码和静态文件。执行deploy操作后，刷新你的网页 <a href="http://username.github.io" target="_blank" rel="external">http://username.github.io</a> 你就能看到默认的内容了。</p>
-<p>但此时还是默认主题，不够美观，所以下一步要配置Next主题。</p>
-<h3 id="3-__u914D_u7F6E_u4E3B_u9898Next"><a href="#3-__u914D_u7F6E_u4E3B_u9898Next" class="headerlink" title="3. 配置主题Next"></a>3. 配置主题Next</h3><p>Hexo主题非常多，可以参考<a href="https://hexo.io/themes/" target="_blank" rel="external">丰富多彩的Hexo主题</a>，本文选Next为主题，样式参考<a href="http://wingjay.com">我的博客</a>。</p>
-<p>进入配置阶段，最好的文档还是<a href="http://theme-next.iissnan.com/" target="_blank" rel="external">官方文档</a>，简单得不能再细致了。下面只提几点注意：</p>
-<ul>
-<li>第三方评论系统。评论系统很重要，你可以与读者进行更多交流，配置也简单，建议采用<a href="https://disqus.com/" target="_blank" rel="external">DISQUS</a>，更国际化一点，<a href="http://theme-next.iissnan.com/third-party-services.html#DISUQS" target="_blank" rel="external">配置见此</a>。另外，前期建议开启<code>不登陆评论</code>，即在Disqus的<code>Comment Rule</code>里允许<code>Guest comment</code>。</li>
-<li>创建留言板。熟悉<code>page</code>的创建与使用，<a href="http://www.arao.me/2015/hexo-next-theme-optimize-base/#为你的hexo网站NexT主题增加留言页" target="_blank" rel="external">参考这里</a></li>
-<li>给自己博客做<code>SEO</code>。有好的SEO便于搜索引擎索引你的网站，随着以后读者增多，他们可以更好搜索到你的网站。<a href="http://www.arao.me/2015/hexo-next-theme-optimize-seo/" target="_blank" rel="external">具体方法见此</a></li>
-</ul>
-<!-- ![Disqus评论系统](/img/Disqus评论系统.png) -->
-<h3 id="4-__u66FF_u6362_u81EA_u5DF1_u7684_u57DF_u540D"><a href="#4-__u66FF_u6362_u81EA_u5DF1_u7684_u57DF_u540D" class="headerlink" title="4. 替换自己的域名"></a>4. 替换自己的域名</h3><p>好了，经过上面的步骤，博客已经拥有了一个全新的主题啦。</p>
-<p>下面，我们要对域名 <a href="http://wingjay.github.io" target="_blank" rel="external">http://wingjay.github.io</a> 下手啦。</p>
-<h5 id="i-__u8D2D_u4E70_u57DF_u540D"><a href="#i-__u8D2D_u4E70_u57DF_u540D" class="headerlink" title="i. 购买域名"></a>i. 购买域名</h5><p>速速前往<a href="http://wanwang.aliyun.com/" target="_blank" rel="external">万网</a>，支付宝刷的一声，你就拥有了一个闪闪发光的个人域名啦</p>
-<h5 id="ii-__u57DF_u540D_u89E3_u6790_1"><a href="#ii-__u57DF_u540D_u89E3_u6790_1" class="headerlink" title="ii. 域名解析_1"></a>ii. 域名解析_1</h5><p>以购买的域名<code>wingjay.com</code>为例，我们希望在访问这个域名时能自动进入Github Pages，所以我们要在万网建立一个CNAME纪录来帮我们做一个域名跳转：<code>wingjay.com</code> -&gt; <code>wingjay.github.io</code>，<code>www.wingjay.com</code> -&gt; <code>wingjay.github.io</code>。添加方法<a href="http://www.sudu.cn/service/detail/1/0/0/3/10036.html" target="_blank" rel="external">参考这里</a>，添加后可以看到两条记录：<img src="/img/域名解析.png" alt="域名解析">。然后万网会在世界各地的DNS服务器上添加这两条记录，当用户访问<code>wingjay.com</code>时会自动去访问<code>wingjay.github.io</code>。</p>
-<h5 id="iii-__u57DF_u540D_u89E3_u6790_2"><a href="#iii-__u57DF_u540D_u89E3_u6790_2" class="headerlink" title="iii. 域名解析_2"></a>iii. 域名解析_2</h5><p>但是，此时并不能成功访问，因为github pages是有限制的，它不允许任意域名都跳转过来，而是只限制一个域名，而且这个域名必须声明在CNAME文件中。</p>
-<p>所以，我们需要添加一个CNAME文件到项目的master中才行，<a href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/" target="_blank" rel="external">参考这里</a>。读者可以参考本人的<a href="https://github.com/wingjay/wingjay.github.io/blob/master/CNAME" target="_blank" rel="external">CNAME文件内容</a>。</p>
-<p>不过，对于<code>Hexo 3</code>，<strong>这里有一个坑要注意</strong>：大家应该还记得上文说的，master分支里的内容都是自动生成的，而且会完全覆盖之前的内容。如果我们直接创建一个新文件CNAME，填好域名。但会发现在下一次部署后这个文件就消失了。不用惊讶，因为hexo并不会自动生成CNAME文件，所以在部署时被覆盖删除了。</p>
-<p>所以，我们就需要这个CNAME工具<a href="https://github.com/leecrossley/hexo-generator-cname" target="_blank" rel="external">hexo-generator-cname</a>，这时会自动在public里生成一个CNAME文件，把你的域名加进去再部署一下吧！</p>
-<h3 id="5-_HTTP_-_26gt_3B_HTTPS"><a href="#5-_HTTP_-_26gt_3B_HTTPS" class="headerlink" title="5. HTTP -&gt; HTTPS"></a>5. HTTP -&gt; HTTPS</h3><p>HTTPS是安全版的HTTP协议，它在http协议与TCP之间加入SSL层，采用端口443，不仅会对传输数据加密，还会进行身份验证。当然个人博客并没有强制性要求采用该协议，这也只是本人的好奇而为。</p>
-<p>目前Github Pages已经支持https了，但是不支持自定义证书。不过我们可以利用<a href="https://www.cloudflare.com" target="_blank" rel="external">CloudFlare</a>来实现。具体实现可以<a href="https://www.benburwell.com/posts/configuring-cloudflare-universal-ssl/" target="_blank" rel="external">参考这里</a></p>
-<p>说明：本网站的https正处在申请中</p>
-<h3 id="u56DB_u3001_u603B_u7ED3"><a href="#u56DB_u3001_u603B_u7ED3" class="headerlink" title="四、总结"></a>四、总结</h3><p>经过上面的步骤，我们已经能够通过访问自己的域名进入自己酷炫的博客了。本文的任务也就告一段落。</p>
-<p>除了上面的功能，本人还完成了<code>支持双域名同时登陆</code>，其中，支持双域名的解决思路是考虑到<a href="https://help.github.com/articles/adding-a-cname-file-to-your-repository/" target="_blank" rel="external">Github Pages的CNAME纪录只允许添加一个域名</a>，所以本人又在<a href="https://gitcafe.com" target="_blank" rel="external">Gitcafe</a>上部署了一套。不过考虑到这点大家不一定能用的上，就没有做介绍，有需要的话可以看下文的联系方式联系我。</p>
-<h3 id="u5173_u4E8E_u4F5C_u8005"><a href="#u5173_u4E8E_u4F5C_u8005" class="headerlink" title="关于作者"></a>关于作者</h3><p>欢迎各位关注<br><a href="https://github.com/wingjay" target="_blank" rel="external">我的Github</a> <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和<br><a href="http://wingjay.com">我的个人博客</a></p>
-<p>如果有问题，可以给我留言或发邮件<a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#x79;&#x69;&#x6e;&#x6a;&#105;&#101;&#115;&#104;&#x40;&#x31;&#x32;&#54;&#x2e;&#99;&#x6f;&#x6d;">&#x79;&#x69;&#x6e;&#x6a;&#105;&#101;&#115;&#104;&#x40;&#x31;&#x32;&#54;&#x2e;&#99;&#x6f;&#x6d;</a></p>
-
-            
-          </span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2015/12/07/如何在一天之内搭建以你自己名字为域名的很cool的个人博客/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
