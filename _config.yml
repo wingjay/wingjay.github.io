@@ -115,5 +115,5 @@ baidusitemap:
 deploy: 
   type: git
   repo: 
-    github: https://github.com/wingjay/wingjay.github.io.git,master
+    github: https://github.com/wingjay/wingjay.github.io.git,gh-pages
     gitcafe: https://gitcafe.com/wingjay/wingjay.git,gitcafe-pages
