@@ -122,6 +122,19 @@ HTTPS是安全版的HTTP协议，它在http协议与TCP之间加入SSL层，采�
 
 说明：本网站的https正处在申请中
 
+### 疑难杂症
+1. 本地deploy成功，但是github上的master并没有收到该commit。
+目前不知道是什么原因，本人感觉是two-factor的开启，使得本地不具备权限直接push。比较无语。
+解决方法：
+在code分支上，创建一个.deploy的文件夹，在该文件夹内把master clone下来；
+当有新的改动后，generate后把public文件夹的内容拷入进上面clone的文件夹内；
+进入上面clone下来的文件夹，手动push到master上来更新。
+该思路就是自己维护一个master文件夹，手动把生成的public内容复制进去，再push上去。
+
+快捷命令：
+alias hexodeploy='cd ~/Documents/blog/wingjay.github.io;hexo generate -d;cp -R public/ .deploy/wingjay.github.io;cd .deploy/wingjay.github.io;git add .;git commit -m "update";git push origin master'
+
+
 ## 总结
 经过上面的步骤，我们已经能够通过访问自己的域名进入自己酷炫的博客了。本文的任务也就告一段落。
 
