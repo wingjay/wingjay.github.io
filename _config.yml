@@ -20,7 +20,7 @@ avatar: https://avatars2.githubusercontent.com/u/9619875?v=3&s=400
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://wingjay.com/
 enforce_ssl: wingjay.com
-root: /
+root: /.deploy_git
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
