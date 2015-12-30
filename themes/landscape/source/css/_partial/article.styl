@@ -1,357 +1,172 @@
-.article
-  margin: block-margin 0
-
-.article-inner
-  @extend $block
-  overflow: hidden
-
-.article-meta
-  clearfix()
-
-.article-date
-  @extend $block-caption
-  float: left
-
-.article-category
-  float: left
-  line-height: 1em
-  color: #ccc
-  text-shadow: 0 1px #fff
-  margin-left: 8px
-  &:before
-    content: "\2022"
-
-.article-category-link
-  @extend $block-caption
-  margin: 0 12px 1em
-
-.article-header
-  padding: article-padding article-padding 0
-
-.article-title
-  text-decoration: none
-  font-size: 2em
-  font-weight: bold
-  color: color-default
-  line-height: line-height-title
-  transition: color 0.2s
-  a&:hover
-    color: color-link
-
-.article-entry
-  @extend $base-style
-  clearfix()
-  color: color-default
-  padding: 0 article-padding
-  p, table
-    line-height: line-height
-    margin: line-height 0
-  h1, h2, h3, h4, h5, h6
-    font-weight: bold
-  h1, h2, h3, h4, h5, h6
-    line-height: line-height-title
-    margin: line-height-title 0
+.post,.page
+  background color-section
   a
-    color: color-link
-    text-decoration: none
+    color color-blue 
     &:hover
-      text-decoration: underline
-  ul, ol, dl
-    margin-top: line-height
-    margin-bottom: line-height
-  img, video
-    max-width: 100%
-    height: auto
-    display: block
-    margin: auto
-  iframe
-    border: none
-  table
-    width: 100%
-    border-collapse: collapse
-    border-spacing: 0
-  th
-    font-weight: bold
-    border-bottom: 3px solid color-border
-    padding-bottom: 0.5em
-  td
-    border-bottom: 1px solid color-border
-    padding: 10px 0
-  blockquote
-    font-family: font-serif
-    font-size: 1.4em
-    margin: line-height 20px
-    text-align: center
-    footer
-      font-size: font-size
-      margin: line-height 0
-      font-family: font-sans
+      color color-theme
+
+article
+  header.article-info
+    @media mini
+      border-bottom 1px solid lighten(color-gray,30%)
+    >h1
+      padding 0.2em 3%
+      font-size font-size+70
+      line-height line-height
+      @media tablet
+        font-size font-size+100
+        padding-top 0.3em
+      word-wrap break-word 
+      word-break normal
+      font-smoothing antialiased
+      border-left 5px solid color-theme
+    >p.article-author
+      padding 0.3em 4% 0.3em 0
+      text-align right
+      border-bottom 1px solid lighten(color-gray,30%)
+      @media mini
+        float right
+        border-bottom none
+    >p.article-time
+      padding-top 0.5em
+      font-size 0.8em
+      text-align center
+      @media mini
+        float right
+        margin-right 1em
+        padding-top 0.1em
+        font-size 0.9em
+      &:before
+        font-family font-icon-family
+        font-size font-size+30
+        content "\f017"
+        font-smoothing()      
+  .article-content
+    padding 1.5em 4%
+    .kb      
+      padding .1em .6em
+      border 1px solid color-gray
+      background-color code-color
+      color darken(color-gray,30%)
+      box-shadow 0 1px 0 rgba(0,0,0,0.2),0 0 0 2px color-white inset
+      border-radius 3px
+      display inline-block
+      margin 0 .1em;
+      text-shadow 0 1px 0 color-white
+      line-height line-height
+      white-space nowrap
+    h1,h2
+      font-size font-size+80
+      line-height 1.2em
+    h3,h4,h5,h6
+      font-size font-size+40
+    h1,h2,h3,h3,h4,h5,h6
+      color color-heading
+      font-smoothing antialiased
+      padding 0.3em 0
+      margin 0.5em 0
+      >code
+        color darken(color-gray,20%)
+    hr 
+      border 1px solid lighten(color-gray,30%)
+    strong
+      font-weight bold
+    em
+      font-style italic
+    acronym,abbr
+      border-bottom 1px dotted
+    blockquote
+      border-left .2em solid color-theme
+      margin 0.65em 0 0.65em 4%
+      padding-left 1%
+      line-height line-height
+      font-size font-size+10
+      footer
+        background color-section
+        padding 0
+        margin 0
+        font-size 80%
+        line-height 1em
       cite
-        &:before
-          content: "—"
-          padding: 0 0.5em
-  .pullquote
-    text-align: left
-    width: 45%
-    margin: 0
-    &.left
-      margin-left: 0.5em
-      margin-right: 1em
-    &.right
-      margin-right: 0.5em
-      margin-left: 1em
-  .caption
-    color: color-grey
-    display: block
-    font-size: 0.9em
-    margin-top: 0.5em
-    position: relative
-    text-align: center
-  // http://webdesignerwall.com/tutorials/css-elastic-videos
-  .video-container
-    position: relative
-    padding-top: (9 / 16 * 100)% // 16:9 ratio
-    height: 0
-    overflow: hidden
-    iframe, object, embed
-      position: absolute
-      top: 0
-      left: 0
-      width: 100%
-      height: 100%
-      margin-top: 0
-
-.article-more-link a
-  display: inline-block
-  line-height: 1em
-  padding: 6px 15px
-  border-radius: 15px
-  background: color-background
-  color: color-grey
-  text-shadow: 0 1px #fff
-  text-decoration: none
-  &:hover
-    background: color-link
-    color: #fff
-    text-decoration: none
-    text-shadow: 0 1px darken(color-link, 20%)
-
-.article-footer
-  clearfix()
-  font-size: 0.85em
-  line-height: line-height
-  border-top: 1px solid color-border
-  padding-top: line-height
-  margin: 0 article-padding article-padding
-  a
-    color: color-grey
-    text-decoration: none
-    &:hover
-      color: color-default
-
-.article-tag-list-item
-  float: left
-  margin-right: 10px
-
-.article-tag-list-link
-  &:before
-    content: "#"
-
-.article-comment-link
-  float: right
-  &:before
-    content: "\f075"
-    font-family: font-icon
-    padding-right: 8px
-
-.article-share-link
-  cursor: pointer
-  float: right
-  margin-left: 20px
-  &:before
-    content: "\f064"
-    font-family: font-icon
-    padding-right: 6px
-
-#article-nav
-  clearfix()
-  position: relative
-  @media mq-normal
-    margin: block-margin 0
-    &:before
-      absolute-center(8px)
-      content: ""
-      border-radius: 50%
-      background: color-border
-      box-shadow: 0 1px 2px #fff
-
-.article-nav-link-wrap
-  text-decoration: none
-  text-shadow: 0 1px #fff
-  color: color-grey
-  box-sizing: border-box
-  margin-top: block-margin
-  text-align: center
-  display: block
-  &:hover
-    color: color-default
-  @media mq-normal
-    width: 50%
-    margin-top: 0
-
-#article-nav-newer
-  @media mq-normal
-    float: left
-    text-align: right
-    padding-right: 20px
-
-#article-nav-older
-  @media mq-normal
-    float: right
-    text-align: left
-    padding-left: 20px
-
-.article-nav-caption
-  text-transform: uppercase
-  letter-spacing: 2px
-  color: color-border
-  line-height: 1em
-  font-weight: bold
-  #article-nav-newer &
-    margin-right: -2px
-
-.article-nav-title
-  font-size: 0.85em
-  line-height: line-height
-  margin-top: 0.5em
-
-.article-share-box
-  position: absolute
-  display: none
-  background: #fff
-  box-shadow: 1px 2px 10px rgba(0, 0, 0, 0.2)
-  border-radius: 3px
-  margin-left: -145px
-  overflow: hidden
-  z-index: 1
-  &.on
-    display: block
-
-.article-share-input
-  width: 100%
-  background: none
-  box-sizing: border-box
-  font: 14px font-sans
-  padding: 0 15px
-  color: color-default
-  outline: none
-  border: 1px solid color-border
-  border-radius: 3px 3px 0 0
-  height: 36px
-  line-height: 36px
-
-.article-share-links
-  clearfix()
-  background: color-background
-
-$article-share-link
-  width: 50px
-  height: 36px
-  display: block
-  float: left
-  position: relative
-  color: #999
-  text-shadow: 0 1px #fff
-  &:before
-    font-size: 20px
-    font-family: font-icon
-    absolute-center(@font-size)
-    text-align: center
-  &:hover
-    color: #fff
-
-.article-share-twitter
-  @extend $article-share-link
-  &:before
-    content: "\f099"
-  &:hover
-    background: color-twitter
-    text-shadow: 0 1px darken(color-twitter, 20%)
-
-.article-share-facebook
-  @extend $article-share-link
-  &:before
-    content: "\f09a"
-  &:hover
-    background: color-facebook
-    text-shadow: 0 1px darken(color-facebook, 20%)
-
-.article-share-pinterest
-  @extend $article-share-link
-  &:before
-    content: "\f0d2"
-  &:hover
-    background: color-pinterest
-    text-shadow: 0 1px darken(color-pinterest, 20%)
-
-.article-share-google
-  @extend $article-share-link
-  &:before
-    content: "\f0d5"
-  &:hover
-    background: color-google
-    text-shadow: 0 1px darken(color-google, 20%)
-
-.article-gallery
-  background: #000
-  position: relative
-
-.article-gallery-photos
-  position: relative
-  overflow: hidden
-
-.article-gallery-img
-  display: none
-  max-width: 100%
-  &:first-child
-    display: block
-  &.loaded
-    position: absolute
-    display: block
-  img
-    display: block
-    max-width: 100%
-    margin: 0 auto
-/*
-$article-gallery-ctrl
-  position: absolute
-  top: 0
-  height: 100%
-  width: 60px
-  color: #fff
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.3)
-  opacity: 0.3
-  transition: opacity 0.2s
-  cursor: pointer
-  &:hover
-    opacity: 0.8
-  &:before
-    font-size: 30px
-    font-family: font-icon
-    position: absolute
-    top: 50%
-    margin-top: @font-size * -0.5
-
-.article-gallery-prev
-  @extend $article-gallery-ctrl
-  left: 0
-  &:before
-    content: "\f053"
-    left: 15px
-
-.article-gallery-next
-  @extend $article-gallery-ctrl
-  right: 0
-  &:before
-    content: "\f054"
-    right: 15px*/
+        font-style italic
+        padding-left 0.5em
+    ul,ol
+      padding-left 2em
+      font-size font-size+5
+      @media mini
+        padding-left 3em
+    ul li
+      list-style disc
+      text-align match-parent
+      margin 0.5em 0
+    ol li
+      list-style-type decimal
+      margin 0.5em 0
+    dl dt
+      font-weight blod
+    ul li>code,ol li>code,p code,strong code,em code
+      font-family font-mono
+      background color-code
+      color darken(color-font,10%)
+      border 1px solid darken(color-code,10%)
+      padding 0 5px
+      margin 0 2px
+      font-size 90%
+      white-space nowrap
+      text-shadow 0 1px #fff
+    p
+      font-size font-size+5
+      line-height line-height+0.2
+      margin 0.7em 0
+      @media tablet
+        margin 1.2em 0
+    img,video,figure img
+      max-width 100%
+      display block
+      margin auto
+      height auto
+      vertical-align middle
+      padding-top 0.5em
+      @media tablet 
+        padding-top 0.7em
+    figcaption,.caption
+      text-align center
+      display block
+      font-size 0.9em
+      font-weight blod
+    .video-container
+      position relative;
+      padding-top 56%
+      height 0
+      overflow hidden
+      iframe,object,embed
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        margin-top 0
+    table
+      width 100%
+      border-collapse collapse
+      border-spacing 0
+      th
+        font-weight bold
+        border-bottom 3px solid lighten(color-gray,30%)
+        padding-bottom 0.5em
+      td 
+        border-bottom 1px solid lighten(color-gray,30%)
+        padding 10px 0
+    .pullquote
+      text-align left
+      width 45%
+      margin 0
+      border none
+    .left
+      margin-left 0.5em
+      margin-right 1em
+      float left
+    .right
+      margin-right 0.5em
+      margin-left 1em
+      float right
