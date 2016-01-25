@@ -14,8 +14,8 @@ date: 2016-01-25 18:41:43
 
 <!-- more -->
 
-![ring](/img/有趣的曲线在Android上的实现/ring.pdf)
-![ring](/img/有趣的曲线在Android上的实现/box.pdf)
+![ring](/img/有趣的曲线在Android上的实现/ring.gif)
+![ring](/img/有趣的曲线在Android上的实现/box.gif)
 ![ring](/img/有趣的曲线在Android上的实现/1.png)
 ![ring](/img/有趣的曲线在Android上的实现/2.png)
 ![ring](/img/有趣的曲线在Android上的实现/3.png)
