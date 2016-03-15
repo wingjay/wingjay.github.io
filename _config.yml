@@ -116,4 +116,3 @@ deploy:
   type: git
   repo: 
     github: https://github.com/wingjay/wingjay.github.io.git,master
-    gitcafe: https://gitcafe.com/wingjay/wingjay.git,gitcafe-pages
