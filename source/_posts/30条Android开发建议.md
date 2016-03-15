@@ -3,7 +3,7 @@ date: 2016-03-15 12:03:03
 tags: 
 	- Android
 ---
-#![](https://cdn-images-1.medium.com/max/2000/1*4kl1dDdzNf6hMHdnOQzd7w.jpeg)
+![](https://cdn-images-1.medium.com/max/2000/1*4kl1dDdzNf6hMHdnOQzd7w.jpeg)
 
     There are two kinds of people ：
      those who learn the hard way and those who learn by taking someone’s advice. 
@@ -39,11 +39,11 @@ tags:
 `ProGuard`可以把code里unnecessary的method移除，压缩apk，当然还有`代码混淆`的奇效。
 - 再创建一个`DEX File`。把app里可以独立的模块或code提取出来，放到一个独立的dex文件里，你可以使用[Custom ClassLoader](http://android-developers.blogspot.it/2011/07/custom-class-loading-in-dalvik.html)来加载这些类，然后使用`接口`或`反射`来调用这些方法。不过，这个过程还是比较麻烦的。
 
-#### [RxJava](https://github.com/ReactiveX/RxJava)＋[RxAndroid](https://github.com/ReactiveX/RxAndroid)＋[Retrolambda](https://github.com/orfjackal/retrolambda)
-使用前可以通过[这篇gist](https://gist.github.com/cesarferreira/510aa2456dc0879f559f#file-rxjava-md)来了解`RxJava, RxAndroid & Retrolambda`的结合用法。这个组合可以优雅的在不同线程中处理事务，同时能够方便的实现数据流动和及时响应，而且Retrolambda能够精简你的code。其中，核心的两个概念是`Observables`和`Subscribers`，前者对外提供数据，后者监听并消费这些数据。
+#### `RxJava, RxAndroid & Retrolambda`
+使用前可以通过[这篇gist](https://gist.github.com/cesarferreira/510aa2456dc0879f559f#file-rxjava-md)来了解[RxJava](https://github.com/ReactiveX/RxJava)＋[RxAndroid](https://github.com/ReactiveX/RxAndroid)＋[Retrolambda](https://github.com/orfjackal/retrolambda)的结合用法。这个组合可以优雅的在不同线程中处理事务，同时能够方便的实现数据流动和及时响应，而且Retrolambda能够精简你的code。其中，核心的两个概念是`Observables`和`Subscribers`，前者对外提供数据，后者监听并消费这些数据。
 另外，这里有一个看起来不错的项目[Learning RxJava for Android by example](https://github.com/kaushikgopal/RxJava-Android-Samples)，等空闲时再去阅读下code。
 
-#### [Retrofit](http://square.github.io/retrofit/) ＋ RxJava
+#### `Retrofit` ＋ RxJava
 利用[Retrofit](http://square.github.io/retrofit/)与RxJava结合，为你的app提供网络请求服务。
 你可以参考这个[超赞的例子](https://gist.github.com/cesarferreira/da1e8fc5742ab1e581b7)，让你快速感受二者结合使用方法。
 
@@ -54,7 +54,8 @@ tags:
 
 关于这点，欢迎读者给出自己意见。
 
-#### [加速Gradle](https://medium.com/the-engineering-team/speeding-up-gradle-builds-619c442113cb#.vpoaqdivn)
+#### Gradle 加速
+参考[这篇文章](https://medium.com/the-engineering-team/speeding-up-gradle-builds-619c442113cb#.vpoaqdivn)来加速你的Gradle
 
 #### 架构：使用clean Architecture
 这里有两篇优质文章:[Architecting Android…The clean way?](http://fernandocejas.com/2014/09/03/architecting-android-the-clean-way/)和[Architecting Android…The evolution](http://fernandocejas.com/2015/07/18/architecting-android-the-evolution/) 分别介绍并用code实现了一个Clean架构。后面我也会专门分析下这种架构，因为对于任何一个project而言，最初的好的架构是非常重要的！所以，如果你想提高自己，那么`架构`这一关是必经之路。
@@ -63,12 +64,13 @@ tags:
 虽然做测试需要花费你不少时间，但一旦你完成了这一步，以后的开发会更加快速，app也会更加稳定。
 这里有个哥们，[对`unit test`进行了细致的点评](http://stackoverflow.com/a/67500/794485)。
 
-#### 使用`依赖注入`神器[Dagger](http://google.github.io/dagger/)
+#### 使用`依赖注入`神器`Dagger`
 如果你不知道什么是`依赖注入`，你可以先读一下这篇文章[Dependency injection on Android: Dagger (Part 1)](http://antonioleiva.com/dependency-injection-android-dagger-part-1/)，或者这篇[依赖注入](https://github.com/android-cn/blog/tree/master/java/dependency-injection)。简单来说，依赖注入替代了传统创建对象的`new`操作，当需要创建一个class的实例时，使用依赖注入从外部直接获取一个实例，具体这个实例是如何创建的不需要关心，由一个对象库统一管理每个对象的创建过程，并直接对外提供对象。这样做的好处是我们不用管实例是怎么创建的，这种抽象可以使得每个对象的创建过程变得可扩展性，只要在对象库里修改一次，那么所有用到这个实例的地方都随之变更。例如在测试时，我们希望某个mock某个对象的数据，就可以修改注入的对象。
 
-依赖注入有不少工具，不过Dagger2使用的是`编译时代码生成(code generation)`方式而不是`反射(reflection)`，所以它的性能比较出众。[这篇文章](http://fernandocejas.com/2015/04/11/tasting-dagger-2-on-android/)有对Dagger2的实践和分析。
+依赖注入有不少工具，不过[Dagger2](http://google.github.io/dagger/)使用的是`编译时代码生成(code generation)`方式而不是`反射(reflection)`，所以它的性能比较出众。[这篇文章](http://fernandocejas.com/2015/04/11/tasting-dagger-2-on-android/)有对Dagger2的实践和分析。
 
-#### [对EditText使用合适的输入类型](http://developer.android.com/training/keyboard-input/style.html)
+#### EditText
+[对EditText使用合适的输入类型](http://developer.android.com/training/keyboard-input/style.html)
 
 #### 关注新的开源library
 你可以通过[Android Arsenal](http://android-arsenal.com/cc)来保持对开源项目的关注，同时利用这个工具[dryrun](https://github.com/cesarferreira/dryrun)来快速将开源项目跑在genymotion以看到实际效果。
@@ -76,7 +78,8 @@ tags:
 #### Service
 如果你创建了Service，那么一旦这个Service完成了自己的使命，就应该立即清理掉它
 
-#### 使用[AccountManager](http://developer.android.com/reference/android/accounts/AccountManager.html)来统一管理用户的帐号密码。
+#### AccountManager
+使用[AccountManager](http://developer.android.com/reference/android/accounts/AccountManager.html)来统一管理用户的帐号密码。
 
 #### 使用`持续集成CI(Continuous Integration)`来编译并发布你的beta和release build
 持续集成可以帮助你方便的编译并发布项目，不过，不要去搭建你们自己的CI服务器，因为你需要花费太多的时间来处理硬盘空间、安全问题和预防SSL攻击等问题。你可以尝试Jenkins、circleci、 travis 或者 shippable，这些价格并不贵，而且能帮你省很多事情。
