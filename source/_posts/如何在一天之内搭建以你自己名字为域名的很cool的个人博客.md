@@ -118,9 +118,8 @@ Hexo主题非常多，可以参考[丰富多彩的Hexo主题](https://hexo.io/th
 ### HTTP -> HTTPS
 HTTPS是安全版的HTTP协议，它在http协议与TCP之间加入SSL层，采用端口443，不仅会对传输数据加密，还会进行身份验证。当然个人博客并没有强制性要求采用该协议，这也只是本人的好奇而为。
 
-目前Github Pages已经支持https了，但是不支持自定义证书。不过我们可以利用[CloudFlare](https://www.cloudflare.com)来实现。具体实现可以[参考这里](https://www.benburwell.com/posts/configuring-cloudflare-universal-ssl/)
+[Update] 目前，我的博客采用了[Kloudsec](https://kloudsec.com/github-pages)来做的https，大家可以点进去看。通过与服务商联系后，我了解到目前这项服务是免费的，不仅做https还能做负载均衡。
 
-说明：本网站的https正处在申请中
 
 ### 疑难杂症
 1. 本地deploy成功，但是github上的master并没有收到该commit。
