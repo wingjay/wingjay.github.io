@@ -46,15 +46,17 @@ app中为了请求网络数据，采用了[Retrofit](http://square.github.io/ret
     GankApi gankApi = gankRestAdapter.create(GankApi.class);
 
     public GankApi getGankApi() {    
-        return gankService;
+        return gankApi;
     }
 ##### iii. `DrakeetFactory`： 这个类用来对外生成单例`GankApi`实例，为确保`GankApi`实例只生成一次。
     public static GankApi getGankApi() {    
-        synchronized (monitor) {        
-           if (sGankApi == null) {            
-              sGankApi = new DrakeetRetrofit().getGankApi();        
-           }       
-           return sGankApi;    
+        if (sGankApi == null) {
+            synchronized (monitor) {        
+               if (sGankApi == null) {            
+                  sGankApi = new DrakeetRetrofit().getGankApi();        
+               }       
+               return sGankApi;    
+            }
         }
     }
 
@@ -127,7 +129,7 @@ app中为了请求网络数据，采用了[Retrofit](http://square.github.io/ret
 
 其中`mergeVideoWithMeizhi`是一个合并函数，把`video`信息与`meizhi`信息合并成新的`MeizhiWithVideo对象`。
 
-    public Observable<MeizhiWithVideoList> 
+    public MeizhiWithVideoList
     mergeVideoWithMeizhi(MeizhiList meizhiList, VideoList videoList) {//省略...}
 
 ![RxJava - zip](http://upload-images.jianshu.io/upload_images/281665-91320f2cce108a8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -165,7 +167,7 @@ app中为了请求网络数据，采用了[Retrofit](http://square.github.io/ret
     })
     .subscribeOn(Schedulers.computation());
 
-##### iv. 排序后，我们得到Observable<List<MeizhiWithVideo>>数据源，传给adapter去更新UI
+##### iv. 排序后，我们得到`Observable<List<MeizhiWithVideo>>`数据源，传给adapter去更新UI
 上面的`toSortedList(xxx)`方法会把`Observable<MeizhiWithVideo>`排序后重新组装成`Observable<List<MeizhiWithVideo>>`对象`sortedMVListObservable`，该对象对外发射一个`有序的List<MeizhiWithVideo>`。我们将该数据源提供给adapter供显示。
 
 代码如下：
@@ -192,7 +194,7 @@ app中为了请求网络数据，采用了[Retrofit](http://square.github.io/ret
 
 那么问题就来了，假设在A页面发出了多个网络请求，在这些网络请求还在等待响应时用户就跳转到了B页面，在以前的情况下是，A页面的网络请求仍然进行直到所有数据返回，而且当数据返回时会尝试去调用A页面的UI进行修改，而此时已经进入了B页面，所以，这不仅造成了网络资源的浪费，也存在一定的风险。
 
-有了RxJava，我们可以把每一个网络请求转化为一个`Subscription`对象，这个`Subscription`对象可以被手动`onSubscribe`，即停止订阅所请求的数据源，这样就可以暂定数据请求，而且即使数据返回回来，我也不会再接收这些数据了。
+有了RxJava，我们可以把每一个网络请求转化为一个`Subscription`对象，这个`Subscription`对象可以被手动`unsubscribe`，即停止订阅所请求的数据源，这样就可以暂定数据请求，而且即使数据返回回来，由于我已经取消订阅了，所以不会再接收这些数据了。
 
 代码实现：
 在`BaseActivity`中，创建一个`CompositeSubscription`对象来进行管理
