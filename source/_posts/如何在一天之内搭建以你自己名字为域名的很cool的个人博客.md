@@ -144,16 +144,27 @@ alias hexodeploy='cd ~/Documents/blog/wingjay.github.io;hexo generate -d;cp -R p
 
 [如何在一天之内搭建以你自己名字为域名且具备cool属性的个人博客](http://www.jianshu.com/p/99665608d295)
 
-## 关于作者
+谢谢！
+
+wingjay
+
+
+
+
+
 欢迎各位关注
 [我的Github](https://github.com/wingjay): <https://github.com/wingjay> 
 和 
 [我的个人博客](http://wingjay.com): <http://wingjay.com>
 和
+[我的简书](http://www.jianshu.com/users/da333fd63fe5/latest_articles): <http://www.jianshu.com/users/da333fd63fe5/latest_articles>
+和
 [微博 iam_wingjay](http://weibo.com/u/1625892654): <http://weibo.com/u/1625892654>
 如果有问题，可以给我留言或发邮件<mailto:yinjiesh@126.com>
 
 ![](https://avatars0.githubusercontent.com/u/9619875?v=3&s=460)
+
+![](/img/打赏.JPG)
 
 
 

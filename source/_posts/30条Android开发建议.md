@@ -105,7 +105,14 @@ tags:
 ## 小结
 本文长期更新，会保持跟踪最新的技术和研究实践经验，为大家提供有效有用的经验，少走坑。
 
-## Reach me
+谢谢！
+
+wingjay
+
+
+
+
+
 欢迎各位关注
 [我的Github](https://github.com/wingjay): <https://github.com/wingjay> 
 和 
@@ -117,3 +124,5 @@ tags:
 如果有问题，可以给我留言或发邮件<mailto:yinjiesh@126.com>
 
 ![](https://avatars0.githubusercontent.com/u/9619875?v=3&s=460)
+
+![](/img/打赏.JPG)
