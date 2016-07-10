@@ -9,6 +9,9 @@ tags:
 目的地：淮海中路＋陕西南路
 
 <img src="http://0.0.0.0:4000/img/walk_in_sh/1.JPG">
+
+<!-- more -->
+
 <img src="http://0.0.0.0:4000/img/walk_in_sh/2.JPG">
 <img src="http://0.0.0.0:4000/img/walk_in_sh/3.JPG">
 <img src="http://0.0.0.0:4000/img/walk_in_sh/4.JPG">
