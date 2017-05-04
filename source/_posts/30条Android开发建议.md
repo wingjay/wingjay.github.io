@@ -3,9 +3,7 @@ date: 2016-03-15 12:03:03
 tags: 
 	- Android
 ---
-![](https://cdn-images-1.medium.com/max/2000/1*4kl1dDdzNf6hMHdnOQzd7w.jpeg)
-
-    There are two kinds of people ：
+>    There are two kinds of people ：
      those who learn the hard way and those who learn by taking someone’s advice. 
 
 <!-- more -->
@@ -125,4 +123,3 @@ wingjay
 
 ![](https://avatars0.githubusercontent.com/u/9619875?v=3&s=460)
 
-![](/img/打赏.JPG)

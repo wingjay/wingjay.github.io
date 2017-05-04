@@ -2,15 +2,18 @@ title: '带你学开源项目：Meizhi Android之RxJava & Retrofit最佳实践'
 date: 2016-04-13 00:17:28
 tags:
 	- Android
+  - 带你学开源项目
 ---
-![](https://wallcat.imgix.net/os43HKoEfD.jpg?crop=entropy&dpr=2&h=800&ixjsv=2.1.0&q=70&w=1400)
+> 私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。
+此次来分享下 Meizhi Android 源码的分析。
+
+<!-- more -->
 
 ## 零、背景
 比起阅读枯燥的技术文档，独自苦苦摸索新技术的基本用法，还有一种更好更快速也更有效的提高自身技术的方法，那就是阅读学习优质的开源项目，通过仿写、练习最终达到理解，潜移默化提升自身编程技能。
 
 《带你学开源项目》系列将带领你深入阅读及分析当前流行的一些开源项目，并针对其中采用的新技术与精妙之处进行细致的阐述，以期让你快速掌握Android开发中的多种强大技能点。
 
-<!-- more -->
 
 ## 一、本期开源项目Meizhi Android
 本次的开源项目选择了[Meizhi Android](https://github.com/drakeet/Meizhi)，本文主要介绍该项目中采用的`RxJava`、`Retrofit`两种技术，这二者在Android开发者中非常流行，不仅能够`优美地处理异步回调`，而且能`提高代码的性能和稳定性`。而Meizhi Android中较好的覆盖了二者的多种应用场景，能够给多数开发者一个全面的学习。
@@ -246,8 +249,6 @@ wingjay
 
 欢迎各位关注
 [我的Github](https://github.com/wingjay): <https://github.com/wingjay> 
-和 
-[我的个人博客](http://wingjay.com): <http://wingjay.com>
 和
 [我的简书](http://www.jianshu.com/users/da333fd63fe5/latest_articles): <http://www.jianshu.com/users/da333fd63fe5/latest_articles>
 和
@@ -256,4 +257,3 @@ wingjay
 
 ![](https://avatars0.githubusercontent.com/u/9619875?v=3&s=460)
 
-![](/img/打赏.JPG)
