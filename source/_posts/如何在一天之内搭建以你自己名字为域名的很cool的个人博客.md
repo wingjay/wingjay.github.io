@@ -134,7 +134,7 @@ HTTPS是安全版的HTTP协议，它在http协议与TCP之间加入SSL层，采�
 该思路就是自己维护一个master文件夹，手动把生成的public内容复制进去，再push上去。
 
 快捷命令：
-alias hexodeploy='cd ~/Documents/blog/wingjay.github.io;hexo generate -d;cp -R public/ .deploy/wingjay.github.io;cd .deploy/wingjay.github.io;git add .;git commit -m "update";git push origin master'
+alias hexodeploy='cd ~/Documents/blog/wingjay.github.io;hexo generate;cp -R public/ .deploy/wingjay.github.io;cd .deploy/wingjay.github.io;git add .;git commit -m "update";    git push origin master; cd -; git add .; git commit -m "source code"; git push origin code'
 
 
 ## 总结
