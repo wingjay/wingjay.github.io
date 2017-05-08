@@ -13,7 +13,8 @@ tags:
 
 > 本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等
 
-> 文章涉及代码：https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java
+> 文章涉及代码：
+https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java
 
 <!-- more -->
 
