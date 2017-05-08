@@ -8,8 +8,11 @@ tags:
   - Annotation
 ---
 > 类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。
+
 > 这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。
+
 > 本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等
+
 > 文章涉及代码：https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java
 
 <!-- more -->
