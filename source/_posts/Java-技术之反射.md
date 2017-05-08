@@ -8,7 +8,8 @@ tags: Java
 
 >本文涉及到的知识点：`class.getDeclaredXXX()`、`XXX.getModifiers()`、`method.getReturnType()`、`method.getParameterTypes()`、`method.isAnnotationPresent(XXX.class)`、`Modifier.isStatic(method.getModifiers())` 和 `constructor.newInstance(XX)`
 
->本文涉及代码：https://github.com/wingjay/HelloJava/blob/master/data-structure/src/reflection/ForArticle.java   
+>本文涉及代码：
+https://github.com/wingjay/HelloJava/blob/master/data-structure/src/reflection/ForArticle.java   
 
 <!-- more -->
 

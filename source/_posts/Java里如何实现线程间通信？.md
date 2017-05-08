@@ -10,7 +10,9 @@ tags:
 
 > 本文涉及到的知识点：`thread.join()`, `object.wait()`, `object.notify()`, `CountdownLatch`, `CyclicBarrier`, `FutureTask`, `Callable` 等。
 
-> 本文涉及代码：https://github.com/wingjay/HelloJava/blob/master/multi-thread/src/ForArticle.java
+> 本文涉及代码：
+https://github.com/wingjay/HelloJava/blob/master/multi-thread/src/ForArticle.java
+
 <!-- more -->
 
 下面我从几个例子作为切入点来讲解下 Java 里有哪些方法来实现线程间通信。
