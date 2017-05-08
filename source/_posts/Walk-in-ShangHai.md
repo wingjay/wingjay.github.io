@@ -1,5 +1,7 @@
 title: Walk in ShangHai
 date: 2016-07-10 16:11:38
+categories:
+  - 摄影
 tags:
 	- 摄影
 ---

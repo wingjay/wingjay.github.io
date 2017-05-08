@@ -1,5 +1,8 @@
 title: '带你学开源项目：Meizhi Android之RxJava & Retrofit最佳实践'
 date: 2016-04-13 00:17:28
+categories:
+  - Android
+  - 带你学开源项目
 tags:
 	- Android
   - 带你学开源项目

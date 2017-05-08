@@ -1,5 +1,8 @@
 title: 带你学开源项目：OkHttp--自己动手实现okhttp
 date: 2016-07-21 14:54:33
+categories:
+  - Android
+  - 带你学开源项目
 tags:
     - Android
     - 带你学开源项目

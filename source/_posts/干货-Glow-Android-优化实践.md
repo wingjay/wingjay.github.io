@@ -1,5 +1,7 @@
 title: '[干货] Glow Android 优化实践'
 date: 2016-11-02 19:58:15
+categories:
+  - Android
 tags: Android
 ---
 

@@ -1,5 +1,8 @@
 title: RxLifecycle源码解析－当Activity被destory时自动停掉网络请求
 date: 2016-07-14 20:50:37
+categories:
+  - Android
+  - 带你学开源项目
 tags: 
 	- Android
 	- RxJava 

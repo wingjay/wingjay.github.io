@@ -1,5 +1,7 @@
 title: Java的equals与hashcode对比分析
 date: 2017-03-29 21:23:53
+categories:
+  - 深入理解Java技术
 tags: Java
 ---
 >在阅读《Effective Java》第3章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多Java程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。
@@ -271,8 +273,6 @@ Result: TheValue
 
 wingjay
 
-
-[我的Github](https://github.com/wingjay): <https://github.com/wingjay> 
-[微博 iam_wingjay](http://weibo.com/u/1625892654): <http://weibo.com/u/1625892654>
+http://wingjay.com
 
 如果有问题，可以给我留言或发邮件<mailto:yinjiesh@126.com>

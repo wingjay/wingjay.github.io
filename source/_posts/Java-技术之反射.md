@@ -1,5 +1,7 @@
 title: Java 技术之反射
 date: 2017-04-26 22:37:55
+categories:
+  - 深入理解Java技术
 tags: Java
 ---
 >关于Java反射机制的文章很多，这次换种方式来讲解反射的作用。
@@ -215,10 +217,6 @@ I'm a private method
 
 wingjay
 
-
-[我的Github](https://github.com/wingjay): <https://github.com/wingjay> 
-[微博 iam_wingjay](http://weibo.com/u/1625892654): <http://weibo.com/u/1625892654>
-
-如果有问题，可以给我留言或发邮件<mailto:yinjiesh@126.com>
+http://wingjay.com
 
 ![](https://avatars0.githubusercontent.com/u/9619875?v=3&s=460)

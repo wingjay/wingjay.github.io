@@ -1,4 +1,7 @@
 title: 有趣的曲线在Android上的实现
+categories:
+  - Android
+  - Performance
 tags:
   - cool
   - 动效

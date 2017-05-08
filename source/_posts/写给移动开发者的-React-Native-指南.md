@@ -1,5 +1,7 @@
 title: 写给移动开发者的 React Native 指南
 date: 2017-03-14 12:07:06
+categories:
+  - React Native
 tags: React Native
 ---
 
