@@ -88,12 +88,42 @@ Want to leave a comment? Visit <a href="https://github.com/wingjay/wingjay.githu
 .f5 {
     font-size: 14px !important;
 }
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
 </style>
-
-
 
 <script type="text/javascript">
   function loadComments(data) {
+  	var commentUrl = "location.href='https://github.com/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}'"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
     for (var i=0; i<data.length; i++) {
       var cuser = data[i].user.login;
       var cuserlink = data[i].user.html_url;
@@ -107,8 +137,7 @@ Want to leave a comment? Visit <a href="https://github.com/wingjay/wingjay.githu
       $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
     }
   }
-  console.log('start load');
-  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/1/comments", {
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}/comments", {
     headers: {Accept: "application/vnd.github.v3.html+json"},
     dataType: "json",
     success: function(msg){
