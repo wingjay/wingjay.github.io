@@ -9,6 +9,7 @@
     "hexo": "^3.1.1",
     "hexo-console-rename": "^3.0.0",
     "hexo-deployer-git": "0.0.4",
+    "hexo-filter-auto-spacing": "^0.2.1",
     "hexo-generator-archive": "^0.1.2",
     "hexo-generator-baidu-sitemap": "^0.1.2",
     "hexo-generator-category": "^0.1.2",
