@@ -200,6 +200,10 @@
         </div>
       {% endif %}
 
+      {% if page.commentIssueId %}
+        {% include '../_partials/github-comments.swig' %}
+      {% endif %}
+      
       {% set isLast = loop.index % page.per_page === 0 %}
       {% if is_index and not isLast %}
         <div class="post-eof"></div>

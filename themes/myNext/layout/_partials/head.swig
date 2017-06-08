@@ -64,6 +64,9 @@
   <meta property="fb:app_id" content="{{ theme.facebook_sdk.app_id }}" />
 {% endif %}
 
+{% if page.commentIssueId %}
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+{% endif %}
 
 {{
   open_graph({
