@@ -78,9 +78,12 @@ theme: myNext
 ## admin url: http://wingjay.duoshuo.com/
 #duoshuo_shortname: wingjay
 
+## Github comment system
+enable_github_comment: true
+
 ## Disqus comment system
 ## If you want to forbid comment in some page, add 'comments: false' in .md file top
-disqus_shortname: wingjay
+# disqus_shortname: wingjay
 
 ## baidu analytics
 baidu_analytics: 5bbd26412404683ce820c9bf65201e84
