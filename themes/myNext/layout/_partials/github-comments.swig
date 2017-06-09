@@ -15,7 +15,7 @@ Comment on Github Issue for this article(Yup I know it's cool)! click below butt
 
 <script type="text/javascript">
   function loadComments(data) {
-  	var commentUrl = "location.href='https://github.com/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}'"
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}')"
     $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
 
     for (var i=0; i<data.length; i++) {
