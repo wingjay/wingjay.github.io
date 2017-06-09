@@ -6,6 +6,7 @@ categories:
 tags:
   - Java
   - Annotation
+commentIssueId: 4  
 ---
 > 类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。
 

@@ -9,6 +9,7 @@ tags:
     - 带你学开源项目
     - 内存泄漏
     - 性能优化
+commentIssueId: 3    
 ---
 >OOM 是 Android 开发中常见的问题，而内存泄漏往往是罪魁祸首。
 

@@ -5,6 +5,7 @@ categories:
 tags: 
   - Java
   - Annotation
+commentIssueId: 5  
 ---
 
 >`注解`这种语法本身很有意思，当前很多流行库如 `Dagger`、`ButterKnife`等都是基于注解这种语法。
