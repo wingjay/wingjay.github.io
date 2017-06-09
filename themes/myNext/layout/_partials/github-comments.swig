@@ -8,10 +8,39 @@
 </div>
 
 <article class="post-content">
-<p>本站评论搭建在 Github Issue 上，请前往 <a href="https://github.com/wingjay/wingjay.github.io/issues/1/{{page.commentIssueId}}">  此文issue</a> 进行评论。（你需要有 Github 账号）<br/>
-Want to leave a comment? Visit <a href="https://github.com/wingjay/wingjay.github.io/issues/1/{{page.commentIssueId}}"> this post's issue page on GitHub</a> (you'll need a GitHub account).</p>
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
 </article>
 </div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "location.href='https://github.com/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}'"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
 
 <style type="text/css">
 .timeline-comment-wrapper {
@@ -119,31 +148,4 @@ Want to leave a comment? Visit <a href="https://github.com/wingjay/wingjay.githu
 }
 </style>
 
-<script type="text/javascript">
-  function loadComments(data) {
-  	var commentUrl = "location.href='https://github.com/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}'"
-    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
-
-    for (var i=0; i<data.length; i++) {
-      var cuser = data[i].user.login;
-      var cuserlink = data[i].user.html_url;
-      var avatarlink = data[i].user.avatar_url;
-      var clink = data[i].html_url;
-      var cbody = data[i].body_html;
-      var cavatarlink = data[i].user.avatar_url;      
-      var cdate = new Date(data[i].created_at);
-      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
-
-      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
-    }
-  }
-  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/{{ page.commentIssueId }}/comments", {
-    headers: {Accept: "application/vnd.github.v3.html+json"},
-    dataType: "json",
-    success: function(msg){
-      console.log(msg);
-      loadComments(msg);
-   }
-  });
-</script>
 </html>
