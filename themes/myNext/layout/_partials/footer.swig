@@ -19,8 +19,12 @@
   </a>
 </div>
 
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
 <span id="busuanzi_container_site_pv">
-    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
 </span>
 <span class="with-love">
     <i class="icon-next-heart fa fa-heart"></i>
