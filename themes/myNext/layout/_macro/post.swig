@@ -91,11 +91,13 @@
             {% endif %}
           {% endif %}
 
-          <span id="busuanzi_container_page_pv">
-            &nbsp; | &nbsp;
-            本文总阅读量<span id="busuanzi_value_page_pv"></span>次
-          </span>
-
+          {% if not is_index %}
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          {% endif %}
+          
           {% if not is_index and theme.facebook_sdk.enable and theme.facebook_sdk.like_button %}
             &nbsp; | &nbsp;
             <div class="fb-like" data-layout="button_count" data-share="true"></div>
@@ -203,7 +205,7 @@
       {% if page.commentIssueId %}
         {% include '../_partials/github-comments.swig' %}
       {% endif %}
-      
+
       {% set isLast = loop.index % page.per_page === 0 %}
       {% if is_index and not isLast %}
         <div class="post-eof"></div>
