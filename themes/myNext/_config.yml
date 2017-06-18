@@ -30,6 +30,7 @@ menu:
   #categories: /categories
   #about: /about
   resume: /resume
+  rss: /atom.xml
   archives: /archives
   tags: /tags
   #commonweal: /404.html

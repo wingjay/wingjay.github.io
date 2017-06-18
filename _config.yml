@@ -113,6 +113,14 @@ sitemap:
 baidusitemap:
   path: baidusitemap.xml
 
+# RSS/Atom
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+  content:
+
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy: 
