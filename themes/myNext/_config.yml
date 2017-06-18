@@ -29,6 +29,7 @@ menu:
   home: /
   #categories: /categories
   #about: /about
+  resume: /resume
   archives: /archives
   tags: /tags
   #commonweal: /404.html
@@ -44,6 +45,7 @@ menu_icons:
   # Icon Mapping.
   home: home
   about: user
+  resume: user
   categories: th
   tags: tags
   archives: archive
