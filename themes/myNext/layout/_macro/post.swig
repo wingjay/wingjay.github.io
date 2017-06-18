@@ -179,7 +179,9 @@
       {% endif %}
 
       {% if not is_index %}
-        {{ related_posts(post, site.posts) }}
+        <div class="post-nav">
+          {{ related_posts(post, site.posts) }}
+        </div>  
       {% endif %}
       
       {% if not is_index and (post.prev or post.next) and not navlessPost %}
