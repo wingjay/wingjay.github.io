@@ -1,8 +1,11 @@
 title: 如何在一天之内搭建以你自己名字为域名又具备cool属性的个人博客
 categories:
   - cool stuff
+categories:
+  - 个人博客
+  - 一天变cool  
 tags:
-  - '<一天变cool>系列'
+  - 一天变cool
   - 个人博客
 date: 2015-12-07 20:03:33
 ---
