@@ -11,7 +11,7 @@ date: 2015-12-07 20:03:33
 <!-- more -->
 
 
-![个人博客](/img/我的博客.png)
+![个人博客](/img/myblog.png)
 
 
 ## 个人博客
@@ -70,7 +70,7 @@ git clone https://github.com/wingjay/wingjay.github.io
 #### 熟悉Hexo
 为了让读者快速了解`Hexo`，我作几个简单介绍吧。当然，更多的还是需要仔细阅读[文档](https://hexo.io/docs/writing.html)才能了解更详细。
 
-![hexo目录结构](/img/hexo目录.png)
+![hexo目录结构](/img/hexo-directory.png)
 
  - `_config.yml`是整体的配置文件，很多基础配置、插件配置等都需要在里面进行。要注意的是，该文件格式要求极为严格，缺少一个空格都会导致运行错误。小提示：不要用Tab缩进，用两个空格符。
  - `layout`，包括`draft(草稿)、page(页面)、post(文章)`。这个就是三种文件的基本格式，其中`post`是你发表的文章，会显示在你的网站里，一篇post会包括`title标题、date日期、tags标签`等信息；`draft`是草稿，只有你在本地能看到，必须要`publish`后才能成为`post`，draft和post差别是date，因为draft没有发表，所以不需要指定日期。`page`是一个页面，对应一个新的html页面，比如[博客内容展示页](http://wingjay.com/2015/12/06/%E8%AF%B4%E4%B8%80%E8%AF%B4%E5%8D%9A%E5%AE%A2/)是一个页面，[留言本](http://wingjay.com/guestbook/)也是一个页面。
@@ -107,7 +107,7 @@ Hexo主题非常多，可以参考[丰富多彩的Hexo主题](https://hexo.io/th
 速速前往[万网](http://wanwang.aliyun.com/)，支付宝刷的一声，你就拥有了一个闪闪发光的个人域名啦
 
 #### 域名解析_1
-以购买的域名`wingjay.com`为例，我们希望在访问这个域名时能自动进入Github Pages，所以我们要在万网建立一个CNAME纪录来帮我们做一个域名跳转：`wingjay.com` -> `wingjay.github.io`，`www.wingjay.com` -> `wingjay.github.io`。添加方法[参考这里](http://www.sudu.cn/service/detail/1/0/0/3/10036.html)，添加后可以看到两条记录：![域名解析](/img/域名解析.png)。然后万网会在世界各地的DNS服务器上添加这两条记录，当用户访问`wingjay.com`时会自动去访问`wingjay.github.io`。
+以购买的域名`wingjay.com`为例，我们希望在访问这个域名时能自动进入Github Pages，所以我们要在万网建立一个CNAME纪录来帮我们做一个域名跳转：`wingjay.com` -> `wingjay.github.io`，`www.wingjay.com` -> `wingjay.github.io`。添加方法[参考这里](http://www.sudu.cn/service/detail/1/0/0/3/10036.html)，添加后可以看到两条记录：![域名解析](/img/host.png)。然后万网会在世界各地的DNS服务器上添加这两条记录，当用户访问`wingjay.com`时会自动去访问`wingjay.github.io`。
 
 #### 域名解析_2
 但是，此时并不能成功访问，因为github pages是有限制的，它不允许任意域名都跳转过来，而是只限制一个域名，而且这个域名必须声明在CNAME文件中。
