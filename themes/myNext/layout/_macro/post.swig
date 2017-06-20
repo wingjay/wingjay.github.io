@@ -5,6 +5,7 @@
 
   {% set post_class = 'post post-type-' + post.type | default('normal') %}
   {% set post_class = post_class + ' ' + post_extra_class | default('') %}
+  {% set pure_date = post.date / 1000 %}
   {% if post.sticky > 0 %}
     {% set post_class = post_class + ' ' + 'post-sticky' %}
   {% endif %}
@@ -47,6 +48,19 @@
         {% endif %}
 
         <div class="post-meta">
+          {% if pure_date % 5 == 0 %}
+            <i class="fa fa-motorcycle"></i>
+          {% elseif pure_date % 5 == 1 %}
+            <i class="fa fa-rocket"></i>
+          {% elseif pure_date % 5 == 2 %}
+            <i class="fa fa-bicycle"></i>
+          {% elseif pure_date % 5 == 3 %}
+            <i class="fa fa-subway"></i>
+          {% elseif pure_date % 5 == 4 %}
+            <i class="fa fa-rocket"></i>
+          {% endif %}  
+
+
           <span class="post-time">
             {{ __('post.posted') }}
             <time itemprop="dateCreated" datetime="{{ moment(post.date).format() }}" content="{{ date(post.date, config.date_format) }}">
