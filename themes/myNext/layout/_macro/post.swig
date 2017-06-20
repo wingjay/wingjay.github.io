@@ -100,7 +100,7 @@
 
           <span=>
             &nbsp; | &nbsp;
-            {{ wordcount(post.content) }} 字数
+            {{ wordcount(post.content) }} 字
           </span>
 
           {% if not is_index and theme.facebook_sdk.enable and theme.facebook_sdk.like_button %}
