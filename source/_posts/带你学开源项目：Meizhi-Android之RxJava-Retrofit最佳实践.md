@@ -6,6 +6,7 @@ categories:
 tags:
 	- Android
   - 带你学开源项目
+commentIssueId: 16  
 ---
 > 私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。
 此次来分享下 Meizhi Android 源码的分析。

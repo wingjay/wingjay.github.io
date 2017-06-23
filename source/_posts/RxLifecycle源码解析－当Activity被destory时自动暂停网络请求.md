@@ -7,6 +7,7 @@ tags:
 	- Android
 	- RxJava 
   - 带你学开源项目
+commentIssueId: 15  
 ---
 
 > 私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。

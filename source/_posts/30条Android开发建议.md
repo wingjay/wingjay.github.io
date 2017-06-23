@@ -4,6 +4,7 @@ categories:
   - Android
 tags: 
 	- Android
+commentIssueId: 17	
 ---
 >    There are two kinds of people ：
      those who learn the hard way and those who learn by taking someone’s advice. 

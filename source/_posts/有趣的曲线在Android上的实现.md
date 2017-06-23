@@ -6,6 +6,7 @@ tags:
   - cool
   - 动效
 date: 2016-01-25 18:41:43
+commentIssueId: 19
 ---
 > 简单的数学原理其实很有趣
 

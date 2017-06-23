@@ -3,6 +3,7 @@ date: 2017-03-14 12:07:06
 categories:
   - React Native
 tags: React Native
+commentIssueId: 10
 ---
 
 > React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。

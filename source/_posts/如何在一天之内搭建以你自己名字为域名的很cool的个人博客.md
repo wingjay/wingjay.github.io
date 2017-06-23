@@ -8,6 +8,7 @@ tags:
   - 一天变cool
   - 个人博客
 date: 2015-12-07 20:03:33
+commentIssueId: 20
 ---
 >对程序员而言，最好的简历就是个人博客和GitHub。
 

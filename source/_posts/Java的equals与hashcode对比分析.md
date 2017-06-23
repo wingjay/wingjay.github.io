@@ -3,6 +3,7 @@ date: 2017-03-29 21:23:53
 categories:
   - 深入理解Java技术
 tags: Java
+commentIssueId: 8
 ---
 >在阅读《Effective Java》第3章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多Java程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。
 
