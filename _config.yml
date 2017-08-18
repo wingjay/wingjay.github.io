@@ -105,7 +105,7 @@ marked:
   smartypants: true
 
 plugins:
-- hexo-generator-cname
+#- hexo-generator-cname
 
 # Sitemap
 sitemap:
