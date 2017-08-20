@@ -1,6 +1,7 @@
 title: Hey folks
 tags: welcome
 date: 2015-12-05 21:39:28
+commentIssueId:  
 ---
 
 ![Hey folks](/img/hey_folks.jpg)
