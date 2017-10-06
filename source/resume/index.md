@@ -19,7 +19,7 @@ Second place of IBM Mobile Application Development Competition, 2014.
 
 
 **Experience**
-3 years experience in Android & Java;
+3.5 years experience in Android & Java;
 Serveral months in React Native;
 1.5 years in Python backend + Flask + Nginx + Redis + MySQL + AliYun;
 Half year in Web fronted.
@@ -32,7 +32,7 @@ Half year in Web fronted.
 
 **My job in Alibaba**
 Develop a new network framework `RxApi` to make network code cleaner and more stable.
-Develop a new RecyclerView Adapter: `Lego` List, which supports multi-type item, reusable ViewHolder.
+Develop a new RecyclerView Adapter framework: `Lego` List, which supports multi-type item, reusable ViewHolder class.
 
 
 **What I did**
@@ -40,6 +40,8 @@ I write Android & Java [tech blogs](http://wingjay.com/).
 I open-source Android projects [jianshi + BlurImage](https://github.com/wingjay) etc.
 I read source code: OkHttp, LeakCanary, AOSP, RxLifecycle etc. (I love [Square](https://github.com/square), don't you?).
 I developed one personal Full-Stack project [jianshi 简诗](https://github.com/wingjay/jianshi) by myself. and Yeah, it's still alive, 25000 users, running on AliYun.
+I write [script](https://github.com/wingjay/hacker_scripts): shell + python + Node.js
+
 
 **Links**
 Github: https://github.com/wingjay
