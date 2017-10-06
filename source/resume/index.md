@@ -25,9 +25,15 @@ Serveral months in React Native;
 Half year in Web fronted.
 
 **Background**
-2015/06 - Now | Android-Server engineer | Glow | Shanghai
+2017/06 - Now | Android Senior Engineer | Alibaba, Inc. | HangZhou
+2015/06 - 2017/06 | Android-Server engineer | Glow | Shanghai
 2013/09 - 2016/06  | Master | Shanghai Jiao Tong University | Shanghai
 2009/09 - 2013/06  | Bachelor | Beijing Institute of Technology | Beijing
+
+**My job in Alibaba**
+Develop a new network framework `RxApi` to make network code cleaner and more stable.
+Develop a new RecyclerView Adapter: `Lego` List, which supports multi-type item, reusable ViewHolder.
+
 
 **What I did**
 I write Android & Java [tech blogs](http://wingjay.com/).
