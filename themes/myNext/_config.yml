@@ -29,9 +29,9 @@ menu:
   home: /
   #categories: /categories
   #about: /about
+  xiaozhuanlan: https://xiaozhuanlan.com/u/wingjay
   resume: /resume
   rss: /atom.xml
-  xiaozhuanlan: https://xiaozhuanlan.com/
   archives: /archives
   tags: /tags
   #commonweal: /404.html
