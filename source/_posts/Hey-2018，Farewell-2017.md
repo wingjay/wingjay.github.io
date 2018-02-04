@@ -4,7 +4,7 @@ permalink: hey-2018
 categories:
 	- 年度计划
 tags:
-commentIssueId: 
+commentIssueId: 27
 ---
 很久没抽出时间来写博客了，加入阿里后确实是忙，忙，忙。有不少业务提出的挑战，也有更多个人技术上的追求与挑战。
 
