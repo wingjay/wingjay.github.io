@@ -1,0 +1,1007 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="关于Java反射机制的文章很多，这次换种方式来讲解反射的作用。 本文涉及到的知识点：class.getDeclaredXXX()、XXX.getModifiers()、method.getReturnType()、method.getParameterTypes()、method.isAnnotationPresent(XXX.class)、Modifier.isStatic(method.ge">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 技术之反射">
+<meta property="og:url" content="http://wingjay.com/2017/04/26/Java-技术之反射/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="关于Java反射机制的文章很多，这次换种方式来讲解反射的作用。 本文涉及到的知识点：class.getDeclaredXXX()、XXX.getModifiers()、method.getReturnType()、method.getParameterTypes()、method.isAnnotationPresent(XXX.class)、Modifier.isStatic(method.ge">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 技术之反射">
+<meta name="twitter:description" content="关于Java反射机制的文章很多，这次换种方式来讲解反射的作用。 本文涉及到的知识点：class.getDeclaredXXX()、XXX.getModifiers()、method.getReturnType()、method.getParameterTypes()、method.isAnnotationPresent(XXX.class)、Modifier.isStatic(method.ge">
+<meta name="twitter:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 技术之反射 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 技术之反射
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-motorcycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-04-26T22:37:55+08:00" content="2017-04-26">
+              2017-04-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            1,512 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>关于 Java 反射机制的文章很多，这次换种方式来讲解反射的作用。</p>
+<p>本文涉及到的知识点：<code>class.getDeclaredXXX()</code>、<code>XXX.getModifiers()</code>、<code>method.getReturnType()</code>、<code>method.getParameterTypes()</code>、<code>method.isAnnotationPresent(XXX.class)</code>、<code>Modifier.isStatic(method.getModifiers())</code> 和 <code>constructor.newInstance(XX)</code></p>
+<p>本文涉及代码：<br><a href="https://github.com/wingjay/HelloJava/blob/master/data-structure/src/reflection/ForArticle.java" target="_blank" rel="external">https://github.com/wingjay/HelloJava/blob/master/data-structure/src/reflection/ForArticle.java</a>   </p>
+</blockquote>
+<a id="more"></a>
+<h2 id="先来看一个熟悉的 -Class"><a href="# 先来看一个熟悉的 -Class" class="headerlink" title="先来看一个熟悉的 Class"></a>先来看一个熟悉的 Class</h2><p>首先，简单来说，反射就是在运行时可以获取任意 <code>Class</code> 或 <code>Object</code> 内部所有成员属性，如成员变量、成员方法、构造函数和 Annotation。</p>
+<p>这次先给出一个大家非常熟悉的 <code>Class</code>：<code>UserBean</code>。</p>
+<p>本文要完成的任务就是，在只有一个 <code>UserBean.getClass()</code> 的情况下，利用代码 <code> 打印出其内部所有成员变量、方法，并动态执行内部用 @Invoke 修饰的成员方法</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">package com.wingjay.reflection;</div><div class="line"></div><div class="line">public class UserBean &#123;</div><div class="line"></div><div class="line">    public String userName;</div><div class="line"></div><div class="line">    private long userId;</div><div class="line"></div><div class="line">    public UserBean(String userName, long userId) &#123;</div><div class="line">        this.userName = userName;</div><div class="line">        this.userId = userId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public String getName() &#123;</div><div class="line">        return userName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public long getId() &#123;</div><div class="line">        return userId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Invoke</div><div class="line">    public static void staticMethod(String devName) &#123;</div><div class="line">        System.out.printf(&quot;Hi %s, I&apos;m a static method&quot;, devName);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Invoke</div><div class="line">    public void publicMethod() &#123;</div><div class="line">        System.out.println(&quot;I&apos;m a public method&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Invoke</div><div class="line">    private void privateMethod() &#123;</div><div class="line">        System.out.println(&quot;I&apos;m a private method&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在只提供一个 UserBean 的 Class 情况下，</p>
+<ol>
+<li>打印出这个 <code>Class</code> 内部的所有成员变量、成员方法、构造函数，包括 <code>private</code> 的；</li>
+<li>调用这个 <code>Class</code> 内部的三个用 <code>@Invoke</code> 修饰的方法：<code>staticMethod()</code>, <code>publicMethod()</code>, <code>privateMethod()</code>；</li>
+</ol>
+<h2 id="1- 打印 -UserBean-Class- 里的所有成员变量、成员方法，包括 -private- 的"><a href="#1- 打印 -UserBean-Class- 里的所有成员变量、成员方法，包括 -private- 的" class="headerlink" title="1. 打印 UserBean Class 里的所有成员变量、成员方法，包括 private 的"></a>1. 打印 UserBean Class 里的所有成员变量、成员方法，包括 private 的 </h2><p> 首先我们拥有一个 <code>Class userBeanClass = UserBean.class</code>，我们要利用这个 <code>Class</code> 来打印它的成员变量 <code>userName</code> 和 <code>userId</code>。</p>
+<h4 id="打印成员变量"><a href="# 打印成员变量" class="headerlink" title="打印成员变量"></a>打印成员变量 </h4><p> 那么如何获取成员变量呢，我们发现，Java 里提供了 <code>Field</code> 这个类来表示成员变量，提供了 <code>clazz.getDeclaredFields()</code> 来获取一个类内部声明的所有变量。因此，可以利用下面的代码获取 <code>userBeanClass</code> 内部所有的成员变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Field[] fields = userBeanClass.getDeclaredFields();</div></pre></td></tr></table></figure></p>
+<p>那么，我们如何将一个 <code>field</code> 对象打印成 <code>private String userName;</code> 这种形式呢？或者说如何分别找到 <code>private</code>、<code>String</code>、<code>userName</code> 这三个值呢？</p>
+<p>其实，<code>Field</code> 里包含了三种元素来对应它们，分别是<code>Modifier</code>、<code>Type</code>、<code>Name</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">private &lt;-- field.getModifiers();</div><div class="line">String &lt;-- field.getType();</div><div class="line">userName &lt;-- field.getName();</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">// fields</div><div class="line">Field[] fields = userBeanClass.getDeclaredFields();</div><div class="line"></div><div class="line">for(Field field : fields) &#123;</div><div class="line">    String fieldString = &quot;&quot;;</div><div class="line">    fieldString += Modifier.toString(field.getModifiers()) + &quot; &quot;; // `private`</div><div class="line">    fieldString += field.getType().getSimpleName() + &quot; &quot;; // `String`</div><div class="line">    fieldString += field.getName(); // `userName`</div><div class="line">    fieldString += &quot;;&quot;;</div><div class="line">    System.out.println(fieldString);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">public String userName;</div><div class="line">private long userId;</div></pre></td></tr></table></figure>
+<h4 id="打印成员方法"><a href="# 打印成员方法" class="headerlink" title="打印成员方法"></a>打印成员方法 </h4><p> 类似成员变量的 <code>Field</code>，成员方法也有对应的类 <code>Method</code>，首先可以通过 <code>Method[] methods = userBeanClass.getDeclaredMethods();</code> 获得所有的成员方法，然后，为了打印形如：<code>public static void staticMethod(String devName)</code>的数据，可以利用下列 <code>method</code> 提供的方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">private static &lt;-- method.getModifiers();</div><div class="line">void &lt;-- method.getReturnType();</div><div class="line">staticMethod &lt;-- method.getName();</div><div class="line">String &lt;-- method.getParameterTypes();</div></pre></td></tr></table></figure>
+<p>因此可以得到:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Method[] methods = userBeanClass.getDeclaredMethods();</div><div class="line">for (Method method : methods) &#123;</div><div class="line">    String methodString = Modifier.toString(method.getModifiers()) + &quot; &quot; ; // private static</div><div class="line">    methodString += method.getReturnType().getSimpleName() + &quot; &quot;; // void</div><div class="line">    methodString += method.getName() + &quot;(&quot;; // staticMethod </div><div class="line">    Class[] parameters = method.getParameterTypes();</div><div class="line">    for (Class parameter : parameters) &#123;</div><div class="line">        methodString += parameter.getSimpleName() + &quot; &quot;; // String</div><div class="line">    &#125;</div><div class="line">    methodString += &quot;)&quot;;</div><div class="line">    System.out.println(methodString);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public String getName()</div><div class="line">public long getId()</div><div class="line">public static void staticMethod(String)</div><div class="line">public void publicMethod()</div><div class="line">private void privateMethod()</div></pre></td></tr></table></figure></p>
+<p>可以完整的打印所有成员方法，无论是 <code>public</code> 还是 <code>private</code>，而且能打印 <code>static</code> 关键字。</p>
+<h4 id="打印构造函数"><a href="# 打印构造函数" class="headerlink" title="打印构造函数"></a>打印构造函数 </h4><p> 其实构造函数和成员函数非常类似，Java 里提供了 <code>Constructor</code> 来表示构造函数，为了打印 <code>public UserBean(String userName, long userId)</code>，可以利用下面的函数实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// constructors</div><div class="line">Constructor[] constructors = userBeanClass.getDeclaredConstructors();</div><div class="line">for (Constructor constructor : constructors) &#123;</div><div class="line">    String s = Modifier.toString(constructor.getModifiers()) + &quot; &quot;;</div><div class="line">    s += constructor.getName() + &quot;(&quot;;</div><div class="line">    Class[] parameters = constructor.getParameterTypes();</div><div class="line">    for (Class parameter : parameters) &#123;</div><div class="line">        s += parameter.getSimpleName() + &quot;, &quot;;</div><div class="line">    &#125;</div><div class="line">    s += &quot;)&quot;;</div><div class="line">    System.out.println(s);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>打印结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public com.wingjay.reflection.UserBean(String, long)</div></pre></td></tr></table></figure></p>
+<h2 id="2- 调用 -Class- 内部的用 -Invoke- 修饰的方法"><a href="#2- 调用 -Class- 内部的用 -Invoke- 修饰的方法" class="headerlink" title="2. 调用 Class 内部的用 @Invoke 修饰的方法"></a>2. 调用 Class 内部的用 <code>@Invoke</code> 修饰的方法 </h2><p> 从上面知道，我们可以利用 <code>class.getDeclaredMethods()</code> 获取一个类内部所有成员方法，接下来我们还要做的事是：</p>
+<ol>
+<li>判断这个方法是否被 <code>@Invoke</code> 修饰</li>
+<li>如果修饰，判断这个方法是不是 <code>static</code> 的</li>
+<li>如果是 <code>static</code>，则可以直接用 class 调用</li>
+<li>如果不是 <code>static</code>，那就需要实例化一个对象来调用</li>
+<li>如果这个方法是 <code>private</code> 的，要记得 <code>setAccessible(true)</code>。</li>
+</ol>
+<p>如果分别实现上面的一些功能呢？</p>
+<ul>
+<li>为了判断一个 Method 是否被某个 Annotation 修饰，可以用 <code>method.isAnnotationPresent(Invoke.class)</code> ；</li>
+<li>关于 <code>static</code> <code>private</code>，我们可以用 <code>Modifier</code> 类提供的 <code>Modifier.isStatic()</code> 和 <code>Modifier.isPrivate()</code>来判断；</li>
+<li>如果 Method 不是 static，那就要实例化对象，我们可以用 <code>class.newInstance()</code> 或者 <code>constructor.newInstance(params)</code> 来得到实例。</li>
+<li>关于执行一个 Method，可以使用 <code>method.invoke(object, ...params)</code> 方法，如果方法不是 <code>static</code> 就必须实例化一个 <code>object</code> 传给它，否则可以传 <code>null</code></li>
+</ul>
+<p>实现如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Method[] methods = userBeanClass.getDeclaredMethods(); // 获取所有成员方法</div><div class="line">for (Method method : methods) &#123;</div><div class="line">    if (method.isAnnotationPresent(Invoke.class)) &#123; // 判断是否被 @Invoke 修饰</div><div class="line">        if (Modifier.isStatic(method.getModifiers())) &#123; // 如果是 static 方法</div><div class="line">            method.invoke(null, &quot;wingjay&quot;); // 直接调用，并传入需要的参数 devName</div><div class="line">        &#125; else &#123;</div><div class="line">            Class[] params = &#123;String.class, long.class&#125;;</div><div class="line">            Constructor constructor = userBeanClass.getDeclaredConstructor(params); // 获取参数格式为 String,long 的构造函数</div><div class="line">            Object userBean = constructor.newInstance(&quot;wingjay&quot;, 11); // 利用构造函数进行实例化，得到 Object</div><div class="line">            if (Modifier.isPrivate(method.getModifiers())) &#123;</div><div class="line">                method.setAccessible(true); // 如果是 private 的方法，需要获取其调用权限</div><div class="line">            &#125;</div><div class="line">            method.invoke(userBean); // 调用 method，无须参数</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">I&apos;m a public method</div><div class="line">Hi wingjay, I&apos;m a static method</div><div class="line">I&apos;m a private method</div></pre></td></tr></table></figure></p>
+<p>可见三个方法都正常调用了，而且 <code>public static void staticMethod(String devName)</code> 的参数 <code>devName</code> 也正常传进去了。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 基于上面两个实践，我们已经能够利用反射机制，在运行状态下把一个 Class 的内部成员方法、成员变量和构造函数全部获取到，并且能够进行实例化、直接调用内部的成员方法。</p>
+<p>因此，有了反射机制，我们即使只有动态得到的 Class，也能直接得到它内部的信息、甚至调用它内部的方法。</p>
+<p>了解了反射后，下文我将介绍 <code>Annotation</code> 一些有趣的自定义实现，合理地利用 <code>Annotation</code> 能让代码更简洁，自动生成代码，实现一些常规难以实现的功能。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/09/Java里如何实现线程间通信？/" rel="next" title="Java 里如何实现线程间通信？">
+                <i class="fa fa-chevron-left"></i> Java 里如何实现线程间通信？
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/03/Java-技术之注解-Annotation/" rel="prev" title="Java 技术之注解 Annotation">
+                Java 技术之注解 Annotation <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/6')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/6/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#先来看一个熟悉的 -Class"><span class="nav-number">1.</span> <span class="nav-text">先来看一个熟悉的 Class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1- 打印 -UserBean-Class- 里的所有成员变量、成员方法，包括 -private- 的"><span class="nav-number">2.</span> <span class="nav-text">1. 打印 UserBean Class 里的所有成员变量、成员方法，包括 private 的 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#打印成员变量"><span class="nav-number">2.0.1.</span> <span class="nav-text">打印成员变量 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#打印成员方法"><span class="nav-number">2.0.2.</span> <span class="nav-text">打印成员方法 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#打印构造函数"><span class="nav-number">2.0.3.</span> <span class="nav-text">打印构造函数 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2- 调用 -Class- 内部的用 -Invoke- 修饰的方法"><span class="nav-number">3.</span> <span class="nav-text">2. 调用 Class 内部的用 @Invoke 修饰的方法 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

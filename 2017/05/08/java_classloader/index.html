@@ -1,0 +1,1041 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Annotation," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。 这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。 本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等 文章涉及代码：https://github.com/wingjay/">
+<meta name="keywords" content="Java,Annotation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 技术之类加载机制">
+<meta property="og:url" content="http://wingjay.com/2017/05/08/java_classloader/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。 这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。 本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等 文章涉及代码：https://github.com/wingjay/">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wingjay.com/img/classloader/order.png">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 技术之类加载机制">
+<meta name="twitter:description" content="类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。 这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。 本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等 文章涉及代码：https://github.com/wingjay/">
+<meta name="twitter:image" content="http://wingjay.com/img/classloader/order.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 技术之类加载机制 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 技术之类加载机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-08T20:46:38+08:00" content="2017-05-08">
+              2017-05-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,058 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>类加载机制是 Java 语言的一大亮点，使得 Java 类可以被动态加载到 Java 虚拟机中。</p>
+<p>这次我们抛开术语和概念，从例子入手，由浅入深地讲解 Java 的类加载机制。</p>
+<p>本文涉及知识点：双亲委托机制、BootstrapClassLoader、ExtClassLoader、AppClassLoader、自定义网络类加载器等</p>
+<p>文章涉及代码：<br><a href="https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java" target="_blank" rel="external">https://github.com/wingjay/HelloJava/blob/master/common/src/classloader/HelloClassLoader.java</a></p>
+</blockquote>
+<a id="more"></a>
+<h2 id="什么是 -Java- 类加载机制"><a href="# 什么是 -Java- 类加载机制" class="headerlink" title="什么是 Java 类加载机制?"></a>什么是 Java 类加载机制?</h2><p>Java 虚拟机一般使用 Java 类的流程为：首先将开发者编写的 Java 源代码（.java 文件）编译成 Java 字节码（.class 文件），然后类加载器会读取这个 .class 文件，并转换成 java.lang.Class 的实例。有了该 Class 实例后，Java 虚拟机可以利用 newInstance 之类的方法创建其真正对象了。</p>
+<p>ClassLoader 是 Java 提供的类加载器，绝大多数的类加载器都继承自 ClassLoader，它们被用来加载不同来源的 Class 文件。</p>
+<h2 id="Class- 文件有哪些来源呢"><a href="#Class- 文件有哪些来源呢" class="headerlink" title="Class 文件有哪些来源呢?"></a>Class 文件有哪些来源呢?</h2><p>上文提到了 ClassLoader 可以去加载多种来源的 Class，那么具体有哪些来源呢？</p>
+<p>首先，最常见的是开发者在应用程序中编写的类，这些类位于项目目录下；</p>
+<p>然后，有 Java 内部自带的 <code> 核心类 </code> 如 <code>java.lang</code>、<code>java.math</code>、<code>java.io</code> 等 package 内部的类，位于 <code>$JAVA_HOME/jre/lib/</code> 目录下，如 <code>java.lang.String</code> 类就是定义在 <code>$JAVA_HOME/jre/lib/rt.jar</code> 文件里；</p>
+<p>另外，还有 Java <code>核心扩展类</code>，位于 <code>$JAVA_HOME/jre/lib/ext</code> 目录下。开发者也可以把自己编写的类打包成 jar 文件放入该目录下；</p>
+<p>最后还有一种，是动态加载远程的 .class 文件。</p>
+<p>既然有这么多种类的来源，那么在 Java 里，是由某一个具体的 ClassLoader 来统一加载呢？还是由多个 ClassLoader 来协作加载呢？</p>
+<h2 id="哪些 -ClassLoader- 负责加载上面几类 -Class？"><a href="# 哪些 -ClassLoader- 负责加载上面几类 -Class？" class="headerlink" title="哪些 ClassLoader 负责加载上面几类 Class？"></a>哪些 ClassLoader 负责加载上面几类 Class？</h2><p>实际上，针对上面四种来源的类，分别有不同的加载器负责加载。</p>
+<p>首先，我们来看级别最高的 <code>Java 核心类 </code>，即<code>$JAVA_HOME/jre/lib</code> 里的核心 jar 文件。这些类是 Java 运行的基础类，由一个名为 <code>BootstrapClassLoader</code> 加载器负责加载，它也被称作 <code> 根加载器／引导加载器</code>。注意，<code>BootstrapClassLoader</code> 比较特殊，它不继承 <code>ClassLoader</code>，而是由 JVM 内部实现；</p>
+<p>然后，需要加载 <code>Java 核心扩展类 </code>，即 <code>$JAVA_HOME/jre/lib/ext</code> 目录下的 jar 文件。这些文件由 <code>ExtensionClassLoader</code> 负责加载，它也被称作 <code> 扩展类加载器</code>。当然，用户如果把自己开发的 jar 文件放在这个目录，也会被 <code>ExtClassLoader</code> 加载；</p>
+<p>接下来是开发者在项目中编写的类，这些文件将由 <code>AppClassLoader</code> 加载器进行加载，它也被称作 <code>系统类加载器 System ClassLoader</code>；</p>
+<p>最后，如果想远程加载如（本地文件／网络下载）的方式，则必须要自己自定义一个 ClassLoader，复写其中的 <code>findClass()</code> 方法才能得以实现。</p>
+<p>因此能看出，Java 里提供了至少四类 <code>ClassLoader</code> 来分别加载不同来源的 Class。</p>
+<p>那么，这几种 ClassLoader 是如何协作来加载一个类呢？</p>
+<h2 id="这些 -ClassLoader- 以何种方式来协作加载 -String- 类呢？"><a href="# 这些 -ClassLoader- 以何种方式来协作加载 -String- 类呢？" class="headerlink" title="这些 ClassLoader 以何种方式来协作加载 String 类呢？"></a>这些 ClassLoader 以何种方式来协作加载 String 类呢？</h2><p>String 类是 Java 自带的最常用的一个类，现在的问题是，JVM 将以何种方式把 String class 加载进来呢？</p>
+<p>我们来猜想下。</p>
+<p>首先，String 类属于 Java 核心类，位于 <code>$JAVA_HOME/jre/lib</code> 目录下。有的朋友会马上反应过来，上文中提过了，该目录下的类会由 <code>BootstrapClassLoader</code> 进行加载。没错，它确实是由 <code>BootstrapClassLoader</code> 进行加载。但，这种回答的前提是你已经知道了 String 在 <code>$JAVA_HOME/jre/lib</code> 目录下。</p>
+<p>那么，如果你并不知道 String 类究竟位于哪呢？或者我希望你去加载一个 <code>unknown</code> 的类呢？</p>
+<p>有的朋友这时会说，那很简单，只要去遍历一遍所有的类，看看这个 <code>unknown</code> 的类位于哪里，然后再用对应的加载器去加载。</p>
+<p>是的，思路很正确。那应该如何去遍历呢？</p>
+<p>比如，可以先遍历用户自己写的类，如果找到了就用 <code>AppClassLoader</code> 去加载；否则去遍历 Java 核心类目录，找到了就用 <code>BootstrapClassLoader</code> 去加载，否则就去遍历 Java 扩展类库，依次类推。</p>
+<p>这种思路方向是正确的，不过存在一个漏洞。</p>
+<p>假如开发者自己伪造了一个 <code>java.lang.String</code> 类，即在项目中创建一个包<code>java.lang</code>，包内创建一个名为 <code>String</code> 的类，这完全可以做到。那如果利用上面的遍历方法，是不是这个项目中用到的 String 不是都变成了这个伪造的 <code>java.lang.String</code> 类吗？如何解决这个问题呢？</p>
+<p>解决方法很简单，当查找一个类时，优先遍历最高级别的 Java 核心类，然后再去遍历 Java 核心扩展类，最后再遍历用户自定义类，而且这个遍历过程是一旦找到就立即停止遍历。</p>
+<p>在 Java 中，这种实现方式也称作 <code>双亲委托</code>。其实很简单，把 <code>BootstrapClassLoader</code> 想象为核心高层领导人， <code>ExtClassLoader</code> 想象为中层干部， <code>AppClassLoader</code> 想象为普通公务员。每次需要加载一个类，先获取一个系统加载器 <code>AppClassLoader</code> 的实例（ClassLoader.getSystemClassLoader()），然后向上级层层请求，由最上级优先去加载，如果上级觉得这些类不属于核心类，就可以下放到各子级负责人去自行加载。</p>
+<p>如下图所示：<br><img src="/img/classloader/order.png" alt="双亲委托"></p>
+<h2 id="真的是按照双亲委托方式进行类加载吗？"><a href="# 真的是按照双亲委托方式进行类加载吗？" class="headerlink" title="真的是按照双亲委托方式进行类加载吗？"></a>真的是按照 <code> 双亲委托 </code> 方式进行类加载吗？</h2><p>下面通过几个例子来验证上面的加载方式。</p>
+<h4 id="开发者自定义的类会被 -AppClassLoader- 加载吗？"><a href="# 开发者自定义的类会被 -AppClassLoader- 加载吗？" class="headerlink" title="开发者自定义的类会被 AppClassLoader 加载吗？"></a>开发者自定义的类会被 <code>AppClassLoader</code> 加载吗？</h4><p>在项目中创建一个名为 <code>MusicPlayer</code> 的类文件，内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">package classloader;</div><div class="line"></div><div class="line">public class MusicPlayer &#123;</div><div class="line">	public void print() &#123;</div><div class="line">		System.out.printf(&quot;Hi I&apos;m MusicPlayer&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后来加载 <code>MusicPlayer</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">private static void loadClass() throws ClassNotFoundException &#123;</div><div class="line">    Class&lt;?&gt; clazz = Class.forName(&quot;classloader.MusicPlayer&quot;);</div><div class="line">    ClassLoader classLoader = clazz.getClassLoader();</div><div class="line">    System.out.printf(&quot;ClassLoader is %s&quot;, classLoader.getClass().getSimpleName());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>打印结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ClassLoader is AppClassLoader</div></pre></td></tr></table></figure></p>
+<p>可以验证，<code>MusicPlayer</code> 是由 <code>AppClassLoader</code> 进行的加载。</p>
+<h4 id="验证 -AppClassLoader- 的双亲真的是 -ExtClassLoader- 和 -BootstrapClassLoader- 吗？"><a href="# 验证 -AppClassLoader- 的双亲真的是 -ExtClassLoader- 和 -BootstrapClassLoader- 吗？" class="headerlink" title="验证 AppClassLoader 的双亲真的是 ExtClassLoader 和 BootstrapClassLoader 吗？"></a>验证 <code>AppClassLoader</code> 的双亲真的是 ExtClassLoader 和 BootstrapClassLoader 吗？</h4><p>这时发现 <code>AppClassLoader</code> 提供了一个 <code>getParent()</code> 的方法，来打印看看都是什么。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">private static void printParent() throws ClassNotFoundException &#123;</div><div class="line">        Class&lt;?&gt; clazz = Class.forName(&quot;classloader.MusicPlayer&quot;);</div><div class="line">        ClassLoader classLoader = clazz.getClassLoader();</div><div class="line">        System.out.printf(&quot;currentClassLoader is %s\n&quot;, classLoader.getClass().getSimpleName());</div><div class="line"></div><div class="line">        while (classLoader.getParent() != null) &#123;</div><div class="line">            classLoader = classLoader.getParent();</div><div class="line">            System.out.printf(&quot;Parent is %s\n&quot;, classLoader.getClass().getSimpleName());</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">currentClassLoader is AppClassLoader</div><div class="line">Parent is ExtClassLoader</div></pre></td></tr></table></figure></p>
+<p>首先能看到 <code>ExtClassLoader</code> 确实是 <code>AppClassLoader</code> 的双亲，不过却没有看到 <code>BootstrapClassLoader</code>。事实上，上文就提过， <code>BootstrapClassLoader</code>比较特殊，它是由 JVM 内部实现的，所以 <code>ExtClassLoader.getParent() = null</code>。</p>
+<h4 id="如果把 -MusicPlayer- 类挪到 -JAVA-HOME-jre-lib-ext- 目录下会发生什么？"><a href="# 如果把 -MusicPlayer- 类挪到 -JAVA-HOME-jre-lib-ext- 目录下会发生什么？" class="headerlink" title="如果把 MusicPlayer 类挪到 $JAVA_HOME/jre/lib/ext 目录下会发生什么？"></a>如果把 MusicPlayer 类挪到 <code>$JAVA_HOME/jre/lib/ext</code> 目录下会发生什么？</h4><p>上文中说了，<code>ExtClassLoader</code> 会加载<code>$JAVA_HOME/jre/lib/ext</code> 目录下所有的 jar 文件。那来尝试下直接把 <code>MusicPlayer</code> 这个类放到 <code>$JAVA_HOME/jre/lib/ext</code> 目录下吧。</p>
+<p>利用下面命令可以把 MusicPlayer.java 编译打包成 jar 文件，并放置到对应目录。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">javac classloader/MusicPlayer.java</div><div class="line">jar cvf MusicPlayer.jar classloader/MusicPlayer.class</div><div class="line">mv MusicPlayer.jar $JAVA_HOME/jre/lib/ext/</div></pre></td></tr></table></figure></p>
+<p>这时 MusicPlayer.jar 已经被放置与 <code>$JAVA_HOME/jre/lib/ext</code> 目录下，同时把之前的 <code>MusicPlayer</code> <code>删除 </code>，而且这一次<code> 刻意 </code> 使用 <code>AppClassLoader</code> 来加载：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">private static void loadClass() throws ClassNotFoundException &#123;</div><div class="line">    ClassLoader appClassLoader = ClassLoader.getSystemClassLoader(); // AppClassLoader</div><div class="line">    Class&lt;?&gt; clazz = appClassLoader.loadClass(&quot;classloader.MusicPlayer&quot;);</div><div class="line">    ClassLoader classLoader = clazz.getClassLoader();</div><div class="line">    System.out.printf(&quot;ClassLoader is %s&quot;, classLoader.getClass().getSimpleName());</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ClassLoader is ExtClassLoader</div></pre></td></tr></table></figure></p>
+<p>说明即使直接用 <code>AppClassLoader</code> 去加载，它仍然会被 <code>ExtClassLoader</code> 加载到。</p>
+<h2 id="从源码角度真正理解双亲委托加载机制"><a href="# 从源码角度真正理解双亲委托加载机制" class="headerlink" title="从源码角度真正理解双亲委托加载机制"></a>从源码角度真正理解 <code> 双亲委托 </code> 加载机制 </h2><p> 上面已经通过一些例子了解了 <code> 双亲委托 </code> 的一些特性了，下面来看一下它的实现代码，加深理解。</p>
+<p>打开 <code>ClassLoader</code> 里的 <code>loadClass()</code> 方法，便是需要分析的源码了。这个方法里做了下面几件事：</p>
+<ol>
+<li>检查目标 class 是否曾经加载过，如果加载过则直接返回；</li>
+<li>如果没加载过，把加载请求传递给 parent 加载器去加载；</li>
+<li>如果 parent 加载器加载成功，则直接返回；</li>
+<li>如果 parent 未加载到，则自身调用 findClass() 方法进行寻找，并把寻找结果返回。</li>
+</ol>
+<p>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">protected Class&lt;?&gt; loadClass(String name, boolean resolve)</div><div class="line">    throws ClassNotFoundException</div><div class="line">&#123;</div><div class="line">    synchronized (getClassLoadingLock(name)) &#123;</div><div class="line">        // 1. 检查是否曾加载过</div><div class="line">        Class&lt;?&gt; c = findLoadedClass(name);</div><div class="line">        if (c == null) &#123;</div><div class="line">            long t0 = System.nanoTime();</div><div class="line">            try &#123;</div><div class="line">                if (parent != null) &#123;</div><div class="line">                	// 优先让 parent 加载器去加载</div><div class="line">                    c = parent.loadClass(name, false);</div><div class="line">                &#125; else &#123;</div><div class="line">                	// 如无 parent，表示当前是 BootstrapClassLoader，调用 native 方法去 JVM 加载</div><div class="line">                    c = findBootstrapClassOrNull(name);</div><div class="line">                &#125;</div><div class="line">            &#125; catch (ClassNotFoundException e) &#123;</div><div class="line">                // ClassNotFoundException thrown if class not found</div><div class="line">                // from the non-null parent class loader</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            if (c == null) &#123;</div><div class="line">            	// 如果 parent 均没有加载到目标 class，调用自身的 findClass() 方法去搜索</div><div class="line">                long t1 = System.nanoTime();</div><div class="line">                c = findClass(name);</div><div class="line"></div><div class="line">                // this is the defining class loader; record the stats</div><div class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</div><div class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</div><div class="line">                sun.misc.PerfCounter.getFindClasses().increment();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        if (resolve) &#123;</div><div class="line">            resolveClass(c);</div><div class="line">        &#125;</div><div class="line">        return c;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// BootstrapClassLoader 会调用 native 方法去 JVM 加载</div><div class="line">private native Class&lt;?&gt; findBootstrapClass(String name);</div></pre></td></tr></table></figure></p>
+<p>看完实现源码相信能够有更完整的理解。</p>
+<h2 id="类加载器最酷的一面：自定义类加载器"><a href="# 类加载器最酷的一面：自定义类加载器" class="headerlink" title="类加载器最酷的一面：自定义类加载器"></a>类加载器最酷的一面：自定义类加载器 </h2><p> 前面提到了 Java 自带的加载器 <code>BootstrapClassLoader</code>、<code>AppClassLoader</code>和<code>ExtClassLoader</code>，这些都是 Java 已经提供好的。</p>
+<p>而真正有意思的，是 <code>自定义类加载器 </code>，它允许我们在<code> 运行时 </code> 可以从 <code> 本地磁盘或网络 </code> 上动态加载自定义类。这使得开发者可以动态修复某些有问题的类，热更新代码。</p>
+<p>下面来实现一个 <code> 网络类加载器</code>，这个加载器可以从网络上动态下载 .class 文件并加载到虚拟机中使用。</p>
+<p>后面我还会写作与 <code>热修复／动态更新</code> 相关的文章，这里先学习 Java 层 <code>NetworkClassLoader</code> 相关的原理。</p>
+<ol>
+<li>作为一个 <code>NetworkClassLoader</code>，它首先要继承 <code>ClassLoader</code>；</li>
+<li>然后它要实现 <code>ClassLoader</code> 内的 <code>findClass()</code> 方法。注意，不是 <code>loadClass()</code> 方法，因为 <code>ClassLoader</code> 提供了 <code>loadClass()</code>（如上面的源码），它会基于<code> 双亲委托 </code> 机制去搜索某个 class，直到搜索不到才会调用自身的 <code>findClass()</code>，如果直接复写<code>loadClass()</code>，那还要实现<code> 双亲委托 </code> 机制；</li>
+<li>在 <code>findClass()</code> 方法里，要从网络上下载一个 .class 文件，然后转化成 Class 对象供虚拟机使用。</li>
+</ol>
+<p>具体实现代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Load class from network</div><div class="line"> */</div><div class="line">public class NetworkClassLoader extends ClassLoader &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected Class&lt;?&gt; findClass(String name) throws ClassNotFoundException &#123;</div><div class="line">        byte[] classData = downloadClassData(name); // 从远程下载</div><div class="line">        if (classData == null) &#123;</div><div class="line">            super.findClass(name); // 未找到，抛异常</div><div class="line">        &#125; else &#123;</div><div class="line">            return defineClass(name, classData, 0, classData.length); // convert class byte data to Class&lt;?&gt; object</div><div class="line">        &#125;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private byte[] downloadClassData(String name) &#123;</div><div class="line">        // 从 localhost 下载 .class 文件</div><div class="line">        String path = &quot;http://localhost&quot; + File.separatorChar + &quot;java&quot; + File.separatorChar + name.replace(&apos;.&apos;, File.separatorChar) + &quot;.class&quot;; </div><div class="line"></div><div class="line">        try &#123;</div><div class="line">            URL url = new URL(path);</div><div class="line">            InputStream ins = url.openStream();</div><div class="line">            ByteArrayOutputStream baos = new ByteArrayOutputStream();</div><div class="line">            int bufferSize = 4096;</div><div class="line">            byte[] buffer = new byte[bufferSize];</div><div class="line">            int bytesNumRead = 0;</div><div class="line">            while ((bytesNumRead = ins.read(buffer)) != -1) &#123;</div><div class="line">                baos.write(buffer, 0, bytesNumRead); // 把下载的二进制数据存入 ByteArrayOutputStream</div><div class="line">            &#125;</div><div class="line">            return baos.toByteArray();</div><div class="line">        &#125; catch (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public String getName() &#123;</div><div class="line">        System.out.printf(&quot;Real NetworkClassLoader\n&quot;);</div><div class="line">        return &quot;networkClassLoader&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个类的作用是从网络上（这里是本人的 local apache 服务器 <a href="http://localhost/java" target="_blank" rel="external">http://localhost/java</a> 上）目录里去下载对应的 .class 文件，并转换成 Class&lt;?&gt; 返回回去使用。</p>
+<p>下面我们来利用这个 <code>NetworkClassLoader</code> 去加载 localhost 上的 <code>MusicPlayer</code> 类：</p>
+<ol>
+<li>首先把 <code>MusicPlayer.class</code> 放置于 <code>/Library/WebServer/Documents/java</code> （MacOS）目录下，由于 MacOS 自带 apache 服务器，这里是服务器的默认目录；</li>
+<li><p>执行下面一段代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">String className = &quot;classloader.NetworkClass&quot;;</div><div class="line">NetworkClassLoader networkClassLoader = new NetworkClassLoader();</div><div class="line">Class&lt;?&gt; clazz  = networkClassLoader.loadClass(className);</div></pre></td></tr></table></figure>
+</li>
+<li><p>正常运行，加载 <code>http://localhost/java/classloader/MusicPlayer.class</code>成功。</p>
+</li>
+</ol>
+<p>可以看出 <code>NetworkClassLoader</code> 可以正常工作，如果读者要用的话，只要稍微修改 url 的拼接方式即可自行使用。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 类加载方式是 Java 上非常创新的一项技术，给未来的热修复技术提供了可能。本文力求通过简单的语言和合适的例子来讲解其中 <code> 双亲委托机制 </code>、<code> 自定义加载器 </code> 等，并开发了自定义的<code>NetworkClassLoader</code>。</p>
+<p>当然，类加载是很有意思的技术，很难覆盖所有知识点，比如不同类加载器加载同一个类，得到的实例却不是同一个等等。</p>
+<p>之后我还会写作关于热修复／动态更新相关的技术，欢迎关注。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+            <a href="/tags/Annotation/" rel="tag">#Annotation</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/03/Java-技术之注解-Annotation/" rel="next" title="Java 技术之注解 Annotation">
+                <i class="fa fa-chevron-left"></i> Java 技术之注解 Annotation
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/14/dig_into_leakcanary/" rel="prev" title="带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏">
+                带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/4')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/4/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是 -Java- 类加载机制"><span class="nav-number">1.</span> <span class="nav-text">什么是 Java 类加载机制?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Class- 文件有哪些来源呢"><span class="nav-number">2.</span> <span class="nav-text">Class 文件有哪些来源呢?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哪些 -ClassLoader- 负责加载上面几类 -Class？"><span class="nav-number">3.</span> <span class="nav-text">哪些 ClassLoader 负责加载上面几类 Class？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#这些 -ClassLoader- 以何种方式来协作加载 -String- 类呢？"><span class="nav-number">4.</span> <span class="nav-text">这些 ClassLoader 以何种方式来协作加载 String 类呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#真的是按照双亲委托方式进行类加载吗？"><span class="nav-number">5.</span> <span class="nav-text">真的是按照  双亲委托  方式进行类加载吗？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开发者自定义的类会被 -AppClassLoader- 加载吗？"><span class="nav-number">5.0.1.</span> <span class="nav-text">开发者自定义的类会被 AppClassLoader 加载吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#验证 -AppClassLoader- 的双亲真的是 -ExtClassLoader- 和 -BootstrapClassLoader- 吗？"><span class="nav-number">5.0.2.</span> <span class="nav-text">验证 AppClassLoader 的双亲真的是 ExtClassLoader 和 BootstrapClassLoader 吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如果把 -MusicPlayer- 类挪到 -JAVA-HOME-jre-lib-ext- 目录下会发生什么？"><span class="nav-number">5.0.3.</span> <span class="nav-text">如果把 MusicPlayer 类挪到 $JAVA_HOME/jre/lib/ext 目录下会发生什么？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从源码角度真正理解双亲委托加载机制"><span class="nav-number">6.</span> <span class="nav-text">从源码角度真正理解  双亲委托  加载机制 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器最酷的一面：自定义类加载器"><span class="nav-number">7.</span> <span class="nav-text">类加载器最酷的一面：自定义类加载器 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">8.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

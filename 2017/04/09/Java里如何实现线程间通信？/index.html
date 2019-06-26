@@ -1,0 +1,1056 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,多线程," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="正常情况下，每个子线程完成各自的任务就可以结束了。不过有的时候，我们希望多个线程协同工作来完成某个任务，这时就涉及到了线程间通信了。 本文涉及到的知识点：thread.join(), object.wait(), object.notify(), CountdownLatch, CyclicBarrier, FutureTask, Callable 等。 本文涉及代码：https://githu">
+<meta name="keywords" content="Java,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 里如何实现线程间通信？">
+<meta property="og:url" content="http://wingjay.com/2017/04/09/Java里如何实现线程间通信？/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="正常情况下，每个子线程完成各自的任务就可以结束了。不过有的时候，我们希望多个线程协同工作来完成某个任务，这时就涉及到了线程间通信了。 本文涉及到的知识点：thread.join(), object.wait(), object.notify(), CountdownLatch, CyclicBarrier, FutureTask, Callable 等。 本文涉及代码：https://githu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 里如何实现线程间通信？">
+<meta name="twitter:description" content="正常情况下，每个子线程完成各自的任务就可以结束了。不过有的时候，我们希望多个线程协同工作来完成某个任务，这时就涉及到了线程间通信了。 本文涉及到的知识点：thread.join(), object.wait(), object.notify(), CountdownLatch, CyclicBarrier, FutureTask, Callable 等。 本文涉及代码：https://githu">
+<meta name="twitter:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 里如何实现线程间通信？ | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 里如何实现线程间通信？
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-rocket"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-04-09T17:24:06+08:00" content="2017-04-09">
+              2017-04-09
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,894 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>正常情况下，每个子线程完成各自的任务就可以结束了。不过有的时候，我们希望多个线程协同工作来完成某个任务，这时就涉及到了线程间通信了。</p>
+<p>本文涉及到的知识点：<code>thread.join()</code>, <code>object.wait()</code>, <code>object.notify()</code>, <code>CountdownLatch</code>, <code>CyclicBarrier</code>, <code>FutureTask</code>, <code>Callable</code> 等。</p>
+<p>本文涉及代码：<br><a href="https://github.com/wingjay/HelloJava/blob/master/multi-thread/src/ForArticle.java" target="_blank" rel="external">https://github.com/wingjay/HelloJava/blob/master/multi-thread/src/ForArticle.java</a></p>
+</blockquote>
+<a id="more"></a>
+<p>下面我从几个例子作为切入点来讲解下 Java 里有哪些方法来实现线程间通信。</p>
+<ul>
+<li>如何让两个线程依次执行？</li>
+<li>那如何让 <code> 两</code>个线程按照指定方式有序交叉运行呢？</li>
+<li>四个线程 A B C D，其中 D 要等到 A B C 全执行完毕后才执行，而且 A B C 是同步运行的</li>
+<li>三个运动员各自准备，等到三个人都准备好后，再一起跑</li>
+<li>子线程完成某件任务后，把得到的结果回传给主线程</li>
+</ul>
+<h2 id="如何让两个线程依次执行？"><a href="# 如何让两个线程依次执行？" class="headerlink" title="如何让两个线程依次执行？"></a>如何让两个线程依次执行？</h2><p>假设有两个线程，一个是线程 A，另一个是线程 B，两个线程分别依次打印 1-3 三个数字即可。我们来看下代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">private static void demo1() &#123;</div><div class="line">    Thread A = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            printNumber(&quot;A&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    Thread B = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            printNumber(&quot;B&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    A.start();</div><div class="line">    B.start();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中的 <code>printNumber(String)</code> 实现如下，用来依次打印 <code>1</code>, <code>2</code>, <code>3</code> 三个数字：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private static void printNumber(String threadName) &#123;</div><div class="line">    int i=0;</div><div class="line">    while (i++ &lt; 3) &#123;</div><div class="line">        try &#123;</div><div class="line">            Thread.sleep(100);</div><div class="line">        &#125; catch (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        System.out.println(threadName + &quot; print: &quot; + i);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这时我们得到的结果是：</p>
+<blockquote>
+<p>B print: 1<br>A print: 1<br>B print: 2<br>A print: 2<br>B print: 3<br>A print: 3</p>
+</blockquote>
+<p>可以看到 A 和 B 是同时打印的。</p>
+<p>那么，如果我们希望 B 在 A <code>全部打印 </code> 完后再开始打印呢？我们可以利用 <code>thread.join()</code> 方法，代码如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">private static void demo2() &#123;</div><div class="line">    Thread A = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            printNumber(&quot;A&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    Thread B = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">        	System.out.println(&quot;B 开始等待 A&quot;);</div><div class="line">            try &#123;</div><div class="line">                A.join();</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            printNumber(&quot;B&quot;);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    B.start();</div><div class="line">    A.start();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>得到的结果如下：</p>
+<blockquote>
+<p>B 开始等待 A<br>A print: 1<br>A print: 2<br>A print: 3</p>
+<p>B print: 1<br>B print: 2<br>B print: 3</p>
+</blockquote>
+<p>所以我们能看到 <code>A.join()</code> 方法会让 B 一直等待直到 A 运行完毕。</p>
+<h2 id="那如何让两个线程按照指定方式有序交叉运行呢？"><a href="# 那如何让两个线程按照指定方式有序交叉运行呢？" class="headerlink" title="那如何让两个线程按照指定方式有序交叉运行呢？"></a>那如何让 <code> 两</code>个线程按照指定方式有序交叉运行呢？</h2><p>还是上面那个例子，我现在希望 A 在打印完 <code>1</code> 后，再让 B 打印 <code>1</code>, <code>2</code>, <code>3</code>，最后再回到 A 继续打印 <code>2</code>, <code>3</code>。这种需求下，显然 <code>Thread.join()</code> 已经不能满足了。我们需要更细粒度的锁来控制执行顺序。</p>
+<p>这里，我们可以利用 <code>object.wait()</code> 和 <code>object.notify()</code> 两个方法来实现。代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * A 1, B 1, B 2, B 3, A 2, A 3</div><div class="line"> */</div><div class="line">private static void demo3() &#123;</div><div class="line">    Object lock = new Object();</div><div class="line"></div><div class="line">    Thread A = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            synchronized (lock) &#123;</div><div class="line">                System.out.println(&quot;A 1&quot;);</div><div class="line">                try &#123;</div><div class="line">                    lock.wait();</div><div class="line">                &#125; catch (InterruptedException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                System.out.println(&quot;A 2&quot;);</div><div class="line">                System.out.println(&quot;A 3&quot;);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    Thread B = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            synchronized (lock) &#123;</div><div class="line">                System.out.println(&quot;B 1&quot;);</div><div class="line">                System.out.println(&quot;B 2&quot;);</div><div class="line">                System.out.println(&quot;B 3&quot;);</div><div class="line"></div><div class="line">                lock.notify();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    A.start();</div><div class="line">    B.start();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：</p>
+<blockquote>
+<p>A 1<br>A waiting…</p>
+<p>B 1<br>B 2<br>B 3<br>A 2<br>A 3</p>
+</blockquote>
+<p>正是我们要的结果。</p>
+<p>那么，这个过程发生了什么呢？</p>
+<ol>
+<li>首先创建一个 A 和 B 共享的对象锁 lock = new Object();</li>
+<li>当 A 得到锁后，先打印 1，然后调用 <code>lock.wait()</code> 方法，交出锁的控制权，进入 <code>wait</code> 状态；</li>
+<li>对 B 而言，由于 A 最开始得到了锁，导致 B 无法执行；直到 A 调用 <code>lock.wait()</code> 释放控制权后， B 才得到了锁；</li>
+<li>B 在得到锁后打印 1， 2， 3；然后调用 <code>lock.notify()</code> 方法，唤醒正在 <code>wait</code> 的 A;</li>
+<li>A 被唤醒后，继续打印剩下的 2，3。</li>
+</ol>
+<p>为了更好理解，我在上面的代码里加上 log 方便读者查看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">private static void demo3() &#123;</div><div class="line">    Object lock = new Object();</div><div class="line">    Thread A = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            System.out.println(&quot;INFO: A 等待锁 &quot;);</div><div class="line">            synchronized (lock) &#123;</div><div class="line">                System.out.println(&quot;INFO: A 得到了锁 lock&quot;);</div><div class="line">                System.out.println(&quot;A 1&quot;);</div><div class="line">                try &#123;</div><div class="line">                    System.out.println(&quot;INFO: A 准备进入等待状态，放弃锁 lock 的控制权 &quot;);</div><div class="line">                    lock.wait();</div><div class="line">                &#125; catch (InterruptedException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line">                System.out.println(&quot;INFO: 有人唤醒了 A, A 重新获得锁 lock&quot;);</div><div class="line">                System.out.println(&quot;A 2&quot;);</div><div class="line">                System.out.println(&quot;A 3&quot;);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    Thread B = new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            System.out.println(&quot;INFO: B 等待锁 &quot;);</div><div class="line">            synchronized (lock) &#123;</div><div class="line">                System.out.println(&quot;INFO: B 得到了锁 lock&quot;);</div><div class="line">                System.out.println(&quot;B 1&quot;);</div><div class="line">                System.out.println(&quot;B 2&quot;);</div><div class="line">                System.out.println(&quot;B 3&quot;);</div><div class="line"></div><div class="line">                System.out.println(&quot;INFO: B 打印完毕，调用 notify 方法 &quot;);</div><div class="line">                lock.notify();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    A.start();</div><div class="line">    B.start();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>打印结果如下:</p>
+<blockquote>
+<p>INFO: A 等待锁<br>INFO: A 得到了锁 lock<br>A 1<br>INFO: A 准备进入等待状态，调用 lock.wait() 放弃锁 lock 的控制权<br>INFO: B 等待锁<br>INFO: B 得到了锁 lock<br>B 1<br>B 2<br>B 3<br>INFO: B 打印完毕，调用 lock.notify() 方法<br>INFO: 有人唤醒了 A, A 重新获得锁 lock<br>A 2<br>A 3</p>
+</blockquote>
+<h2 id="四个线程 -A-B-C-D，其中 -D- 要等到 -A-B-C- 全执行完毕后才执行，而且 -A-B-C- 是同步运行的"><a href="# 四个线程 -A-B-C-D，其中 -D- 要等到 -A-B-C- 全执行完毕后才执行，而且 -A-B-C- 是同步运行的" class="headerlink" title="四个线程 A B C D，其中 D 要等到 A B C 全执行完毕后才执行，而且 A B C 是同步运行的"></a>四个线程 A B C D，其中 D 要等到 A B C 全执行完毕后才执行，而且 A B C 是同步运行的 </h2><p> 最开始我们介绍了 <code>thread.join()</code>，可以让一个线程等另一个线程运行完毕后再继续执行，那我们可以在 D 线程里依次 join A B C，不过这也就使得 A B C 必须依次执行，而我们要的是这三者能同步运行。</p>
+<p>或者说，我们希望达到的目的是：A B C 三个线程同时运行，各自独立运行完后通知 D；对 D 而言，只要 A B C 都运行完了，D 再开始运行。针对这种情况，我们可以利用 <code>CountdownLatch</code> 来实现这类通信方式。它的基本用法是：</p>
+<ol>
+<li>创建一个计数器，设置初始值，CountdownLatch countDownLatch = new CountDownLatch(2);</li>
+<li>在 <code> 等待线程 </code> 里调用 <code>countDownLatch.await()</code> 方法，进入等待状态，直到计数值变成 0；</li>
+<li>在 <code> 其他线程 </code> 里，调用 <code>countDownLatch.countDown()</code> 方法，该方法会将计数值减小 1；</li>
+<li>当 <code> 其他线程 </code> 的 <code>countDown()</code> 方法把计数值变成 0 时，<code>等待线程</code> 里的 <code>countDownLatch.await()</code> 立即退出，继续执行下面的代码。</li>
+</ol>
+<p>实现代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">private static void runDAfterABC() &#123;</div><div class="line">    int worker = 3;</div><div class="line">    CountDownLatch countDownLatch = new CountDownLatch(worker);</div><div class="line"></div><div class="line">    new Thread(new Runnable() &#123;</div><div class="line">        @Override</div><div class="line">        public void run() &#123;</div><div class="line">            System.out.println(&quot;D is waiting for other three threads&quot;);</div><div class="line">            try &#123;</div><div class="line">                countDownLatch.await();</div><div class="line">                System.out.println(&quot;All done, D starts working&quot;);</div><div class="line">            &#125; catch (InterruptedException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line"></div><div class="line">        &#125;</div><div class="line">    &#125;).start();</div><div class="line"></div><div class="line">    for (char threadName=&apos;A&apos;; threadName &lt;= &apos;C&apos;; threadName++) &#123;</div><div class="line">        final String tN = String.valueOf(threadName);</div><div class="line">        new Thread(new Runnable() &#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                System.out.println(tN + &quot; is working&quot;);</div><div class="line">                try &#123;</div><div class="line">                    Thread.sleep(100);</div><div class="line">                &#125; catch (Exception e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                System.out.println(tN + &quot; finished&quot;);</div><div class="line">                countDownLatch.countDown();</div><div class="line">            &#125;</div><div class="line">        &#125;).start();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面是运行结果：</p>
+<blockquote>
+<p>D is waiting for other three threads<br>A is working<br>B is working<br>C is working</p>
+<p>A finished<br>C finished<br>B finished<br>All done, D starts working</p>
+</blockquote>
+<p>其实简单点来说，<code>CountDownLatch</code> 就是一个倒计数器，我们把初始计数值设置为<code>3</code>，当 <code>D</code> 运行时，先调用 <code>countDownLatch.await()</code> 检查计数器值是否为 <code>0</code>，若不为 <code>0</code> 则保持等待状态；当<code>A</code> <code>B</code> <code>C</code> 各自运行完后都会利用<code>countDownLatch.countDown()</code>，将倒计数器减 <code>1</code>，当三个都运行完后，计数器被减至 <code>0</code>；此时立即触发 <code>D</code> 的 <code>await()</code> 运行结束，继续向下执行。</p>
+<p>因此，<code>CountDownLatch</code> 适用于一个线程去等待多个线程的情况。</p>
+<h2 id="三个运动员各自准备，等到三个人都准备好后，再一起跑"><a href="# 三个运动员各自准备，等到三个人都准备好后，再一起跑" class="headerlink" title="三个运动员各自准备，等到三个人都准备好后，再一起跑"></a>三个运动员各自准备，等到三个人都准备好后，再一起跑 </h2><p> 上面是一个形象的比喻，针对 <code> 线程 A B C 各自开始准备，直到三者都准备完毕，然后再同时运行 </code>。也就是要实现一种<code> 线程之间互相等待 </code> 的效果，那应该怎么来实现呢？</p>
+<p>上面的 <code>CountDownLatch</code> 可以用来倒计数，但当计数完毕，只有一个线程的 <code>await()</code> 会得到响应，无法让多个线程同时触发。</p>
+<p>为了实现线程间互相等待这种需求，我们可以利用 <code>CyclicBarrier</code> 数据结构，它的基本用法是：</p>
+<ol>
+<li>先创建一个公共 <code>CyclicBarrier</code> 对象，设置 <code> 同时等待 </code> 的线程数，CyclicBarrier cyclicBarrier = new CyclicBarrier(3);</li>
+<li>这些线程同时开始自己做准备，自身准备完毕后，需要等待别人准备完毕，这时调用 <code>cyclicBarrier.await();</code> 即可开始等待别人；</li>
+<li>当指定的 <code> 同时等待 </code> 的线程数都调用了 <code>cyclicBarrier.await();</code>时，意味着这些线程都准备完毕好，然后这些线程才 <code> 同时继续执行</code>。</li>
+</ol>
+<p>实现代码如下，设想有三个跑步运动员，各自准备好后等待其他人，全部准备好后才开始跑：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">private static void runABCWhenAllReady() &#123;</div><div class="line">    int runner = 3;</div><div class="line">    CyclicBarrier cyclicBarrier = new CyclicBarrier(runner);</div><div class="line"></div><div class="line">    final Random random = new Random();</div><div class="line">    for (char runnerName=&apos;A&apos;; runnerName &lt;= &apos;C&apos;; runnerName++) &#123;</div><div class="line">        final String rN = String.valueOf(runnerName);</div><div class="line">        new Thread(new Runnable() &#123;</div><div class="line">            @Override</div><div class="line">            public void run() &#123;</div><div class="line">                long prepareTime = random.nextInt(10000) + 100;</div><div class="line">                System.out.println(rN + &quot; is preparing for time: &quot; + prepareTime);</div><div class="line">                try &#123;</div><div class="line">                    Thread.sleep(prepareTime);</div><div class="line">                &#125; catch (Exception e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                try &#123;</div><div class="line">                    System.out.println(rN + &quot; is prepared, waiting for others&quot;);</div><div class="line">                    cyclicBarrier.await(); // 当前运动员准备完毕，等待别人准备好</div><div class="line">                &#125; catch (InterruptedException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125; catch (BrokenBarrierException e) &#123;</div><div class="line">                    e.printStackTrace();</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                System.out.println(rN + &quot; starts running&quot;); // 所有运动员都准备好了，一起开始跑</div><div class="line">            &#125;</div><div class="line">        &#125;).start();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印的结果如下：</p>
+<blockquote>
+<p>A is preparing for time: 4131<br>B is preparing for time: 6349<br>C is preparing for time: 8206</p>
+<p>A is prepared, waiting for others</p>
+<p>B is prepared, waiting for others</p>
+<p>C is prepared, waiting for others</p>
+<p>C starts running<br>A starts running<br>B starts running</p>
+</blockquote>
+<h2 id="子线程完成某件任务后，把得到的结果回传给主线程"><a href="# 子线程完成某件任务后，把得到的结果回传给主线程" class="headerlink" title="子线程完成某件任务后，把得到的结果回传给主线程"></a>子线程完成某件任务后，把得到的结果回传给主线程 </h2><p> 实际的开发中，我们经常要创建子线程来做一些耗时任务，然后把任务执行结果回传给主线程使用，这种情况在 Java 里要如何实现呢？</p>
+<p>回顾线程的创建，我们一般会把 <code>Runnable</code> 对象传给 Thread 去执行。<code>Runnable</code>定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public interface Runnable &#123;</div><div class="line">    public abstract void run();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到 <code>run()</code> 在执行完后不会返回任何结果。那如果希望返回结果呢？这里可以利用另一个类似的接口类 <code>Callable</code>：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">@FunctionalInterface</div><div class="line">public interface Callable&lt;V&gt; &#123;</div><div class="line">    /**</div><div class="line">     * Computes a result, or throws an exception if unable to do so.</div><div class="line">     *</div><div class="line">     * @return computed result</div><div class="line">     * @throws Exception if unable to compute a result</div><div class="line">     */</div><div class="line">    V call() throws Exception;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看出 <code>Callable</code> 最大区别就是返回范型 <code>V</code> 结果。</p>
+<p>那么下一个问题就是，如何把子线程的结果回传回来呢？在 Java 里，有一个类是配合 Callable 使用的：<code>FutureTask</code>，不过注意，它获取结果的 <code>get</code> 方法会阻塞主线程。</p>
+<p>举例，我们想让子线程去计算从 1 加到 100，并把算出的结果返回到主线程。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">private static void doTaskWithResultInWorker() &#123;</div><div class="line">    Callable&lt;Integer&gt; callable = new Callable&lt;Integer&gt;() &#123;</div><div class="line">        @Override</div><div class="line">        public Integer call() throws Exception &#123;</div><div class="line">            System.out.println(&quot;Task starts&quot;);</div><div class="line">            Thread.sleep(1000);</div><div class="line">            int result = 0;</div><div class="line">            for (int i=0; i&lt;=100; i++) &#123;</div><div class="line">                result += i;</div><div class="line">            &#125;</div><div class="line">            System.out.println(&quot;Task finished and return result&quot;);</div><div class="line">            return result;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    FutureTask&lt;Integer&gt; futureTask = new FutureTask&lt;&gt;(callable);</div><div class="line">    new Thread(futureTask).start();</div><div class="line"></div><div class="line"></div><div class="line">    try &#123;</div><div class="line">        System.out.println(&quot;Before futureTask.get()&quot;);</div><div class="line">        System.out.println(&quot;Result: &quot; + futureTask.get());</div><div class="line">        System.out.println(&quot;After futureTask.get()&quot;);</div><div class="line">    &#125; catch (InterruptedException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125; catch (ExecutionException e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：</p>
+<blockquote>
+<p>Before futureTask.get()</p>
+<p>Task starts<br>Task finished and return result</p>
+<p>Result: 5050<br>After futureTask.get()</p>
+</blockquote>
+<p>可以看到，主线程调用 <code>futureTask.get()</code> 方法时阻塞主线程；然后 <code>Callable</code> 内部开始执行，并返回运算结果；此时 <code>futureTask.get()</code> 得到结果，主线程恢复运行。</p>
+<p>这里我们可以学到，通过 <code>FutureTask</code> 和 <code>Callable</code> 可以直接在主线程获得子线程的运算结果，只不过需要阻塞主线程。当然，如果不希望阻塞主线程，可以考虑利用 <code>ExecutorService</code>，把 <code>FutureTask</code> 放到线程池去管理执行。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 多线程是现代语言的共同特性，而线程间通信、线程同步、线程安全是很重要的话题。本文针对 Java 的线程间通信进行了大致的讲解，后续还会对线程同步、线程安全进行讲解。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+            <a href="/tags/多线程/" rel="tag">#多线程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/29/Java的equals与hashcode对比分析/" rel="next" title="Java 的 equals 与 hashcode 对比分析">
+                <i class="fa fa-chevron-left"></i> Java 的 equals 与 hashcode 对比分析
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/26/Java-技术之反射/" rel="prev" title="Java 技术之反射">
+                Java 技术之反射 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/7')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/7/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何让两个线程依次执行？"><span class="nav-number">1.</span> <span class="nav-text">如何让两个线程依次执行？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那如何让两个线程按照指定方式有序交叉运行呢？"><span class="nav-number">2.</span> <span class="nav-text">那如何让  两个线程按照指定方式有序交叉运行呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四个线程 -A-B-C-D，其中 -D- 要等到 -A-B-C- 全执行完毕后才执行，而且 -A-B-C- 是同步运行的"><span class="nav-number">3.</span> <span class="nav-text">四个线程 A B C D，其中 D 要等到 A B C 全执行完毕后才执行，而且 A B C 是同步运行的 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三个运动员各自准备，等到三个人都准备好后，再一起跑"><span class="nav-number">4.</span> <span class="nav-text">三个运动员各自准备，等到三个人都准备好后，再一起跑 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子线程完成某件任务后，把得到的结果回传给主线程"><span class="nav-number">5.</span> <span class="nav-text">子线程完成某件任务后，把得到的结果回传给主线程 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

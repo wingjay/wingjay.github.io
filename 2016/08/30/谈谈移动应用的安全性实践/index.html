@@ -1,0 +1,1012 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈移动应用的安全性实践">
+<meta property="og:url" content="http://wingjay.com/2016/08/30/谈谈移动应用的安全性实践/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-29572b7461c3d279.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.489Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈移动应用的安全性实践">
+<meta name="twitter:description" content="虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/281665-29572b7461c3d279.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 谈谈移动应用的安全性实践 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                谈谈移动应用的安全性实践
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-rocket"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-08-30T21:39:01+08:00" content="2016-08-30">
+              2016-08-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/安全/" itemprop="url" rel="index">
+                    <span itemprop="name">安全</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,398 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。</p>
+</blockquote>
+<a id="more"></a>
+<p>本文将从用户注册流程出发，介绍下个人实践中在提高数据安全性方面采用的一些策略方法，供读者参考。下文将从 <code>Android</code> 和 <code>服务端</code> 两部分来进行讲解。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-29572b7461c3d279.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="从注册说起"><a href="# 从注册说起" class="headerlink" title="从注册说起"></a>从注册说起 </h3><p> 用户第一次打开 app 时便会进入注册页面。然后客户端会要求用户输入用户名、密码并传递给服务端去创建一个新的 user。此时通过明文传递用户名密码便是一个安全性隐患。或者说，如果有人监听注册 API，那么很快就可以窃取到很多用户的账户信息，而且可以偷偷利用这些账户信息随时获取甚至更改用户数据。</p>
+<p>这对于任何一家企业而言都是非常可怕的。</p>
+<h3 id="全站 Https"><a href="# 全站 Https" class="headerlink" title="全站 Https"></a>全站 Https</h3><p>因此，为了应对数据明文传输隐患这个问题，我们可以 <u> 采用 <a href="https://en.wikipedia.org/wiki/HTTPS" target="_blank" rel="external">Https</a> 方式通信 </u>。在 Android 端推荐<a href="http://square.github.io/" target="_blank" rel="external">Square</a> 家的 <a href="https://github.com/square/okhttp" target="_blank" rel="external">OkHttp3</a> 作为网络层，为应用层提供 Https 服务。</p>
+<p>下面先对 Https 的基本工作原理进行下介绍。</p>
+<ol>
+<li>首先，客户端去请求服务端的数字证书，这个证书包含了一个公钥。该证书购买后存储于我们自己服务器上。</li>
+<li>当服务端收到客户端请求后，会把这个数字证书回传给客户端，由于是公钥，所以不害怕被窃取。</li>
+<li>客户端收到数字证书后，先去 <code> 验证 </code> 证书的真实性。如果验证通过，就会从里面取出一个 <code> 公钥</code>。</li>
+<li>客户端本地生成一个 <code> 随机数 </code>，作为未来的<code> 会话私钥 </code>，利用前面的公钥进行<code> 加密</code>。</li>
+<li>客户端把 <code> 加密后会话私钥 </code> 回传给服务端，在这个过程中，即使 <code> 加密后的会话私钥 </code> 被窃取也不用担心，因为中间人并没有 <code> 解密私钥 </code>，所以读不出里面的<code> 会话私钥</code>。</li>
+<li>服务端接收到 <code> 加密会话私钥 </code> 后，利用从 CA 购买证书时获得的 <code> 解密私钥 </code> 进行解密读出 <code> 真实会话私钥 </code>。至此，客户端与服务端同时拥有了一个只有它们二者知道的<code> 会话私钥</code>，非对称加密连接建立完成。</li>
+<li>一旦客户端和服务端连接建立起来后，未来的数据通信都利用这个 <code> 会话私钥 </code> 进行对称加密传输数据。</li>
+</ol>
+<p>采用了 https 后，我们所有网络传输的数据都由明文变成了密文，即使中间有人能够监听到数据包，也不能轻易获取 user 的帐户密码信息。</p>
+<p>听起来，安全性问题基本解决了。</p>
+<p>然而实际上，在步骤 3 用户需要去验证数字证书时，如果 <u> 这个验证过程被欺骗了呢</u>？</p>
+<p>试想这样一种场景，如果在最开始，攻击者就拦截掉客户端与服务端的通信。当客户端在请求证书时，攻击者回传一个他自己的 <code> 假证书 </code>，而且攻击者已经通过其他手段欺骗用户在手机上<code> 信任 </code> 了这个 <code> 假证书 </code>，那么当客户端接收到证书并去验证时，是<strong><u> 可以通过的</u></strong>。</p>
+<p>这也就意味着，一旦客户端遭受这样的攻击，未来客户端都会与一个 <code> 虚假的中间人 </code> 通信，而且中间人也可以拿着客户端传来的信息去与我们的服务端通信，而这个过程 <code> 客户端和我们服务端完全不知道中间人的存在</code>，这是很大的安全隐患。</p>
+<h3 id="SSL-Pinning"><a href="#SSL-Pinning" class="headerlink" title="SSL Pinning"></a>SSL Pinning</h3><p>为了防止客户端被虚假证书欺骗，我们采取的方式是 <u> 把我们自己的公钥直接绑定给每个客户端 </u>，当客户端收到证书后，<u> 与绑定的公钥进行验证 </u>，从而防止<code> 虚假证书 </code> 的入侵。</p>
+<p>在 Android 端，我们利用 <code>OkHttp3</code> 提供的 <code>CertificatePinner</code> 实现 <code> 证书绑定</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">OkHttpClient client = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">  .certificatePinner(</div><div class="line">        <span class="keyword">new</span> CertificatePinner.Builder().add(<span class="string">"your_host"</span>, <span class="string">"your_public_key"</span>).build())</div><div class="line">        .build();</div></pre></td></tr></table></figure>
+<p>至此，我们可以利用更为安全的 https 协议来传输用户名和密码来继续上面的注册流程。</p>
+<h3 id="Token 机制"><a href="#Token 机制" class="headerlink" title="Token 机制"></a>Token 机制 </h3><p> 回到注册流程，当服务端拿到用户名密码后，会去创建一个新的 user，同时我们会 <u> 基于用户相关信息 </u> 生成一个 <code>Token</code> 并回传给客户端。客户端在接收到 <code>Token</code> 后需要在本地进行存储。另外，由于每个 http 请求都是无状态的，因此未来客户端如果想把 <code>user_id</code> 等信息传递给服务端时，就必须通过 <code>Token</code> 来传递，才能识别出某个请求的来源。</p>
+<p>那么，我们应该如何在 Android 和服务端的代码里具体实现 Token 的 <code> 传递 </code>、<code> 解析 </code> 及<code>有效性验证机制 </code> 呢？</p>
+<p><strong>1. 首先在 Android 端，为了把 <code>Token</code> 信息存入到所有请求的 header 里供服务端使用，我们采用了 <code>okhttp3</code> 提供的 <code>interceptor 接口</code> 来。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">OkHttpClient client = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">       .addInterceptor(<span class="keyword">new</span> Interceptor() &#123;</div><div class="line">         <span class="meta">@Override</span></div><div class="line">         <span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">           Request request = chain.request();</div><div class="line">           Request.Builder newRequestBuilder = request.newBuilder();</div><div class="line">           String token = getAuthToken();</div><div class="line">           <span class="keyword">if</span> (!TextUtils.isEmpty(token)) &#123;</div><div class="line">             newRequestBuilder.addHeader(<span class="string">"Authorization"</span>, token);</div><div class="line">           &#125;</div><div class="line"></div><div class="line">           Request newRequest = newRequestBuilder.build();</div><div class="line">           <span class="keyword">return</span> chain.proceed(newRequest);</div><div class="line">         &#125;</div><div class="line">       &#125;)</div><div class="line">       .build();</div></pre></td></tr></table></figure>
+<p><strong>2. 然后在服务端，我们需要 <code> 解析 </code> 客户端传递过来的 Token 信息并进行 <code> 校验 </code>。这里可以创建一个<code>python</code> 的<code>decorator</code>方法：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">mobile_request</span><span class="params">(func)</span>:</span></div><div class="line"><span class="meta">   @functools.wraps(func)</span></div><div class="line">   <span class="function"><span class="keyword">def</span> <span class="title">wrapped</span><span class="params">(*args, **kwargs)</span>:</span></div><div class="line">       kwargs = kwargs <span class="keyword">if</span> kwargs <span class="keyword">or</span> &#123;&#125;</div><div class="line">   	<span class="keyword">if</span> request.headers.get(<span class="string">'Authorization'</span>):</div><div class="line">   		encrypted_token = request.headers.get(<span class="string">'Authorization'</span>)</div><div class="line">   		isValid, user_id = check_token(encrypted_token) // 解析并验证 token 有效性 </div><div class="line">   		<span class="keyword">if</span> <span class="keyword">not</span> isValid:</div><div class="line">   			abort(<span class="number">498</span>) //token 无效，返回<span class="number">498</span> 状态码 </div><div class="line">   		user = get_user_by_id(user_id)</div><div class="line">   		<span class="keyword">if</span> <span class="keyword">not</span> user:</div><div class="line">   			abort(<span class="number">1001</span>) // 找不到 user，自定义<span class="number">601</span> 状态码</div><div class="line">			kwargs[<span class="string">'user_id'</span>] = user_id // 成功解析出 user_id</div><div class="line">   	<span class="keyword">return</span> func(**kwargs)</div><div class="line">   <span class="keyword">return</span> wrapped</div></pre></td></tr></table></figure>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@app.route("/www/index")</span></div><div class="line"><span class="meta">@mobile_request // 使用 decorator 包装方法</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_user</span><span class="params">(**kwargs)</span>:</span></div><div class="line">	user_id = kwargs[<span class="string">'user_id'</span>] // 取出 decorator 中封装好的 user_id</div><div class="line">	<span class="keyword">return</span> db.get_user(user_id) // 利用 user_id 进行逻辑处理</div></pre></td></tr></table></figure>
+<p><strong>3. 最后，请求结果返回到客户端，如果通过监测状态码发现返回结果是与 Token 相关的 <code>error/ 异常</code>，则表示<code>Token 失效</code>，此时我们让用户强制重新登录，生成新 Token。这一步仍然可以在上面的<code>interceptor</code> 里进行。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">OkHttpClient client = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">       .addInterceptor(<span class="keyword">new</span> Interceptor() &#123;</div><div class="line">         <span class="meta">@Override</span></div><div class="line">         <span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">           ... <span class="comment">//put token into newRequest</span></div><div class="line">           Response response = chain.proceed(newRequest); <span class="comment">// 获取服务端返回结果</span></div><div class="line">           <span class="keyword">switch</span>(response.code()) &#123;</div><div class="line">             <span class="keyword">case</span> ResponseCode.USER_NOT_FOUND: <span class="comment">// 自定义状态码: 1001 找不到 user</span></div><div class="line">             	eventBus.post(<span class="keyword">new</span> UserNotFoundEvent()); <span class="comment">// 强制 logout</span></div><div class="line">             	<span class="keyword">break</span>;</div><div class="line">             <span class="keyword">case</span> ResponseCode.TOKEN_EXPIRED: <span class="comment">// 498 token 失效</span></div><div class="line">             	eventBus.post(<span class="keyword">new</span> TokenExpiredEvent()); <span class="comment">// 强制 logout</span></div><div class="line">             	<span class="keyword">break</span>;</div><div class="line">             <span class="keyword">default</span>:</div><div class="line">             	<span class="keyword">break</span>;</div><div class="line">           &#125;</div><div class="line">           <span class="keyword">return</span> response;</div><div class="line">         &#125;</div><div class="line">       &#125;)</div><div class="line">       .build();</div></pre></td></tr></table></figure>
+<p>至此，我们完成了 Android 端和服务端的 Token 传递、解析和失效处理。</p>
+<p>因此，在完善了 Token 的管理机制后，我们未来的 http 请求中只要带上这个 Token，就可以畅通无阻地去服务端做与自身 user 相关的各种操作了。</p>
+<p>那么，既然 Token 像家里门禁卡一样，<u>只要拥有就能进入我们服务端并获取这个特定 user 的所有数据 </u>。那也就意味着，<u> 一旦攻击者窃取了某个 user 的 Token</u>，那在 Token 失效前，攻击者随时可以利用这个 Token 获取这个 user 的一切信息。</p>
+<p>遇到 Token 被盗，该怎么办呢？</p>
+<h3 id="调整 Token 过期时间"><a href="# 调整 Token 过期时间" class="headerlink" title="调整 Token 过期时间"></a>调整 Token 过期时间 </h3><p> 针对 Token 被盗这种威胁，我们可以缩短 Token 的过期时间的方法。这样即使一个 Token 泄漏了，在一段时间后，这个 Token 也会自动失效。当然这也做会需要用户频繁登录获取新 Token；而且失效前的这段时间内，攻击者仍然是可以直接连上服务端随意获取数据的。</p>
+<h3 id="Request 签名"><a href="#Request 签名" class="headerlink" title="Request 签名"></a>Request 签名 </h3><p> 这种方法也是 OAuth 推荐的 <a href="https://oauth.net/core/1.0/#signing_process" target="_blank" rel="external"> 一种方法 </a>，其原理是<u> 在客户端和服务端统一好某种加密方法和一个密钥 </u>，这个密钥同时存储在客户端和服务端。每次客户端准备发起一个请求时，利用这种加密算法和密钥，针对<u> 该请求的 API 和参数 </u> 进行计算得到一个数，称之为这个 <code>Request 的签名</code>，然后我们把这个<code> 签名 </code> 放入到 Request 中。当服务端接收到 Request 后，就可以利用相同的加密算法和密钥来验证其中签名的真实性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">OkHttpClient client = <span class="keyword">new</span> OkHttpClient.Builder()</div><div class="line">        .addInterceptor(<span class="keyword">new</span> Interceptor() &#123;</div><div class="line">          <span class="meta">@Override</span></div><div class="line">          <span class="function"><span class="keyword">public</span> Response <span class="title">intercept</span><span class="params">(Chain chain)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">            Request request = chain.request();</div><div class="line">            String sign = RequestSignUtil.sign(request);</div><div class="line">            HttpUrl url = request.url().newBuilder()</div><div class="line">        		.addQueryParameter(<span class="string">"request_sign"</span>, sign)</div><div class="line">        		.build();</div><div class="line">            Request newRequest = request.newBuilder().url(url).build();</div><div class="line">            <span class="keyword">return</span> chain.proceed(newRequest);</div><div class="line">          &#125;</div><div class="line">        &#125;)</div><div class="line">        .build();</div></pre></td></tr></table></figure>
+<p>通过对每一个 Request 签名，可以确保服务端接收到的所有 Request 都来自我们自己的客户端。即使有人得到了 Token 想伪造 Request，他也不知道如何计算 Request 签名，从而减小了 Token 被盗的危害。</p>
+<p>当然，每种安全方法都有漏洞，Request 签名的方法意味着我们必须在客户端保存好加密算法和密钥，可以通过代码混淆、密钥存储到.so 文件等方法来提高破解难度，这里就不再细述了。</p>
+<h3 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h3><p> 上文中，从注册流程开始，介绍了我们在数据安全性方面采取的一些策略和相关实现代码，希望能对读者有帮助。</p>
+<p>最后，笔者认为虽然没有完美的安全性，但我们所做的每一步都能加大被攻击的难度。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/" rel="next" title="带你学开源项目：OkHttp-- 自己动手实现 okhttp">
+                <i class="fa fa-chevron-left"></i> 带你学开源项目：OkHttp-- 自己动手实现 okhttp
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/02/干货-Glow-Android-优化实践/" rel="prev" title="[干货] Glow Android 优化实践">
+                [干货] Glow Android 优化实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/13')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/13/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从注册说起"><span class="nav-number">1.</span> <span class="nav-text">从注册说起 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全站 Https"><span class="nav-number">2.</span> <span class="nav-text">全站 Https</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL-Pinning"><span class="nav-number">3.</span> <span class="nav-text">SSL Pinning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Token 机制"><span class="nav-number">4.</span> <span class="nav-text">Token 机制 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调整 Token 过期时间"><span class="nav-number">5.</span> <span class="nav-text">调整 Token 过期时间 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Request 签名"><span class="nav-number">6.</span> <span class="nav-text">Request 签名 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">7.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

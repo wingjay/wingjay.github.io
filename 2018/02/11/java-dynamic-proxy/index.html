@@ -1,0 +1,1015 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="动态代理,Java," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="之前的文章里讲解过了Java的反射机制、垃圾回收机制，这一次我们来讲解一个更有意思的机制：动态代理。学习下Java里为什么出现这样一个机制，什么场合下会使用这个机制。 《Java 技术之反射》《Java 技术之类加载机制》">
+<meta name="keywords" content="动态代理,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 技术之动态代理机制">
+<meta property="og:url" content="http://wingjay.com/2018/02/11/java-dynamic-proxy/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="之前的文章里讲解过了Java的反射机制、垃圾回收机制，这一次我们来讲解一个更有意思的机制：动态代理。学习下Java里为什么出现这样一个机制，什么场合下会使用这个机制。 《Java 技术之反射》《Java 技术之类加载机制》">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 技术之动态代理机制">
+<meta name="twitter:description" content="之前的文章里讲解过了Java的反射机制、垃圾回收机制，这一次我们来讲解一个更有意思的机制：动态代理。学习下Java里为什么出现这样一个机制，什么场合下会使用这个机制。 《Java 技术之反射》《Java 技术之类加载机制》">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 技术之动态代理机制 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 技术之动态代理机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-motorcycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2018-02-11T14:46:30+08:00" content="2018-02-11">
+              2018-02-11
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,436 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>之前的文章里讲解过了 Java 的反射机制、垃圾回收机制，这一次我们来讲解一个更有意思的机制：动态代理。学习下 Java 里为什么出现这样一个机制，什么场合下会使用这个机制。</p>
+<p><a href="/2017/04/26/Java-%E6%8A%80%E6%9C%AF%E4%B9%8B%E5%8F%8D%E5%B0%84/">《Java 技术之反射》</a><br><a href="/2017/05/08/java_classloader/">《Java 技术之类加载机制》</a></p>
+</blockquote>
+<a id="more"></a>
+<h2 id="静态代理"><a href="# 静态代理" class="headerlink" title="静态代理"></a>静态代理 </h2><p> 常规的代理模式有以下三个部分组成：<br><strong>功能接口</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IFunction</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doAThing</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>功能提供者</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FunctionProvider</span> <span class="title">implement</span> <span class="title">IFunction</span> </span>&#123;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">void</span> doAThing &#123;</div><div class="line">		System.out.print(<span class="string">"do A"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>功能代理者</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="title">implement</span> <span class="title">IFunction</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> FunctionProvider provider;</div><div class="line">	Proxy(FunctionProvider provider) &#123;</div><div class="line">		<span class="keyword">this</span>.provider = provider;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">void</span> doAThing &#123;</div><div class="line">		provider.doAThing();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>前两者就是普通的接口和实现类，而第三个就是所谓的代理类。对于使用者而言，他会让代理类去完成某件任务，并不关心这件任务具体的跑腿者。</p>
+<p>这就是静态代理，好处是方便调整变换具体实现类，而使用者不会受到任何影响。</p>
+<p>不过这种方式也存在弊端：比如有多个接口需要进行代理，那么就要为每一个功能提供者创建对应的一个代理类，那就会越来越庞大。而且，所谓的“静态”代理，意味着必须提前知道被代理的委托类。</p>
+<p>通过下面一个例子来说明下：</p>
+<h4 id="统计函数耗时–静态代理实现"><a href="# 统计函数耗时–静态代理实现" class="headerlink" title="统计函数耗时–静态代理实现"></a>统计函数耗时–静态代理实现 </h4><p> 现在希望通过一个代理类，对我感兴趣的方法进行耗时统计，利用静态代理有如下实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IAFunc</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doA</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IBFunc</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doB</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeConsumeProxy</span> <span class="title">implement</span> <span class="title">IAFunc</span>, <span class="title">IBFunc</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> AFunc a;</div><div class="line">	<span class="keyword">private</span> BFunc b;</div><div class="line">	<span class="keyword">public</span>(AFunc a, BFunc b) &#123;</div><div class="line">		<span class="keyword">this</span>.a = a;</div><div class="line">		<span class="keyword">this</span>.b = b;</div><div class="line">	&#125;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doA</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">long</span> start = System.currentMillions();</div><div class="line"></div><div class="line">		a.doA();</div><div class="line">		</div><div class="line">		System.out.println(<span class="string">"耗时："</span> + (System.currentMillions() - start));</div><div class="line">	&#125;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doB</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">long</span> start = System.currentMillions();</div><div class="line"></div><div class="line">		b.doB();</div><div class="line">		</div><div class="line">		System.out.println(<span class="string">"耗时："</span> + (System.currentMillions() - start));</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>弊端很明显，如果接口越多，每新增一个函数都要去修改这个 <code>TimeConsumeProxy</code> 代理类：把委托类对象传进去，实现接口，在函数执行前后统计耗时。</p>
+<p>这种方式显然不是可持续性的，下面来看下使用动态代理的实现方式，进行对比。</p>
+<h2 id="动态代理"><a href="# 动态代理" class="headerlink" title="动态代理"></a>动态代理 </h2><p> 动态代理的核心思想是通过 Java Proxy 类，为传入进来的任意对象动态生成一个代理对象，这个代理对象默认实现了原始对象的所有接口。</p>
+<p>还是通过统计函数耗时例子来说明更加直接。</p>
+<h4 id="统计函数耗时–动态代理实现"><a href="# 统计函数耗时–动态代理实现" class="headerlink" title="统计函数耗时–动态代理实现"></a>统计函数耗时–动态代理实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IAFunc</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doA</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IBFunc</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">void</span> <span class="title">doB</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> <span class="title">implement</span> <span class="title">IAFunc</span> </span>&#123; ... &#125;</div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> <span class="title">implement</span> <span class="title">IBFunc</span> </span>&#123; ... &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeConsumeProxy</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> Object realObject;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">bind</span><span class="params">(Object realObject)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.realObject = realObject;</div><div class="line">		Object proxyObject = Proxy.newInstance(</div><div class="line">			realObject.getClass().getClassLoader(),</div><div class="line">			realObject.getClass().getInterfaces(),</div><div class="line">			<span class="keyword">this</span></div><div class="line">		);</div><div class="line"></div><div class="line">		<span class="keyword">return</span> proxyObject;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        <span class="keyword">long</span> start = System.currentMillions();</div><div class="line"></div><div class="line">        Object result = method.invoke(target, args);</div><div class="line"></div><div class="line">        System.out.println(<span class="string">"耗时："</span> + (System.currentMillions() - start));</div><div class="line"></div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>具体使用时：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">	A a = <span class="keyword">new</span> A();</div><div class="line">	IAFunc aProxy = (IAFunc) <span class="keyword">new</span> TimeConsumeProxy().bind(a);</div><div class="line">	aProxy.doA();</div><div class="line"></div><div class="line">	B b = <span class="keyword">new</span> B();</div><div class="line">	IBFunc bProxy = (IBFunc) <span class="keyword">new</span> TimeConsumeProxy().bind(b);</div><div class="line">	bProxy.doB();	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里最大的区别就是：代理类和委托类 <strong> 互相透明独立</strong>，逻辑没有任何耦合，在运行时才绑定在一起。这也就是静态代理与动态代理最大的不同，带来的好处就是：无论委托类有多少个，代理类不受到任何影响，而且在编译时无需知道具体委托类。</p>
+<p>回到动态代理本身，上面代码中最重要的就是:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Object proxyObject = Proxy.newInstance(</div><div class="line">			realObject.getClass().getClassLoader(),</div><div class="line">			realObject.getClass().getInterfaces(),</div><div class="line">			<span class="keyword">this</span></div><div class="line">		);</div></pre></td></tr></table></figure></p>
+<p>通过 Proxy 工具，把真实委托类转换成了一个代理类，最开始提到了一个代理模式的三要素：功能接口、功能提供者、功能代理者；在这里对应的就是：<code>realObject.getClass().getInterfaces()</code>，<code>realObject</code>，<code>TimeConsumeProxy</code>。</p>
+<p>其实动态代理并不复杂，通过一个 Proxy 工具，为委托类的接口自动生成一个代理对象，后续的函数调用都通过这个代理对象进行发起，最终会执行到 <code>InvocationHandler#invoke</code> 方法，在这个方法里除了调用真实委托类对应的方法，还可以做一些其他自定义的逻辑，比如上面的运行耗时统计等。</p>
+<h2 id="探索动态代理实现机制"><a href="# 探索动态代理实现机制" class="headerlink" title="探索动态代理实现机制"></a>探索动态代理实现机制 </h2><p> 好了，上面我们已经把动态代理的基本用法及为什么要用动态代理进行了讲解，很多文章到这里也差不多了，不过我们还准备进一步探索一下给感兴趣的读者。</p>
+<p>抛出几个问题：</p>
+<ol>
+<li>上面生成的代理对象 <code>Object proxyObject</code> 究竟是个什么东西？为什么它可以转型成 <code>IAFunc</code>，还能调用<code>doA()</code> 方法？</li>
+<li>这个 <code>proxyObject</code> 是怎么生成出来的？它是一个 class 吗？</li>
+</ol>
+<p>下面我先给出答案，再一步步探究这个答案是如何来的。</p>
+<h3 id="问题一 -proxyObject 究竟是个什么 -gt- 动态生成的 -Proxy0-class 文件"><a href="# 问题一 -proxyObject 究竟是个什么 -gt- 动态生成的 -Proxy0-class 文件" class="headerlink" title="问题一: proxyObject 究竟是个什么 -&gt; 动态生成的 $Proxy0.class 文件"></a>问题一: proxyObject 究竟是个什么 -&gt; 动态生成的 $Proxy0.class 文件 </h3><p> 在调用 <code>Proxy.newInstance</code> 后，Java 最终会为委托类 <code>A</code> 生成一个真实的 class 文件：<code>$Proxy0.class</code>，而 <code>proxyObject</code> 就是这个 class 的一个实例。</p>
+<p>猜一下，这个 <code>$Proxy0.class</code> 类长什么样呢，包含了什么方法呢？回看下刚刚的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">IAFunc aProxy = (IAFunc) <span class="keyword">new</span> TimeConsumeProxy().bind(a);</div><div class="line">aProxy.doA();</div></pre></td></tr></table></figure></p>
+<p>推理下，显然这个 <code>$Proxy0.class</code> 实现了 <code>IAFunc</code> 接口，同时它内部也实现了 <code>doA()</code> 方法，而且重点是：这个 <code>doA()</code> 方法在运行时会执行到 <code>TimeConsumeProxy#invoke()</code> 方法里。</p>
+<p>重点来了！下面我们来看下这个 <code>$Proxy0.class</code> 文件，把它放进 IDE 反编译下，可以看到如下内容，来验证下刚刚的猜想：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> $<span class="title">Proxy0</span> <span class="keyword">extends</span> <span class="title">Proxy</span> <span class="keyword">implements</span> <span class="title">IAFunc</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m1;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m3;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m2;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Method m0;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> $Proxy0(InvocationHandler var1) <span class="keyword">throws</span>  &#123;</div><div class="line">        <span class="keyword">super</span>(var1);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object var1)</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="comment">// 省略</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">doA</span><span class="params">()</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">        	<span class="comment">// 划重点</span></div><div class="line">            <span class="keyword">super</span>.h.invoke(<span class="keyword">this</span>, m3, (Object[])<span class="keyword">null</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (RuntimeException | Error var2) &#123;</div><div class="line">            <span class="keyword">throw</span> var2;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable var3) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> UndeclaredThrowableException(var3);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="comment">// 省略</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> <span class="keyword">throws</span>  </span>&#123;</div><div class="line">        <span class="comment">// 省略</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> &#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">        	<span class="comment">// 划重点</span></div><div class="line">            m3 = Class.forName(<span class="string">"proxy.IAFunc"</span>).getMethod(<span class="string">"doA"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</div><div class="line"></div><div class="line">            m1 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"equals"</span>, <span class="keyword">new</span> Class[]&#123;Class.forName(<span class="string">"java.lang.Object"</span>)&#125;);</div><div class="line">            m2 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"toString"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</div><div class="line">            m0 = Class.forName(<span class="string">"java.lang.Object"</span>).getMethod(<span class="string">"hashCode"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]);</div><div class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException var2) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchMethodError(var2.getMessage());</div><div class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException var3) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NoClassDefFoundError(var3.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>没错，刚刚的猜想都中了！实现了 <code>IAFunc</code> 接口和 <code>doA()</code> 方法，不过，<code>doA()</code>里是什么鬼？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">super</span>.h.invoke(<span class="keyword">this</span>, m3, (Object[])<span class="keyword">null</span>);</div></pre></td></tr></table></figure>
+<p>回看下，<code>TimeConsumeProxy</code>里面的 <code>invoke</code> 方法，它的函数签名是啥？<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>没错，<code>doA()</code>里做的就是调用 <code>TimeConsumeProxy#invoke()</code> 方法。</p>
+<p>那么也就是说，下面这段代码执行流程如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">IAFunc aProxy = (IAFunc) <span class="keyword">new</span> TimeConsumeProxy().bind(a);</div><div class="line">aProxy.doA();</div></pre></td></tr></table></figure></p>
+<ol>
+<li>基于传入的委托类 <code>A</code>，生成一个<code>$Proxy0.class</code> 文件；</li>
+<li>创建一个 <code>$Proxy0.class</code> 对象，转型为 <code>IAFunc</code> 接口；</li>
+<li>调用 <code>aProxy.doA()</code> 时，自动调用 TimeConsumeProxy 内部的 <code>invoke</code> 方法。</li>
+</ol>
+<h3 id="问题二：proxyObject- 是怎么一步步生成出来的 -gt-Proxy0-class 文件生成流程"><a href="# 问题二：proxyObject- 是怎么一步步生成出来的 -gt-Proxy0-class 文件生成流程" class="headerlink" title="问题二：proxyObject 是怎么一步步生成出来的 -&gt; $Proxy0.class 文件生成流程"></a>问题二：proxyObject 是怎么一步步生成出来的 -&gt; $Proxy0.class 文件生成流程 </h3><p> 刚刚从末尾看了结果，现在我们回到代码的起始端来看：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Object proxyObject = Proxy.newInstance(</div><div class="line">			realObject.getClass().getClassLoader(),</div><div class="line">			realObject.getClass().getInterfaces(),</div><div class="line">			<span class="keyword">this</span></div><div class="line">		);</div></pre></td></tr></table></figure></p>
+<p>准备好，开始发车读源码了。我会截取重要的代码并加上注释。</p>
+<p>先看<code>Proxy.newInstance()</code>:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">newProxyInstance</span><span class="params">(ClassLoader loader,</span></span></div><div class="line"><span class="function"><span class="params">                                      Class&lt;?&gt;[] interfaces,</span></span></div><div class="line"><span class="function"><span class="params">                                      InvocationHandler h)</span> </span>&#123;</div><div class="line">    <span class="comment">// 复制要代理的接口                                  	</span></div><div class="line">	<span class="keyword">final</span> Class&lt;?&gt;[] intfs = interfaces.clone();</div><div class="line"></div><div class="line">	<span class="comment">// 重点：生成 $Proxy0.class 文件并通过 ClassLoader 加载进来</span></div><div class="line">	Class&lt;?&gt; cl = getProxyClass0(loader, intfs);</div><div class="line"></div><div class="line">	<span class="comment">// 对 $Proxy0.class 生成一个实例，就是 `proxyObject`</span></div><div class="line">	<span class="keyword">final</span> Constructor&lt;?&gt; cons = cl.getConstructor(constructorParams);</div><div class="line">	<span class="keyword">return</span> cons.newInstance(<span class="keyword">new</span> Object[]&#123;h&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>再来看 <code>getProxyClass0</code> 的具体实现：<code>ProxyClassFactory</code>工厂类：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public Class&lt;?&gt; apply(ClassLoader loader, Class&lt;?&gt;[] interfaces) &#123;</div><div class="line">	// 参数为 ClassLoader 和要代理的接口</div><div class="line"></div><div class="line">	Map&lt;Class&lt;?&gt;, Boolean&gt; interfaceSet = new IdentityHashMap&lt;&gt;(interfaces.length);</div><div class="line"></div><div class="line">	// 1. 验证 ClassLoader 和接口有效性</div><div class="line">	for (Class&lt;?&gt; intf : interfaces) &#123;</div><div class="line">		// 验证 classLoader 正确性</div><div class="line">		Class&lt;?&gt; interfaceClass = Class.forName(intf.getName(), false, loader);</div><div class="line">		if (interfaceClass != intf) &#123;</div><div class="line">            throw new IllegalArgumentException(</div><div class="line">                intf + &quot; is not visible from class loader&quot;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">		// 验证传入的接口 class 有效</div><div class="line">		if (!interfaceClass.isInterface()) &#123; ... &#125; </div><div class="line"></div><div class="line">		// 验证接口是否重复</div><div class="line">		if (interfaceSet.put(interfaceClass, Boolean.TRUE) != null) &#123; ... &#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	// 2. 创建包名及类名 $Proxy0.class</div><div class="line">	proxyPkg = ReflectUtil.PROXY_PACKAGE + &quot;.&quot;;</div><div class="line">	long num = nextUniqueNumber.getAndIncrement();</div><div class="line">    String proxyName = proxyPkg + proxyClassNamePrefix + num;</div><div class="line"></div><div class="line">    // 3. 创建 class 字节码内容</div><div class="line">    byte[] proxyClassFile = ProxyGenerator.generateProxyClass(proxyName, interfaces, accessFlags);</div><div class="line"></div><div class="line">    // 4. 基于字节码和类名，生成 Class&lt;?&gt; 对象</div><div class="line">    return defineClass0(loader, proxyName, proxyClassFile, 0, proxyClassFile.length);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>再看下第三步生成 class 内容 <code>ProxyGenerator.generateProxyClass</code>：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 添加 hashCode equals toString 方法</span></div><div class="line">addProxyMethod(hashCodeMethod, Object.class);</div><div class="line">addProxyMethod(equalsMethod, Object.class);</div><div class="line">addProxyMethod(toStringMethod, Object.class);</div><div class="line"></div><div class="line"><span class="comment">// 添加委托类的接口实现</span></div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; interfaces.length; i++) &#123;</div><div class="line">    Method[] methods = interfaces[i].getMethods();</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; methods.length; j++) &#123;</div><div class="line">         addProxyMethod(methods[j], interfaces[i]);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 添加构造函数</span></div><div class="line">methods.add(<span class="keyword">this</span>.generateConstructor());</div></pre></td></tr></table></figure></p>
+<p>这里构造好了类的内容：添加必要的函数，实现接口，构造函数等，下面就是要写入上一步看到的 <code>$Proxy0.class</code> 了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">ByteArrayOutputStream bout = <span class="keyword">new</span> ByteArrayOutputStream();</div><div class="line">DataOutputStream dout = <span class="keyword">new</span> DataOutputStream(bout);</div><div class="line">dout.writeInt(<span class="number">0xCAFEBABE</span>);</div><div class="line">...</div><div class="line">dout.writeShort(ACC_PUBLIC | ACC_FINAL | ACC_SUPER);</div><div class="line">...</div><div class="line"><span class="keyword">return</span> bout.toByteArray();</div></pre></td></tr></table></figure>
+<p>到这里就生成了第一步看到的 <code>$Proxy0.class</code> 文件了，完成闭环，讲解完成！</p>
+<h2 id="动态代理小结"><a href="# 动态代理小结" class="headerlink" title="动态代理小结"></a>动态代理小结 </h2><p> 通过上面的讲解可以看出，动态代理可以随时为任意的委托类进行代理，并可以在 <code>InvocationHandler#invoke</code> 拿到运行时的信息，并可以做一些切面处理。</p>
+<p>在动态代理背后，其实是为一个委托类动态生成了一个 <code>$Proxy0.class</code> 的代理类，该代理类会实现委托类的接口，并把接口调用转发到 <code>InvocationHandler#invoke</code> 上，最终调用到真实委托类的对应方法。</p>
+<p>动态代理机制把委托类和代理类进行了隔离，提高了扩展性。</p>
+<h2 id="Java 动态代理与 Python 装饰器"><a href="#Java 动态代理与 Python 装饰器" class="headerlink" title="Java 动态代理与 Python 装饰器"></a>Java 动态代理与 Python 装饰器 </h2><p> 这是 Java 语言提供的一个有意思的语言特性，而其实 Python 里也提供了一种类似的特性：装饰器，可以达到类似的面相切面编程思想，下次有空再把两者做下对比，这次先到这。</p>
+<p>–<br>谢谢。</p>
+<p>wingjay</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/动态代理/" rel="tag">#动态代理</a>
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/26/hey-2018/" rel="next" title="Hey 2018，Farewell 2017">
+                <i class="fa fa-chevron-left"></i> Hey 2018，Farewell 2017
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/26/《亿级-Android-架构》专栏随谈/" rel="prev" title="《亿级 Android 架构》专栏随谈">
+                《亿级 Android 架构》专栏随谈 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/28')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/28/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#静态代理"><span class="nav-number">1.</span> <span class="nav-text">静态代理 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#统计函数耗时–静态代理实现"><span class="nav-number">1.0.1.</span> <span class="nav-text">统计函数耗时–静态代理实现 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态代理"><span class="nav-number">2.</span> <span class="nav-text">动态代理 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#统计函数耗时–动态代理实现"><span class="nav-number">2.0.1.</span> <span class="nav-text">统计函数耗时–动态代理实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#探索动态代理实现机制"><span class="nav-number">3.</span> <span class="nav-text">探索动态代理实现机制 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题一 -proxyObject 究竟是个什么 -gt- 动态生成的 -Proxy0-class 文件"><span class="nav-number">3.1.</span> <span class="nav-text">问题一: proxyObject 究竟是个什么 -> 动态生成的 $Proxy0.class 文件 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题二：proxyObject- 是怎么一步步生成出来的 -gt-Proxy0-class 文件生成流程"><span class="nav-number">3.2.</span> <span class="nav-text">问题二：proxyObject 是怎么一步步生成出来的 -> $Proxy0.class 文件生成流程 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态代理小结"><span class="nav-number">4.</span> <span class="nav-text">动态代理小结 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java 动态代理与 Python 装饰器"><span class="nav-number">5.</span> <span class="nav-text">Java 动态代理与 Python 装饰器 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

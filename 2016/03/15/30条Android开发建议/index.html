@@ -1,0 +1,1002 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="There are two kinds of people ：     those who learn the hard way and those who learn by taking someone’s advice.">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="30 条 Android 开发建议">
+<meta property="og:url" content="http://wingjay.com/2016/03/15/30条Android开发建议/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="There are two kinds of people ：     those who learn the hard way and those who learn by taking someone’s advice.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.479Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="30 条 Android 开发建议">
+<meta name="twitter:description" content="There are two kinds of people ：     those who learn the hard way and those who learn by taking someone’s advice.">
+<meta name="twitter:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 30 条 Android 开发建议 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                30 条 Android 开发建议
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-03-15T12:03:03+08:00" content="2016-03-15">
+              2016-03-15
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,619 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>   There are two kinds of people ：<br>     those who learn the hard way and those who learn by taking someone’s advice. </p>
+</blockquote>
+<a id="more"></a>
+<p>本文主要用来收集 Android 开发中积累的一些宝贵经验，这些经验中有一些约定熟成且经过检验的建议，有一些结合最新技术的实践。无论是菜鸟还是大神，都应该学会阅读别人的经验，并结合自己的思考转化成对自己有用的知识，这才是最快的成长之路。另外，对于这些建议，我会尽量翔实的进行说明以确保能够顺利快速应用到实际开发中。</p>
+<h2 id="介绍"><a href="# 介绍" class="headerlink" title="介绍"></a>介绍 </h2><p> 下面以这篇文章：<a href="https://medium.com/@cesarmcferreira/building-android-apps-30-things-that-experience-made-me-learn-the-hard-way-313680430bf9#.efowqynql" target="_blank" rel="external">Building Android Apps — 30 things that experience made me learn the hard way</a>为核心，对其中提出的每一点建议进行较为深入的分析探究，最终整理成一篇完整的文章。当然，本文还在不断更新中。</p>
+<h4 id="第三方库"><a href="# 第三方库" class="headerlink" title="第三方库"></a>第三方库 </h4><p> 在你添加每一个 third party library 之前，请认真考虑是否真的需要这个 library。</p>
+<h4 id="OverDraw"><a href="#OverDraw" class="headerlink" title="OverDraw"></a>OverDraw</h4><p>如果用户看不到，那就不要进行绘制 (draw)，或者说，不要<code> 过度绘制 OverDraw</code><br><code>OverDraw</code>会导致 GPU 浪费，也会导致 app 的速度变慢。为了减少这种危害，我们可以利用 <a href="http://developer.android.com/tools/performance/debug-gpu-overdraw/index.html" target="_blank" rel="external"><code>Debug GPU Overdraw Tool</code></a> 来观察 app 里的绘制情况，然后可以使用 <a href="http://developer.android.com/tools/performance/hierarchy-viewer/index.html" target="_blank" rel="external">Hierarchy Viewer</a> 来进行优化。 </p>
+<h4 id="数据库"><a href="# 数据库" class="headerlink" title="数据库"></a>数据库 </h4><p> 除非不得不，否则不要使用<code>database</code></p>
+<h4 id="65k-methods-limit"><a href="#65k-methods-limit" class="headerlink" title="65k methods limit"></a>65k methods limit</h4><p><code>Dalvik 65K methods limit</code>你很快就会遇到的，不过放心，<a href="https://medium.com/@rotxed/dex-skys-the-limit-no-65k-methods-is-28e6cb40cf71" target="_blank" rel="external"><code>multidexing</code></a>会帮助你。<br>什么是 <code>Dalvik 65K methods limit</code>？我们知道，我们写完 java code 之后，dx tool 会把 java 编译成 Dalivik 虚拟机能识别的<code>DEX</code> 文件，这个文件里最多能够索引<code>65536 个 method</code>。关于这个有两点要注意：</p>
+<ol>
+<li>这些 method 是指能够 <code> 索引 (reference)</code> 到的，而不是 <code> 定义 (define)</code> 的。或者说，如果你定义了一个方法，但这个方法并没有被调用，那么就不算在内。</li>
+<li>这些 method 不仅仅是开发人员自己写的，还包括所有第三方 library 里面的 method。</li>
+</ol>
+<p>所以，我们总共可以索引 <code>65536</code> 个方法，包括自己写的和引入第三方库里的。<br>那么，我们如何能快速知道我们的 app 里已经有多少个 method 了呢？    </p>
+<ul>
+<li>bash script: <a href="https://github.com/mihaip/dex-method-counts" target="_blank" rel="external">dex-method-counts</a>。这个工具可以快速计算，并且提供一个清晰的视图来阅读。</li>
+<li><a href="https://gist.github.com/JakeWharton/6002797" target="_blank" rel="external">dex.sh</a> by Jake Wharton。这个工具由于采用了递归算法，所以耗时比较长。(Jake 大神还写了一篇有趣的分析文章<a href="http://jakewharton.com/play-services-is-a-monolith/" target="_blank" rel="external">Play Services 5.0 Is A Monolith Abomination</a>，针对 Play Services 5.0 太大的问题进行了分析，有空时我再翻译下给各位。虽然<a href="http://android-developers.blogspot.it/2014/12/google-play-services-and-dex-method.html" target="_blank" rel="external">Play Services 6.5 已经模块化，更加轻量级了</a>）。</li>
+</ul>
+<p>现在，既然我们已经知道了自家 app 里的 method 数了，那么如何来处理这种情况呢？</p>
+<ul>
+<li><a href="http://developer.android.com/tools/building/multidex.html" target="_blank" rel="external">Multidex</a>，官方提供的解决方案，<a href="http://blog.osom.info/2014/10/multi-dex-to-rescue-from-infamous-65536.html" target="_blank" rel="external">这篇文章 </a> 里有详细的使用方法，此不赘述。</li>
+<li><a href="http://developer.android.com/tools/help/proguard.html" target="_blank" rel="external">ProGuard</a><br><code>ProGuard</code>可以把 code 里 unnecessary 的 method 移除，压缩 apk，当然还有 <code> 代码混淆 </code> 的奇效。</li>
+<li>再创建一个 <code>DEX File</code>。把 app 里可以独立的模块或 code 提取出来，放到一个独立的 dex 文件里，你可以使用<a href="http://android-developers.blogspot.it/2011/07/custom-class-loading-in-dalvik.html" target="_blank" rel="external">Custom ClassLoader</a> 来加载这些类，然后使用 <code> 接口 </code> 或<code>反射 </code> 来调用这些方法。不过，这个过程还是比较麻烦的。</li>
+</ul>
+<h4 id="RxJava-RxAndroid-amp-Retrolambda"><a href="#RxJava-RxAndroid-amp-Retrolambda" class="headerlink" title="RxJava, RxAndroid &amp; Retrolambda"></a><code>RxJava, RxAndroid &amp; Retrolambda</code></h4><p>使用前可以通过 <a href="https://gist.github.com/cesarferreira/510aa2456dc0879f559f#file-rxjava-md" target="_blank" rel="external"> 这篇 gist</a>来了解 <a href="https://github.com/ReactiveX/RxJava" target="_blank" rel="external">RxJava</a>＋<a href="https://github.com/ReactiveX/RxAndroid" target="_blank" rel="external">RxAndroid</a>＋<a href="https://github.com/orfjackal/retrolambda" target="_blank" rel="external">Retrolambda</a> 的结合用法。这个组合可以优雅的在不同线程中处理事务，同时能够方便的实现数据流动和及时响应，而且 Retrolambda 能够精简你的 code。其中，核心的两个概念是 <code>Observables</code> 和<code>Subscribers</code>，前者对外提供数据，后者监听并消费这些数据。<br>另外，这里有一个看起来不错的项目<a href="https://github.com/kaushikgopal/RxJava-Android-Samples" target="_blank" rel="external">Learning RxJava for Android by example</a>，等空闲时再去阅读下 code。</p>
+<h4 id="Retrofit-＋-RxJava"><a href="#Retrofit-＋-RxJava" class="headerlink" title="Retrofit ＋ RxJava"></a><code>Retrofit</code> ＋ RxJava</h4><p>利用 <a href="http://square.github.io/retrofit/" target="_blank" rel="external">Retrofit</a> 与 RxJava 结合，为你的 app 提供网络请求服务。<br>你可以参考这个 <a href="https://gist.github.com/cesarferreira/da1e8fc5742ab1e581b7" target="_blank" rel="external"> 超赞的例子</a>，让你快速感受二者结合使用方法。</p>
+<h4 id="按 feature 来分 package，而不是按 layer"><a href="# 按 feature 来分 package，而不是按 layer" class="headerlink" title="按 feature 来分 package，而不是按 layer"></a>按 <code>feature</code> 来分 package，而不是按 <code>layer</code></h4><p> 这是这篇文章提出的一个点，文中认为分 package 就像公司安排座位，要按照 <code>team</code> 来分而不是按照每个人的职位来分，即按照负责一个 app 的 <code>developer、designer、pm</code> 坐在一起，而不是把所有 <code>developer</code> 坐在一起，所有 <code>designer</code> 坐在一起。所以，原文作者认为把一个 feature 相关的如 <code>Activity</code> <code>adapter</code> 等都放在一起。</p>
+<p>不过，我认为按 feature 也有坏处，那就是 <code> 复用 </code>，拿 adapter 来讲，一个 app 里很多 adapter 是类似且可以复用的，如果我们把各个 adapter 拆倒各个角落里，就很难提取其中的关联来创建一个<code>BaseAdapter</code> 了。而且，<code>不同 feature 之间也有很多公用的东西 </code>，比如一个自定义 view，那就很难界定应该放在哪个 feature 包里了。相反，我们把所有自定义 view 放在一起，这样也有助于我们发现某些自定义 view 的区别，然后在 refactor 时可以提取公用的东西来<code> 复用</code>。</p>
+<p>关于这点，欢迎读者给出自己意见。</p>
+<h4 id="Gradle- 加速"><a href="#Gradle- 加速" class="headerlink" title="Gradle 加速"></a>Gradle 加速 </h4><p> 参考 <a href="https://medium.com/the-engineering-team/speeding-up-gradle-builds-619c442113cb#.vpoaqdivn" target="_blank" rel="external"> 这篇文章 </a> 来加速你的 Gradle</p>
+<h4 id="架构：使用 clean-Architecture"><a href="# 架构：使用 clean-Architecture" class="headerlink" title="架构：使用 clean Architecture"></a>架构：使用 clean Architecture</h4><p>这里有两篇优质文章:<a href="http://fernandocejas.com/2014/09/03/architecting-android-the-clean-way/" target="_blank" rel="external">Architecting Android…The clean way?</a>和 <a href="http://fernandocejas.com/2015/07/18/architecting-android-the-evolution/" target="_blank" rel="external">Architecting Android…The evolution</a> 分别介绍并用 code 实现了一个 Clean 架构。后面我也会专门分析下这种架构，因为对于任何一个 project 而言，最初的好的架构是非常重要的！所以，如果你想提高自己，那么<code> 架构 </code> 这一关是必经之路。</p>
+<h4 id="测试你的 app"><a href="# 测试你的 app" class="headerlink" title="测试你的 app"></a>测试你的 app</h4><p>虽然做测试需要花费你不少时间，但一旦你完成了这一步，以后的开发会更加快速，app 也会更加稳定。<br>这里有个哥们，<a href="http://stackoverflow.com/a/67500/794485" target="_blank" rel="external">对 <code>unit test</code> 进行了细致的点评</a>。</p>
+<h4 id="使用依赖注入神器 Dagger"><a href="# 使用依赖注入神器 Dagger" class="headerlink" title="使用依赖注入神器 Dagger"></a>使用 <code> 依赖注入 </code> 神器 <code>Dagger</code></h4><p> 如果你不知道什么是 <code> 依赖注入 </code>，你可以先读一下这篇文章<a href="http://antonioleiva.com/dependency-injection-android-dagger-part-1/" target="_blank" rel="external">Dependency injection on Android: Dagger (Part 1)</a>，或者这篇<a href="https://github.com/android-cn/blog/tree/master/java/dependency-injection" target="_blank" rel="external"> 依赖注入 </a>。简单来说，依赖注入替代了传统创建对象的<code>new</code> 操作，当需要创建一个 class 的实例时，使用依赖注入从外部直接获取一个实例，具体这个实例是如何创建的不需要关心，由一个对象库统一管理每个对象的创建过程，并直接对外提供对象。这样做的好处是我们不用管实例是怎么创建的，这种抽象可以使得每个对象的创建过程变得可扩展性，只要在对象库里修改一次，那么所有用到这个实例的地方都随之变更。例如在测试时，我们希望某个 mock 某个对象的数据，就可以修改注入的对象。</p>
+<p>依赖注入有不少工具，不过 <a href="http://google.github.io/dagger/" target="_blank" rel="external">Dagger2</a> 使用的是 <code> 编译时代码生成 (code generation)</code> 方式而不是 <code> 反射 (reflection)</code>，所以它的性能比较出众。<a href="http://fernandocejas.com/2015/04/11/tasting-dagger-2-on-android/" target="_blank" rel="external"> 这篇文章 </a> 有对 Dagger2 的实践和分析。</p>
+<h4 id="EditText"><a href="#EditText" class="headerlink" title="EditText"></a>EditText</h4><p><a href="http://developer.android.com/training/keyboard-input/style.html" target="_blank" rel="external">对 EditText 使用合适的输入类型</a></p>
+<h4 id="关注新的开源 library"><a href="# 关注新的开源 library" class="headerlink" title="关注新的开源 library"></a>关注新的开源 library</h4><p>你可以通过 <a href="http://android-arsenal.com/cc" target="_blank" rel="external">Android Arsenal</a> 来保持对开源项目的关注，同时利用这个工具 <a href="https://github.com/cesarferreira/dryrun" target="_blank" rel="external">dryrun</a> 来快速将开源项目跑在 genymotion 以看到实际效果。</p>
+<h4 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h4><p>如果你创建了 Service，那么一旦这个 Service 完成了自己的使命，就应该立即清理掉它</p>
+<h4 id="AccountManager"><a href="#AccountManager" class="headerlink" title="AccountManager"></a>AccountManager</h4><p>使用 <a href="http://developer.android.com/reference/android/accounts/AccountManager.html" target="_blank" rel="external">AccountManager</a> 来统一管理用户的帐号密码。</p>
+<h4 id="使用持续集成 CI-Continuous-Integration- 来编译并发布你的 beta 和 release-build"><a href="# 使用持续集成 CI-Continuous-Integration- 来编译并发布你的 beta 和 release-build" class="headerlink" title="使用持续集成 CI(Continuous Integration)来编译并发布你的 beta 和 release build"></a>使用 <code> 持续集成 CI(Continuous Integration)</code>来编译并发布你的 beta 和 release build</h4><p>持续集成可以帮助你方便的编译并发布项目，不过，不要去搭建你们自己的 CI 服务器，因为你需要花费太多的时间来处理硬盘空间、安全问题和预防 SSL 攻击等问题。你可以尝试 Jenkins、circleci、 travis 或者 shippable，这些价格并不贵，而且能帮你省很多事情。</p>
+<h4 id="自动发布到 Play-Store"><a href="# 自动发布到 Play-Store" class="headerlink" title="自动发布到 Play Store"></a>自动发布到 Play Store</h4><p>你可以使用这个工具 <a href="https://github.com/Triple-T/gradle-play-publisher" target="_blank" rel="external">gradle-play-publisher</a> 来帮助你自动上传 apk 到 Play Store 上</p>
+<h4 id="开始考虑用 svg 替代 png"><a href="# 开始考虑用 svg 替代 png" class="headerlink" title="开始考虑用 svg 替代 png"></a>开始考虑用 svg 替代 png</h4><p>理由很简单，android developer 应该很熟悉每次导入一张图片时都需要生成四五种不同大小的 png 图片并放入到对应文件夹。与其维护这么多图片，显然使用一张 svg 图片更加方便。而且，google 也在不断提供相关的支持，除了基本的 <a href="http://developer.android.com/tools/help/vector-asset-studio.html" target="_blank" rel="external">Vector Drawable</a>，从最新的<a href="http://android-developers.blogspot.com/2016/02/android-support-library-232.html" target="_blank" rel="external">Support Library</a> 我们也能看到 google 也在鼓励 developer 们使用 svg。</p>
+<p>不过，svg 也有自己的限制，比如它比较适合小 icon，因为它最终会生成 bitmap 加载以供显示，所以这需要一定的 cpu 支持。当然总体来讲 svg 还是更优的，至少大家可以不用再维护四五张不同尺寸的图片了。</p>
+<h4 id="将一些 library 的类进行抽象，从而方便后期替换 library"><a href="# 将一些 library 的类进行抽象，从而方便后期替换 library" class="headerlink" title="将一些 library 的类进行抽象，从而方便后期替换 library"></a>将一些 library 的类进行抽象，从而方便后期替换 library</h4><p>例如，一旦我们打 log 会使用 <code>Log.i()</code>，但是，如果后面我们突然想换成<code>Timber.i()</code> 就会很麻烦，需要一个个 log 找到来替换。但是，如果我们抽象出一个 <code>AppLogger</code> 来，全部调用 <code>AppLogger.i()</code> 来记 log，那么我们只要简单的在 <code>AppLogger</code> 内部替换掉具体实现就可以了。</p>
+<h4 id="监控网络连接类型，区分移动数据流量和 Wi-Fi；同样，可以监控电量和充电状态"><a href="# 监控网络连接类型，区分移动数据流量和 Wi-Fi；同样，可以监控电量和充电状态" class="headerlink" title="监控网络连接类型，区分移动数据流量和 Wi-Fi；同样，可以监控电量和充电状态"></a>监控网络连接类型，区分 <code> 移动数据流量 </code> 和<code>Wi-Fi</code>；同样，可以监控 <code> 电量 </code> 和<code>充电状态 </code></h4><p> 对于不同网络类型，我们可以动态改变我们的 UI，比如大图可以选择在 <code>Wi-Fi</code> 下才加载，而在 <code> 移动数据流量 </code> 则不加载。对于 <code> 电量 </code> 也是类似的逻辑。用户一定会很感谢 app 做的这种自适应的。</p>
+<h4 id="User-Interface-is-like-a-joke-If-you-have-to-explain-it-it’s-not-that-good"><a href="#User-Interface-is-like-a-joke-If-you-have-to-explain-it-it’s-not-that-good" class="headerlink" title="User Interface is like a joke.If you have to explain it, it’s not that good."></a>User Interface is like a joke.If you have to explain it, it’s not that good.</h4><h4 id="先写 slow 但是 right 的代码，再去进行优化"><a href="# 先写 slow 但是 right 的代码，再去进行优化" class="headerlink" title="先写 slow 但是 right 的代码，再去进行优化"></a>先写 slow 但是 right 的代码，再去进行优化 </h4><h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a> 小结 </h2><p> 本文长期更新，会保持跟踪最新的技术和研究实践经验，为大家提供有效有用的经验，少走坑。</p>
+<p>谢谢！</p>
+<p>wingjay</p>
+<p>欢迎各位关注 <br><a href="https://github.com/wingjay" target="_blank" rel="external"> 我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和 <br><a href="http://wingjay.com"> 我的个人博客 </a>: <a href="http://wingjay.com">http://wingjay.com</a><br> 和<br><a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">我的简书 </a>: <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">http://www.jianshu.com/users/da333fd63fe5/latest_articles</a><br> 和<br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a><br>如果有问题，可以给我留言或发邮件<a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x79;&#105;&#x6e;&#x6a;&#105;&#101;&#x73;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#111;&#109;">&#x79;&#105;&#x6e;&#x6a;&#105;&#101;&#x73;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#111;&#109;</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/12/一种快速毛玻璃虚化效果实现/" rel="next" title="一种快速毛玻璃虚化效果实现">
+                <i class="fa fa-chevron-left"></i> 一种快速毛玻璃虚化效果实现
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/" rel="prev" title="带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践">
+                带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/17')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/17/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第三方库"><span class="nav-number">1.0.1.</span> <span class="nav-text">第三方库 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OverDraw"><span class="nav-number">1.0.2.</span> <span class="nav-text">OverDraw</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库"><span class="nav-number">1.0.3.</span> <span class="nav-text">数据库 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#65k-methods-limit"><span class="nav-number">1.0.4.</span> <span class="nav-text">65k methods limit</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RxJava-RxAndroid-amp-Retrolambda"><span class="nav-number">1.0.5.</span> <span class="nav-text">RxJava, RxAndroid & Retrolambda</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Retrofit-＋-RxJava"><span class="nav-number">1.0.6.</span> <span class="nav-text">Retrofit ＋ RxJava</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#按 feature 来分 package，而不是按 layer"><span class="nav-number">1.0.7.</span> <span class="nav-text">按 feature 来分 package，而不是按 layer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gradle- 加速"><span class="nav-number">1.0.8.</span> <span class="nav-text">Gradle 加速 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#架构：使用 clean-Architecture"><span class="nav-number">1.0.9.</span> <span class="nav-text">架构：使用 clean Architecture</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试你的 app"><span class="nav-number">1.0.10.</span> <span class="nav-text">测试你的 app</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用依赖注入神器 Dagger"><span class="nav-number">1.0.11.</span> <span class="nav-text">使用  依赖注入  神器 Dagger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#EditText"><span class="nav-number">1.0.12.</span> <span class="nav-text">EditText</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关注新的开源 library"><span class="nav-number">1.0.13.</span> <span class="nav-text">关注新的开源 library</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Service"><span class="nav-number">1.0.14.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AccountManager"><span class="nav-number">1.0.15.</span> <span class="nav-text">AccountManager</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用持续集成 CI-Continuous-Integration- 来编译并发布你的 beta 和 release-build"><span class="nav-number">1.0.16.</span> <span class="nav-text">使用  持续集成 CI(Continuous Integration)来编译并发布你的 beta 和 release build</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自动发布到 Play-Store"><span class="nav-number">1.0.17.</span> <span class="nav-text">自动发布到 Play Store</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开始考虑用 svg 替代 png"><span class="nav-number">1.0.18.</span> <span class="nav-text">开始考虑用 svg 替代 png</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将一些 library 的类进行抽象，从而方便后期替换 library"><span class="nav-number">1.0.19.</span> <span class="nav-text">将一些 library 的类进行抽象，从而方便后期替换 library</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#监控网络连接类型，区分移动数据流量和 Wi-Fi；同样，可以监控电量和充电状态"><span class="nav-number">1.0.20.</span> <span class="nav-text">监控网络连接类型，区分  移动数据流量  和Wi-Fi；同样，可以监控  电量  和充电状态 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#User-Interface-is-like-a-joke-If-you-have-to-explain-it-it’s-not-that-good"><span class="nav-number">1.0.21.</span> <span class="nav-text">User Interface is like a joke.If you have to explain it, it’s not that good.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#先写 slow 但是 right 的代码，再去进行优化"><span class="nav-number">1.0.22.</span> <span class="nav-text">先写 slow 但是 right 的代码，再去进行优化 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">2.</span> <span class="nav-text"> 小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

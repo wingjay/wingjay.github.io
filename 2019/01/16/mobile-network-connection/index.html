@@ -1,0 +1,1069 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,架构,高可用,网络," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="读者好，前面我们在《Android 架构之网络连接与加速》和《Android 架构之长连接技术》两篇文章中，讲解了Http短连接、TCP长连接、连接复用与速度优化、数据压缩等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如DNS劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。 因此，本文主要谈一下在真实的网络环境下，存在哪">
+<meta name="keywords" content="Android,架构,高可用,网络">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 架构之高可用移动网络连接">
+<meta property="og:url" content="http://wingjay.com/2019/01/16/mobile-network-connection/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="读者好，前面我们在《Android 架构之网络连接与加速》和《Android 架构之长连接技术》两篇文章中，讲解了Http短连接、TCP长连接、连接复用与速度优化、数据压缩等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如DNS劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。 因此，本文主要谈一下在真实的网络环境下，存在哪">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/1/16/16854a8022fae7a7?w=500&h=500&f=gif&s=2452895">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/1/16/16854a8022cf2833?w=1280&h=852&f=jpeg&s=142010">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/1/16/16854a80252a5bf8?w=640&h=296&f=png&s=114867">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2019/1/16/16854a802525d5dc?w=1000&h=666&f=jpeg&s=247647">
+<meta property="og:updated_time" content="2019-01-16T03:43:42.783Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 架构之高可用移动网络连接">
+<meta name="twitter:description" content="读者好，前面我们在《Android 架构之网络连接与加速》和《Android 架构之长连接技术》两篇文章中，讲解了Http短连接、TCP长连接、连接复用与速度优化、数据压缩等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如DNS劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。 因此，本文主要谈一下在真实的网络环境下，存在哪">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2019/1/16/16854a8022fae7a7?w=500&h=500&f=gif&s=2452895">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Android 架构之高可用移动网络连接 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android 架构之高可用移动网络连接
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-bicycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2019-01-16T11:36:02+08:00" content="2019-01-16">
+              2019-01-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/亿级Android架构/" itemprop="url" rel="index">
+                    <span itemprop="name">亿级Android架构</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,362 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>读者好，前面我们在 <a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络连接与加速》</a> 和<a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">《Android 架构之长连接技术》</a>两篇文章中，讲解了 <code>Http 短连接、TCP 长连接、连接复用与速度优化、数据压缩</code> 等方面的知识点。不过，真实的网络环境是很复杂的，存在各种各样的因素会导致网络服务不可用，比如 DNS 劫持、服务器宕机、弱网等。换言之，如果服务都不可用，那上面这些优化也就没有意义了。</p>
+<p>因此，本文主要谈一下在真实的网络环境下，存在哪些常见的网络不可用原因，以及大多数公司是如何解决并兜底，从而达到 <code> 高可用连接 </code> 这个目标的。</p>
+<p>文章会从下面几方面进行阐述：</p>
+<ul>
+<li>DNS 劫持与可靠 IP 获取<ul>
+<li>HttpDNS</li>
+<li>内置 IP 列表 + 自动测速</li>
+</ul>
+</li>
+<li>IP 列表的缓存更新策略</li>
+<li>IP 列表可用性兜底策略</li>
+<li>针对弱网的多 IP 复合连接测速</li>
+<li>自主网络诊断</li>
+</ul>
+<a id="more"></a>
+<h2 id="DNS 劫持与可靠 IP 获取"><a href="#DNS 劫持与可靠 IP 获取" class="headerlink" title="DNS 劫持与可靠 IP 获取"></a>DNS 劫持与可靠 IP 获取 </h2><p> 我们知道，大多数的网络请求第一步就是 DNS 过程，经过 1-RTT 的时间将域名转化为 IP 地址，然后再去发起请求。但是，有相关经验的开发者应该了解，DNS 过程不仅耗时不稳定（3G 下 200ms，4G 下 100ms），而且可能解析失败，甚至被劫持，将用户导入到了错误的 IP 地址。如果攻击者自己做一个仿冒的网站，劫持你的 DNS 并将 IP 转到这个假网站上，可能会造成很大的用户数据泄漏和公司品牌损失。</p>
+<p>为了解决这个问题，获得可靠的 IP 列表，现有大厂会采用下面一些方案：</p>
+<h4 id="1-HTTPDNS"><a href="#1-HTTPDNS" class="headerlink" title="1. HTTPDNS"></a>1. HTTPDNS</h4><p>比如阿里云和腾讯云都推出了自己的 HttpDNS 服务，在全国多地部署相关的服务器提供安全解析 DNS 服务。</p>
+<p>基本的原理就是通过发起 Http 请求到 HttpDNS 服务器，获取某个域名对应的可用 IP 列表。这个 IP 列表可以根据用户当前的地点进行返回，而且默认会进行 IP 测速，按速度排序。同时，伴随这 IP 列表，服务器还会下发一个缓存有效时间 TTL，有了这个时间，客户端可以放心的将 IP 列表缓存在本地，并在即将过期前及时去更新 IP 列表，保证每次网络请求都可以使用 <strong> 当前最优 </strong> 的 IP 地址。</p>
+<h4 id="2- 内置 IP 列表 - 自动测速"><a href="#2- 内置 IP 列表 - 自动测速" class="headerlink" title="2. 内置 IP 列表 + 自动测速"></a>2. 内置 IP 列表 + 自动测速 </h4><p> 当然，自建 HttpDNS 服务需要一定规模的机房部署、大量的客户端测速数据上报、全球 IP 库收集等，需要不少的投入。因此，有些公司比如 <strong> 携程 </strong> 就采用了更加轻量一点的方案：<code>内置 IP 列表</code>。</p>
+<p>具体原理如下：</p>
+<p>在 APK 打包时会内置一份 IP 列表进去。当 App 启动时，这些 IP 的权重相同，此时会随机从里面获取 IP 来使用。但是这有个问题，对不同地区的用户而言，最优 IP 肯定是不同的。比如对于上海的用户而言，上海区服务器的 IP 肯定是最快的，而对于深圳的用户而言，华南区 IP 才是最快的。因此，在 App 运行过程中，我们会通过依次对 IP 列表逐个进行<strong>Ping 测速</strong>，根据测速结果动态变更 IP 的权重，然后提供给网络连接使用。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/1/16/16854a8022fae7a7?w=500&amp;h=500&amp;f=gif&amp;s=2452895" alt=""></p>
+<h2 id="IP 列表的缓存更新策略"><a href="#IP 列表的缓存更新策略" class="headerlink" title="IP 列表的缓存更新策略"></a>IP 列表的缓存更新策略 </h2><p> 通过 <code>HttpDNS 或内置 IP 列表</code> 的方案，我们可以为网络层提供一份相对可靠的 IP 地址作为缓存，每次需要发起请求时，直接从缓存里读取这份 IP 列表即可建立 IP 直连。</p>
+<p>那新的问题来了，移动网络是在不断变化的。最常见的场景，比如我们从 Wi-Fi 切换到了 4G，获取进入电梯后从 4G 降级成 3G，或者我们从 A Wi-Fi 换到了 B Wi-Fi，这都意味着我们的 <strong> 网络链路变更 </strong> 了。那么，<code>之前缓存的 IP 列表是否仍然可用，或者仍然最优呢？</code></p>
+<p>显然并不一定，比如从 Wi-Fi 切到了移动 4G，背后整条网络链路都不同了，之前的 IP 列表很有可能不是最优的了，极端情况下可能某些 IP 地址也不可用了。因此，我们需要最好 IP 列表的及时更新，保证无论网络如何切换，我们都能使用最优的 IP 地址列表。</p>
+<p>具体有下面几种方式：</p>
+<ol>
+<li>定时器监听 HttpDNS 返回的<code>TTL 过期时间</code>。当 IP 列表即将过期前，发起请求获取下一轮的 IP 列表并进行更新；</li>
+<li>监控网络连接状态，网络链路切换，比如 Wi-Fi/3G/4G 转换，如果是 Wi-Fi，还可以监控 SSID 信息变更（针对不同的 Wi-Fi 热点），及时触发 IP 列表刷新；在异步更新过程中，可以仍然使用旧缓存 IP 提供服务；</li>
+<li>配置中心下发，这种有时会用在服务器分流，比如某台服务器压力过大，可以通过配置中心系统下发新的 IP 列表给客户端访问。</li>
+</ol>
+<p>另外，IP 列表缓存应该对不同网络类型、网络标识有对应的一份缓存，可以使用 <code> 网络类型（3G、4G、Wi-Fi 等）+ 网络标识（SSID、ispCode 等）</code>作为 <code> 缓存 Key</code>，当网络切换时，使用 Key 去查询缓存。</p>
+<p>这些缓存可以持久化到多个文件，以 Key 作为文件名，同时可以基于当前网络状态，缓存一份 IP 列表到内存供使用，当网络状态变化，则刷新内存缓存。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/1/16/16854a8022cf2833?w=1280&amp;h=852&amp;f=jpeg&amp;s=142010" alt=""></p>
+<h2 id="IP 列表可用性兜底策略"><a href="#IP 列表可用性兜底策略" class="headerlink" title="IP 列表可用性兜底策略"></a>IP 列表可用性兜底策略 </h2><p> 通过更新机制，我们可以保证本地 IP 列表缓存动态更新的及时性。那么，<code>如果 HttpDNS 服务器出现故障呢，或者首次打开 App，HttpDNS 还没有完成，或者大面积 DNS 劫持等，怎么办呢？</code></p>
+<p>所以说，除了及时获取最优 IP 列表，我们还要考虑，如果获取不到 IP 列表，如何进行兜底？保证用户的网络请求不受影响。</p>
+<p>在线上运行中，可以采取下面四组 IP 兜底策略，按优先级排列如下：</p>
+<ul>
+<li>HttpDNS IP：即大厂自建的 HttpDNS 服务获取动态 IP；</li>
+<li>DNS IP：即常规 Local DNS 获取 IP；</li>
+<li>Auth IP：通过配置下发的动态保底 IP 列表；</li>
+<li>Hardcode IP：本地写死的保底 IP 列表</li>
+</ul>
+<p>前面两种动态 IP 不用多说，大家都清楚，这两者可以动态获取 IP，效果最好。但是，如果发生故障，导致这两个方案都不可用，比如大面积 DNS 劫持之类的，这时客户端必须能够自动降级到 <code> 静态兜底 IP</code>，保证网络服务可用。</p>
+<p>但这也可能存在一个问题，就是 <code> 静态兜底 IP</code>对应服务器访问量可能会突然暴增，如果峰值太高可能造成更大的危害如 <code> 雪崩 </code>。因此，除了内置静态兜底 IP，还需要为客户端提供一个可通过<code> 配置动态下发 </code> 的<code>兜底 IP 列表</code>，可以做到负载均衡，将流量分散到不同机器上。而且这些静态 IP 贵精不贵多，并且要有高可用的后台服务保证，作为全局网络服务的兜底。</p>
+<h2 id="针对弱网的多 IP 复合连接测速"><a href="# 针对弱网的多 IP 复合连接测速" class="headerlink" title="针对弱网的多 IP 复合连接测速"></a>针对弱网的多 IP 复合连接测速 </h2><p> 通过上面的几套方案，可以保证用户能够 <code> 高可用的获取最优 IP 列表</code>，提高用户访问速度，而且能应对各种复杂的网络状态。</p>
+<p>那么现在考虑这样一种情况，上面的 IP 列表我们能够正常的获取，但是，<strong>用户处于弱网状态下，IP 连接成功率很低，怎么办呢？</strong></p>
+<p>针对弱网一般有两种方式：</p>
+<ul>
+<li>串行连接：先连接第一个 IP，直到发生了超时，再去对第二个 IP 建连；</li>
+<li>并行连接：同时对多个 IP 建立连接，哪个连成功了就用哪个；</li>
+</ul>
+<p>这两种方案的缺点是：串行连接可能需要很长时间的试错，才能找到可用的 IP，而且这里还取决于如何选择超时时间，如果超时时间较长，则需要很长时间才能找到可用 IP；如果很短，则可能会漏掉一些相对优质的 IP，不断去尝试新 IP，恶性循环；而并行连接则会对服务端造成极大的连接负载压力和一定程度的浪费，对于电量也有一定程度开销。</p>
+<p>因此，这里我们介绍下 <code>Mars 里的复合连接策略</code> 作为学习参考：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/1/16/16854a80252a5bf8?w=640&amp;h=296&amp;f=png&amp;s=114867" alt=""></p>
+<p>在弱网状态下，依次发起对 5 组 IP+Port 的连接，10s 作为超时时间。当前一个连接发起了 4s 钟还未成功，则立即发起下一个连接，以此类推。当其中有一个连接建立成功，则立即停止其他连接。这样的方式可以兼备串行连接和并行连接的优势：较快找到可用 IP，同时对于服务器不会造成过大的连接压力。至于这个超时时间 10s，则可以通过上报数据来动态统计，找到一个合理的超时时间。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/1/16/16854a802525d5dc?w=1000&amp;h=666&amp;f=jpeg&amp;s=247647" alt=""></p>
+<h2 id="自主网络诊断"><a href="# 自主网络诊断" class="headerlink" title="自主网络诊断"></a>自主网络诊断 </h2><p> 在真实的线上环境我们发现，即使 IP 和后台服务均有效，仍有一部分用户的网络连接会出现失败。而此时单纯从 IP 地址已经分析不出原因，很有可能是该用户的网络链路上存在问题导致连接失败。</p>
+<p>这时就需要我们主动去探测这个用户的网络连接并诊断整条连接链路。</p>
+<p>因此，为了准确了解线上网络错误的用户的真实情况，我们会在客户端里内置网络诊断策略，通过 <code>Ping</code> 或者 <code>TraceRoute</code> 探测用户手机到服务器的整条网络链路上的情况，并将数据存储上报，用于分析用户的真实网络错误原因。</p>
+<p><a href="https://zh.wikipedia.org/wiki/Ping" target="_blank" rel="external">Ping</a>大家比较熟悉，目的是为了测试另一台主机是否可达，向目标主机发送 Echo 包并等待回包；而 <a href="https://zh.wikipedia.org/wiki/Traceroute" target="_blank" rel="external">TraceRoute</a> 可以获取数据包在 IP 网络经过的路由器的 IP 地址，原理如下：</p>
+<ul>
+<li>程序是利用增加存活时间（TTL）值来实现其功能的。每当数据包经过一个路由器，其存活时间就会减 1。当其存活时间是 0 时，主机便取消数据包，并发送一个 ICMP TTL 数据包给原数据包的发出者。</li>
+<li>程序发出的首 3 个数据包 TTL 值是 1，之后 3 个是 2，如此类推，它便得到一连串数据包路径。注意 IP 不保证每个数据包走的路径都一样。</li>
+</ul>
+<p>在 Android 上一般有两种方式来实现这个诊断：</p>
+<ol>
+<li>通过后台线程执行 ping 命令的方式，模拟 traceroute 的过程；</li>
+<li>通过编译开源网络检测库<code>iputils</code>C 代码的方式对 traceroute 进行了套接字发送 ICMP 报文模拟。</li>
+</ol>
+<p>感兴趣的可以参考文末提供的开源项目<code>LDNetDiagnoService</code>，通过诊断可以把日志上报用于分析，并作出相关的调整和优化。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 本文针对如何提高网络连接的高可用性做了讲解和分析，线上方案最重要考虑的就是兜底，无论发生何种问题，都要保证网络服务可用。如果用户连我们的服务器都连接不上，那可能会带来非常严重的灾难；当然，我们也要考虑服务器负载，不能造成服务器压力过大，导致雪崩之类的问题。</p>
+<p>有相关疑问欢迎随时留言。</p>
+<hr>
+<p>谢谢。</p>
+<p>wingjay</p>
+<hr>
+<h3 id="《亿级 Android 架构》小专栏介绍"><a href="#《亿级 Android 架构》小专栏介绍" class="headerlink" title="《亿级 Android 架构》小专栏介绍"></a>《亿级 Android 架构》小专栏介绍 </h3><p> 业务的快速增长离不开稳定可靠的架构。<a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">《亿级 Android 架构》</a>小专栏会基于作者实际工作经验，结合国内大厂如阿里、腾讯、美团等基础架构现状，尝试谈谈如何设计一套好的架构来支持业务从 0 到 1，甚至到亿，希望与大家多多探讨。</p>
+<p>本专栏主要内容：</p>
+<ol>
+<li>当前大厂有哪些 Android 架构；</li>
+<li>这些架构能解决什么问题；</li>
+<li>这些架构的原理是什么；</li>
+<li>学习这些架构对我们自身的意义。</li>
+</ol>
+<p><strong><a href="https://xiaozhuanlan.com/AndroidArch" target="_blank" rel="external">《亿级 Android 架构》</a>小专栏文章列表：</strong></p>
+<p><a href="https://xiaozhuanlan.com/topic/1934527806" target="_blank" rel="external">《亿级 Android 架构》专栏随谈》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/6982074351" target="_blank" rel="external">《Android 架构之网络连接与加速》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/3758142906" target="_blank" rel="external">《Android 架构之长连接技术》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/2130768549" target="_blank" rel="external">《Android 架构之高可用移动网络连接》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/8159302674" target="_blank" rel="external">《Android 架构之网络安全演进》</a></p>
+<p><a href="https://xiaozhuanlan.com/topic/2694081375" target="_blank" rel="external">《Android 架构之高性能移动端日志系统》</a></p>
+<hr>
+<h2 id="参考文章"><a href="# 参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&amp;mid=2649286458&amp;idx=1&amp;sn=320f690faa4f97f7a49a291d4de174a9&amp;chksm=8334c3b8b4434aae904b6d590027b100283ef175938610805dd33ca53f004bd3c56040b11fa6#rd" target="_blank" rel="external">《微信终端跨平台组件 Mars 系列（三）连接超时与 IP&amp;Port 排序》</a></p>
+<p><a href="http://www.52im.net/thread-1588-1-1.html" target="_blank" rel="external">《海量之道系列文章之弱联网优化》</a></p>
+<p><a href="https://github.com/Lede-Inc/LDNetDiagnoService_Android" target="_blank" rel="external">《LDNetDiagnoService_Android》</a></p>
+<p><a href="https://tech.meituan.com/Shark_SDK.html" target="_blank" rel="external">《美团点评移动网络优化实践》</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/架构/" rel="tag">#架构</a>
+          
+            <a href="/tags/高可用/" rel="tag">#高可用</a>
+          
+            <a href="/tags/网络/" rel="tag">#网络</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/05/android-arch-long-link/" rel="next" title="Android 架构之长连接技术">
+                <i class="fa fa-chevron-left"></i> Android 架构之长连接技术
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/33')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/33/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS 劫持与可靠 IP 获取"><span class="nav-number">1.</span> <span class="nav-text">DNS 劫持与可靠 IP 获取 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-HTTPDNS"><span class="nav-number">1.0.1.</span> <span class="nav-text">1. HTTPDNS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 内置 IP 列表 - 自动测速"><span class="nav-number">1.0.2.</span> <span class="nav-text">2. 内置 IP 列表 + 自动测速 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP 列表的缓存更新策略"><span class="nav-number">2.</span> <span class="nav-text">IP 列表的缓存更新策略 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IP 列表可用性兜底策略"><span class="nav-number">3.</span> <span class="nav-text">IP 列表可用性兜底策略 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对弱网的多 IP 复合连接测速"><span class="nav-number">4.</span> <span class="nav-text">针对弱网的多 IP 复合连接测速 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自主网络诊断"><span class="nav-number">5.</span> <span class="nav-text">自主网络诊断 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#《亿级 Android 架构》小专栏介绍"><span class="nav-number">6.1.</span> <span class="nav-text">《亿级 Android 架构》小专栏介绍 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

@@ -1,0 +1,1026 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,RxJava,带你学开源项目," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 RxLifecycle 源码的分析。">
+<meta name="keywords" content="Android,RxJava,带你学开源项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求">
+<meta property="og:url" content="http://wingjay.com/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 RxLifecycle 源码的分析。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求">
+<meta name="twitter:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 RxLifecycle 源码的分析。">
+<meta name="twitter:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-bicycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-07-14T20:50:37+08:00" content="2016-07-14">
+              2016-07-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/带你学开源项目/" itemprop="url" rel="index">
+                    <span itemprop="name">带你学开源项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            1,777 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。<br>此次来分享下 RxLifecycle 源码的分析。</p>
+</blockquote>
+<a id="more"></a>
+<p><strong>此文需要读者对 RxJava 有一定了解</strong></p>
+<h2 id="一、- 介绍"><a href="# 一、- 介绍" class="headerlink" title="一、 介绍"></a>一、 介绍 </h2><p> 本文分析思路不是从源码里抽代码出来一步步跟踪，而是提出问题，一步步思考解决方法，从而学习到开源项目的思维精华，而不仅仅是了解该项目的具体实现。笔者认为这种方式更有利于读者提高自身思维方式和技术能力。</p>
+<h2 id="二、- 开源项目"><a href="# 二、- 开源项目" class="headerlink" title="二、 开源项目"></a>二、 开源项目 </h2><p><a href="https://github.com/trello/RxLifecycle" target="_blank" rel="external">RxLifecycle</a> 地址：<a href="https://github.com/trello/RxLifecycle" target="_blank" rel="external">https://github.com/trello/RxLifecycle</a> 。该项目是为了防止<code>RxJava</code> 中<code>subscription</code>导致内存泄漏而诞生的，核心思想是通过监听 <code>Activity</code>、<code>Fragment</code> 的生命周期，来自动断开 <code>subscription</code> 以防止内存泄漏。</p>
+<p>基本用法如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">myObservable</div><div class="line">    .compose(RxLifecycle.bindUntilEvent(lifecycle, ActivityEvent.DESTROY))</div><div class="line">    .subscribe();</div></pre></td></tr></table></figure></p>
+<p>此处 <code>myObservable</code> 可以看成一个耗时的网络请求，通过绑定到 <code>ActivityEvent.DESTROY</code>，一旦 Activity 发生了<code>DESTORY</code> 生命周期，数据就不会再流向<code>subscriber</code>，即不会对这些数据进行任何处理和 UI 绘制，从而提高安全性。</p>
+<h2 id="三、- 问题"><a href="# 三、- 问题" class="headerlink" title="三、 问题"></a>三、 问题</h2><p>Android 开发中常会有这样一个场景：</p>
+<ol>
+<li>发送网络请求 -&gt; 2. 服务器处理请求并返回数据 -&gt; 3. client 端接收数据，绘制 UI。</li>
+</ol>
+<p>在前两步一般都是不会出现问题的，但是在第三步，当数据返回给 client 端时，如果页面已经不在了，那么就无法去绘制 UI，很有可能会导致意向不到的问题。因此，为了解决这个问题，一个好的思路就是 <code> 当页面离开时，自动断开网络请求数据的处理过程，即数据返回后不再进行任何处理</code>。</p>
+<h2 id="四、- 思考"><a href="# 四、- 思考" class="headerlink" title="四、 思考"></a>四、 思考 </h2><p> 要达到上面这样一个功能，我们可以思考，至少需要两部分：</p>
+<ol>
+<li>随时监听 <code>Activity</code>(<code>Fragment</code>) 的生命周期并对外发射出去；</li>
+<li>在我们的网络请求中，接收生命周期并进行判断，如果该生命周期是自己绑定的，如<code>Destory</code>，那么就断开数据向下传递的过程。</li>
+</ol>
+<h2 id="五、- 分析"><a href="# 五、- 分析" class="headerlink" title="五、 分析"></a>五、 分析 </h2><p> 可以看到，首先有一个核心功能要实现：就是既能够监听 <code>Activity</code> 生命周期事件并对外发射，又能够接收每一个生命周期事件并作出判断。为了实现这个功能，可以联想到 <code>RxJava</code> 中的<code>Subject</code>，既能够发射数据，又能够接收数据。</p>
+<h2 id="六、-Subject 解析"><a href="# 六、-Subject 解析" class="headerlink" title="六、 Subject 解析"></a>六、 Subject 解析 </h2><p> 了解 <code>Subject</code> 的读者可以跳过这部分。</p>
+<p>如何理解 <code>Subject</code> 呢？</p>
+<p>很容易，在 RxJava 里面，<code>Observable</code>是数据的发射者，它会对外发射数据，然后经过 <code>map</code>、<code>flatmap</code> 等等数据处理后，最终传递给 <code>Observer</code>，这个数据接收者。因此，抛开中间数据处理不管，可以看出，<code>Observable</code> 对外发射数据，是数据流的开端；<code>Observer</code>接收数据，是数据流的末端。</p>
+<p>那么 <code>Subject</code> 呢？看一眼源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Represents an object that is both an Observable and an Observer.</div><div class="line"> */</div><div class="line">public abstract class Subject&lt;T, R&gt; extends Observable&lt;R&gt; implements Observer&lt;T&gt; &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p>首先，它 <code>extends Observable&lt;R&gt;</code>，说明<code>Subject</code> 具备了对外发射数据的能力，即拥有了 <code>from()</code>、<code>just()</code> 等等；另外，它又 <code>implements Observer&lt;T&gt;</code>，说明又能够处理数据，具备<code>onNext()</code>、<code>onCompleted</code> 等等。</p>
+<p>然后，<code>Subject</code>毕竟只是一个抽象类，那么我们要如何使用它呢？</p>
+<p>这里介绍一种最简单的：<code>PublishSubject</code>:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">PublishSubject&lt;Object&gt; subject = PublishSubject.create();</div><div class="line">// myObserver will receive &quot;one&quot; &amp; &quot;two&quot; and onCompleted events</div><div class="line">subject.subscribe(myObserver);</div><div class="line">subject.onNext(&quot;one&quot;);</div><div class="line">subject.onNext(&quot;two&quot;);</div><div class="line">subject.onCompleted();</div></pre></td></tr></table></figure></p>
+<p>这里做的事情很简单，先创建一个 <code>PublishSubject</code> -&gt; 绑定一个<code>myObserver</code>，此时<code>subject</code> 扮演了 <code>Observable</code> 的角色，把数据发射给 <code>myObserver</code> -&gt; 然后<code>subject</code> 处理接收了两个数据 <code>one</code>、<code>two</code> -&gt; 最终这些数据都传递给了<code>myObserver</code>。所以，<code>subject</code> 扮演的角色是:</p>
+<p><strong>数据<code>one</code>、<code>two</code>   =&gt;   (Observer) <code>subject</code> (Observable)   =&gt;   <code>myObserver</code></strong></p>
+<p>简单来说，我们把数据 <code>one</code>、<code>two</code> 塞给 <code>subject</code>，然后<code>subject</code> 又发射给了<code>myObserver</code>。</p>
+<h2 id="七、-BaseActivity 监听生命周期"><a href="# 七、-BaseActivity 监听生命周期" class="headerlink" title="七、 BaseActivity 监听生命周期"></a>七、 BaseActivity 监听生命周期 </h2><p> 那么我们先来实现生命周期监听功能，基本思路是：在 <code>BaseActivity</code> 里创建一个 <code>PublishSubject</code> 对象，在每个生命周期发生时，把该生命周期事件传递给<code>PublishSubject</code>。具体实现如下(只写部分生命周期，其他类似)：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseActivity</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">protected</span> <span class="keyword">final</span> PublishSubject&lt;ActivityLifeCycleEvent&gt; lifecycleSubject = PublishSubject.create();</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">  	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">  		lifecycleSubject.onNext(ActivityLifeCycleEvent.CREATE);</div><div class="line">  		...</div><div class="line">  	&#125;</div><div class="line"></div><div class="line">  	<span class="meta">@Override</span></div><div class="line">  	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123;</div><div class="line">  		lifecycleSubject.onNext(ActivityLifeCycleEvent.PAUSE);</div><div class="line">  		...</div><div class="line">  	&#125;</div><div class="line"></div><div class="line">  	<span class="meta">@Override</span></div><div class="line">  	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</div><div class="line">  		lifecycleSubject.onNext(ActivityLifeCycleEvent.STOP);</div><div class="line">  		...</div><div class="line">  	&#125;</div><div class="line">  	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这样的话，我们把所有生命周期事件都传给了 <code>lifecycleSubject</code> 了，或者说，<code>lifecycleSubject</code>已经接收到了并能够 <code> 对外发射各种生命周期事件 </code> 的能力了。</p>
+<h2 id="八、- 改良每一个 Observable，接收生命周期并自动断开自身"><a href="# 八、- 改良每一个 Observable，接收生命周期并自动断开自身" class="headerlink" title="八、 改良每一个 Observable，接收生命周期并自动断开自身"></a>八、 改良每一个 Observable，接收生命周期并自动断开自身 </h2><p> 通常我们的一次网络请求长这样：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">networkObservable</div><div class="line">	.subscribe(<span class="keyword">new</span> Observer(handleUI()  ));</div></pre></td></tr></table></figure></p>
+<p>其中，<code>networkObservable</code>表示一个通用的网络请求，会接收网络数据并传递给 <code>Observer</code> 去绘制 UI。</p>
+<p>现在，我们希望这个 <code>networkObservable</code> 监听 <code>Activity</code> 的<code>DESTORY</code>事件，一旦发生了 <code>DESTORY</code> 就自动断开 <code>Observer</code>，即使网络数据回来了也不再传递给<code>Observer</code> 去绘制 UI。即：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">networkObservable</div><div class="line">	.compose(bindUntilEvent(ActivityLifeCycleEvent.DESTORY))</div><div class="line">	.subscribe(<span class="keyword">new</span> Observer(handleUI()  ));</div></pre></td></tr></table></figure></p>
+<p>因此，我们需要实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bindUntilEvent(ActivityLifeCycleEvent.DESTORY)</div></pre></td></tr></table></figure></p>
+<p>这个方法，那如何实现呢？</p>
+<p>我们知道 <code>lifecycleSubject</code> 能够发射生命周期事件了，那么我们可以让 <code>networkObservable</code> 去检查 <code>lifecycleSubject</code> 发出的生命周期，如果和自己绑定的生命周期事件一样，那就自动停掉即可。</p>
+<h2 id="九、- 改装 networkObservable"><a href="# 九、- 改装 networkObservable" class="headerlink" title="九、 改装 networkObservable"></a>九、 改装 networkObservable</h2><p>对于<code>networkObservable 自动停掉</code>，我们可以利用操作符<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">networkObservable.takeUntil(otherObservable)</div></pre></td></tr></table></figure></p>
+<p>它的作用是监听 <code>otherObservable</code>，一旦<code>otherObservable</code> 对外发射了数据，就自动把 <code>networkObservable</code> 停掉；</p>
+<p>那 <code>otherObservable</code> 何时对外发射数据呢？当然是 <code>lifecycleSubject</code> 发射出的生命周期事件 <code> 等于 </code> 绑定的生命周期事件时，开始发射。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">otherObservable = lifecycleSubject.takeFirst(<span class="keyword">new</span> Func1&lt;ActivityLifeCycleEvent, Boolean&gt;() &#123;</div><div class="line">             <span class="meta">@Override</span></div><div class="line">             <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(ActivityLifeCycleEvent activityLifeCycleEvent)</span> </span>&#123;</div><div class="line">               <span class="keyword">return</span> activityLifeCycleEvent.equals(bindEvent);</div><div class="line">             &#125;</div><div class="line">           &#125;);</div></pre></td></tr></table></figure></p>
+<p>其中的关键是判断 <code>activityLifeCycleEvent.equals(bindEvent);</code>，一旦条件满足，<code>otherObservable</code> 就对外发射数据，然后 <code>networkObservable</code> 就立即自动停掉。</p>
+<h2 id="十、- 合并 - 生命周期监听 - 与 -networkObservable 改良"><a href="# 十、- 合并 - 生命周期监听 - 与 -networkObservable 改良" class="headerlink" title="十、 合并 生命周期监听 与 networkObservable 改良"></a>十、 合并 生命周期监听 与 networkObservable 改良</h2><ol>
+<li>在 BaseActivity 里添加<code>lifecycleSubject</code>，并把每一个生命周期事件按时传递给<code>lifecycleSubject</code></li>
+<li><p>在 BaseActivity 里添加一个 <code>bindUntilEvent</code> 方法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@NonNull</span></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="keyword">public</span> &lt;T&gt; Observable.<span class="function">Transformer&lt;T, T&gt; <span class="title">bindUntilEvent</span><span class="params">(@NonNull <span class="keyword">final</span> ActivityLifeCycleEvent event)</span> </span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Observable.Transformer&lt;T, T&gt;() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Observable&lt;T&gt; <span class="title">call</span><span class="params">(Observable&lt;T&gt; sourceObservable)</span> </span>&#123;</div><div class="line">      Observable&lt;ActivityLifeCycleEvent&gt; compareLifecycleObservable =</div><div class="line">          lifecycleSubject.takeFirst(<span class="keyword">new</span> Func1&lt;ActivityLifeCycleEvent, Boolean&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(ActivityLifeCycleEvent activityLifeCycleEvent)</span> </span>&#123;</div><div class="line">              <span class="keyword">return</span> activityLifeCycleEvent.equals(event);</div><div class="line">            &#125;</div><div class="line">          &#125;);</div><div class="line">      <span class="keyword">return</span> sourceObservable.takeUntil(compareLifecycleObservable);</div><div class="line">    &#125;</div><div class="line">  &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>在任意一个网络请求 networkObservable 处改良</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">networkObservable</div><div class="line">	.compose(bindUntilEvent(ActivityLifeCycleEvent.DESTORY))</div><div class="line">	.subscribe(new Observer(  handleUI()  ));</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="注意："><a href="# 注意：" class="headerlink" title="注意："></a>注意：</h2><ol>
+<li>文中提到的 <code>networkObservable</code> 是网络请求，但实际上这不限于网络请求，任何耗时操作如文件 io 操作等都可以利用这个方法，来监听生命周期并自动暂停。</li>
+<li>对于 Fragment 中的处理方法也是类似。</li>
+</ol>
+<p>谢谢！</p>
+<h2 id="wingjay"><a href="#wingjay" class="headerlink" title="wingjay"></a>wingjay</h2><p>欢迎各位关注 <br><a href="https://github.com/wingjay" target="_blank" rel="external"> 我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和 <br><a href="http://wingjay.com"> 我的个人博客 </a>: <a href="http://wingjay.com">http://wingjay.com</a><br> 和<br><a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">我的简书 </a>: <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">http://www.jianshu.com/users/da333fd63fe5/latest_articles</a><br> 和<br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a><br>如果有问题，可以给我留言或发邮件<a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#x79;&#x69;&#110;&#106;&#x69;&#x65;&#x73;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#x6f;&#x6d;">&#x79;&#x69;&#110;&#106;&#x69;&#x65;&#x73;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/RxJava/" rel="tag">#RxJava</a>
+          
+            <a href="/tags/带你学开源项目/" rel="tag">#带你学开源项目</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/10/Walk-in-ShangHai/" rel="next" title="Walk in ShangHai">
+                <i class="fa fa-chevron-left"></i> Walk in ShangHai
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/" rel="prev" title="带你学开源项目：OkHttp-- 自己动手实现 okhttp">
+                带你学开源项目：OkHttp-- 自己动手实现 okhttp <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/15')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/15/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、- 介绍"><span class="nav-number">1.</span> <span class="nav-text">一、 介绍 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、- 开源项目"><span class="nav-number">2.</span> <span class="nav-text">二、 开源项目 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、- 问题"><span class="nav-number">3.</span> <span class="nav-text">三、 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、- 思考"><span class="nav-number">4.</span> <span class="nav-text">四、 思考 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、- 分析"><span class="nav-number">5.</span> <span class="nav-text">五、 分析 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、-Subject 解析"><span class="nav-number">6.</span> <span class="nav-text">六、 Subject 解析 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#七、-BaseActivity 监听生命周期"><span class="nav-number">7.</span> <span class="nav-text">七、 BaseActivity 监听生命周期 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#八、- 改良每一个 Observable，接收生命周期并自动断开自身"><span class="nav-number">8.</span> <span class="nav-text">八、 改良每一个 Observable，接收生命周期并自动断开自身 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#九、- 改装 networkObservable"><span class="nav-number">9.</span> <span class="nav-text">九、 改装 networkObservable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#十、- 合并 - 生命周期监听 - 与 -networkObservable 改良"><span class="nav-number">10.</span> <span class="nav-text">十、 合并 生命周期监听 与 networkObservable 改良</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意："><span class="nav-number">11.</span> <span class="nav-text">注意：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wingjay"><span class="nav-number">12.</span> <span class="nav-text">wingjay</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

@@ -1,0 +1,1078 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,带你学开源项目,内存泄漏,性能优化," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="OOM 是 Android 开发中常见的问题，而内存泄漏往往是罪魁祸首。 为了简单方便的检测内存泄漏，Square 开源了 LeakCanary，它可以实时监测 Activity 是否发生了泄漏，一旦发现就会自动弹出提示及相关的泄漏信息供分析。 本文的目的是试图通过分析 LeakCanary 源码来探讨它的 Activity 泄漏检测机制。">
+<meta name="keywords" content="Android,带你学开源项目,内存泄漏,性能优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏">
+<meta property="og:url" content="http://wingjay.com/2017/05/14/dig_into_leakcanary/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="OOM 是 Android 开发中常见的问题，而内存泄漏往往是罪魁祸首。 为了简单方便的检测内存泄漏，Square 开源了 LeakCanary，它可以实时监测 Activity 是否发生了泄漏，一旦发现就会自动弹出提示及相关的泄漏信息供分析。 本文的目的是试图通过分析 LeakCanary 源码来探讨它的 Activity 泄漏检测机制。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wingjay.com/img/leakcanary/project.png">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏">
+<meta name="twitter:description" content="OOM 是 Android 开发中常见的问题，而内存泄漏往往是罪魁祸首。 为了简单方便的检测内存泄漏，Square 开源了 LeakCanary，它可以实时监测 Activity 是否发生了泄漏，一旦发现就会自动弹出提示及相关的泄漏信息供分析。 本文的目的是试图通过分析 LeakCanary 源码来探讨它的 Activity 泄漏检测机制。">
+<meta name="twitter:image" content="http://wingjay.com/img/leakcanary/project.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-14T19:29:33+08:00" content="2017-05-14">
+              2017-05-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/带你学开源项目/" itemprop="url" rel="index">
+                    <span itemprop="name">带你学开源项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,542 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>OOM 是 Android 开发中常见的问题，而内存泄漏往往是罪魁祸首。</p>
+<p>为了简单方便的检测内存泄漏，Square 开源了 <a href="https://github.com/square/leakcanary" target="_blank" rel="external"><code>LeakCanary</code></a>，它可以实时监测 Activity 是否发生了泄漏，一旦发现就会自动弹出提示及相关的泄漏信息供分析。</p>
+<p>本文的目的是试图通过分析 <code>LeakCanary</code> 源码来探讨它的 Activity 泄漏检测机制。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="LeakCanary- 使用方式"><a href="#LeakCanary- 使用方式" class="headerlink" title="LeakCanary 使用方式"></a><code>LeakCanary</code> 使用方式 </h2><p> 为了将 <code>LeakCanary</code> 引入到我们的项目里，我们只需要做以下两步：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">dependencies &#123;</div><div class="line"> debugCompile &apos;com.squareup.leakcanary:leakcanary-android:1.5.1&apos;</div><div class="line"> releaseCompile &apos;com.squareup.leakcanary:leakcanary-android-no-op:1.5.1&apos;</div><div class="line"> testCompile &apos;com.squareup.leakcanary:leakcanary-android-no-op:1.5.1&apos;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class ExampleApplication extends Application &#123;</div><div class="line">  @Override public void onCreate() &#123;</div><div class="line">    super.onCreate();</div><div class="line">    if (LeakCanary.isInAnalyzerProcess(this)) &#123;</div><div class="line">      // This process is dedicated to LeakCanary for heap analysis.</div><div class="line">      // You should not init your app in this process.</div><div class="line">      return;</div><div class="line">    &#125;</div><div class="line">    LeakCanary.install(this);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看出，最关键的就是 <code>LeakCanary.install(this);</code> 这么一句话，正式开启了 <code>LeakCanary</code> 的大门，未来它就会自动帮我们检测内存泄漏，并在发生泄漏是弹出通知信息。</p>
+<h2 id="从 -LeakCanary-install-this- 开始"><a href="# 从 -LeakCanary-install-this- 开始" class="headerlink" title="从 LeakCanary.install(this); 开始"></a>从 <code>LeakCanary.install(this);</code> 开始 </h2><p> 下面我们来看下它做了些什么？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">public static RefWatcher install(Application application) &#123;</div><div class="line">  return install(application, DisplayLeakService.class,</div><div class="line">      AndroidExcludedRefs.createAppDefaults().build());</div><div class="line">&#125;</div><div class="line"></div><div class="line">public static RefWatcher install(Application application,</div><div class="line">    Class&lt;? extends AbstractAnalysisResultService&gt; listenerServiceClass,</div><div class="line">    ExcludedRefs excludedRefs) &#123;</div><div class="line">  if (isInAnalyzerProcess(application)) &#123;</div><div class="line">    return RefWatcher.DISABLED;</div><div class="line">  &#125;</div><div class="line">  enableDisplayLeakActivity(application);</div><div class="line">  HeapDump.Listener heapDumpListener =</div><div class="line">      new ServiceHeapDumpListener(application, listenerServiceClass);</div><div class="line">  RefWatcher refWatcher = androidWatcher(application, heapDumpListener, excludedRefs);</div><div class="line">  ActivityRefWatcher.installOnIcsPlus(application, refWatcher);</div><div class="line">  return refWatcher;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>首先，我们先看最重要的部分，就是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">RefWatcher refWatcher = androidWatcher(application, heapDumpListener, excludedRefs);</div><div class="line">ActivityRefWatcher.installOnIcsPlus(application, refWatcher);</div></pre></td></tr></table></figure></p>
+<p>先生成了一个 <code>RefWatcher</code>，这个东西非常关键，从名字可以看出，它是用来 <code>watch Reference</code> 的，也就是用来一个监控引用的工具。然后再把 <code>refWatcher</code> 和我们自己提供的 <code>application</code> 传入到 <code>ActivityRefWatcher.installOnIcsPlus(application, refWatcher);</code> 这句里面，继续看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static void installOnIcsPlus(Application application, RefWatcher refWatcher) &#123;</div><div class="line">    ActivityRefWatcher activityRefWatcher = new ActivityRefWatcher(application, refWatcher);</div><div class="line">    activityRefWatcher.watchActivities();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>创建了一个 <code>ActivityRefWatcher</code>，大家应该能感受到，这个东西就是用来监控我们的 <code>Activity</code> 泄漏状况的，它调用<code>watchActivities()</code> 方法，就可以开始进行监控了。下面就是它监控的核心原理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public void watchActivities() &#123;</div><div class="line">  application.registerActivityLifecycleCallbacks(lifecycleCallbacks);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>它向 <code>application</code> 里注册了一个 <code>ActivitylifecycleCallbacks</code> 的回调函数，可以用来监听 <code>Application</code> 整个生命周期所有 <code>Activity</code> 的 lifecycle 事件。再看下这个 <code>lifecycleCallbacks</code> 是什么？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">private final Application.ActivityLifecycleCallbacks lifecycleCallbacks =</div><div class="line">    new Application.ActivityLifecycleCallbacks() &#123;</div><div class="line">      @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivityStarted(Activity activity) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivityResumed(Activity activity) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivityPaused(Activity activity) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivityStopped(Activity activity) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) &#123;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      @Override public void onActivityDestroyed(Activity activity) &#123;</div><div class="line">        ActivityRefWatcher.this.onActivityDestroyed(activity);</div><div class="line">      &#125;</div><div class="line">    &#125;;</div></pre></td></tr></table></figure></p>
+<p>原来它只监听了所有 <code>Activity</code> 的 <code>onActivityDestroyed</code> 事件，当 <code>Activity</code> 被 <code>Destory</code> 时，调用 <code>ActivityRefWatcher.this.onActivityDestroyed(activity);</code> 函数。</p>
+<p>猜测下，正常情况下，当一个这个函数应该 <code>activity</code> 被 <code>Destory</code> 时，那这个 <code>activity</code> 对象应该变成 null 才是正确的。如果没有变成 null，那么就意味着发生了内存泄漏。</p>
+<p>因此我们向，这个函数 <code>ActivityRefWatcher.this.onActivityDestroyed(activity);</code> 应该是用来监听 <code>activity</code> 对象是否变成了 null。继续看。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">void onActivityDestroyed(Activity activity) &#123;</div><div class="line">  refWatcher.watch(activity);</div><div class="line">&#125;</div><div class="line">RefWatcher refWatcher = androidWatcher(application, heapDumpListener, excludedRefs);</div></pre></td></tr></table></figure>
+<p>可以看出，这个函数把目标 <code>activity</code> 对象传给了 <code>RefWatcher</code>，让它去监控这个 <code>activity</code> 是否被正常回收了，若未被回收，则意味着发生了内存泄漏。</p>
+<h2 id="RefWatcher- 如何监控 -activity- 是否被正常回收呢？"><a href="#RefWatcher- 如何监控 -activity- 是否被正常回收呢？" class="headerlink" title="RefWatcher 如何监控 activity 是否被正常回收呢？"></a>RefWatcher 如何监控 activity 是否被正常回收呢？</h2><p>我们先来看看这个 <code>RefWatcher</code> 究竟是个什么东西？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public static RefWatcher androidWatcher(Context context, HeapDump.Listener heapDumpListener,</div><div class="line">    ExcludedRefs excludedRefs) &#123;</div><div class="line">  AndroidHeapDumper heapDumper = new AndroidHeapDumper(context, leakDirectoryProvider);</div><div class="line">  heapDumper.cleanup();</div><div class="line"></div><div class="line">  int watchDelayMillis = 5000;</div><div class="line">  AndroidWatchExecutor executor = new AndroidWatchExecutor(watchDelayMillis);</div><div class="line"></div><div class="line">  return new RefWatcher(executor, debuggerControl, GcTrigger.DEFAULT, heapDumper,</div><div class="line">      heapDumpListener, excludedRefs);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里面涉及到两个新的对象：<code>AndroidHeapDumper</code> 和 <code>AndroidWatchExecutor</code>，前者用来 dump 堆内存状态的，后者则是用来 watch 一个引用的监听器。具体原理后面再看。总之，这里已经生成好了一个 <code>RefWatcher</code> 对象了。</p>
+<p>现在再看上面 <code>onActivityDestroyed(Activity activity)</code> 里调用的 <code>refWatcher.watch(activity);</code>，下面来看下这个最为核心的 <code>watch(activity)</code> 方法，了解它是如何监控 <code>activity</code> 是否被回收的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">private final Set&lt;String&gt; retainedKeys;</div><div class="line">public void watch(Object activity, String referenceName) &#123;</div><div class="line">  String key = UUID.randomUUID().toString();</div><div class="line">  retainedKeys.add(key);</div><div class="line"></div><div class="line">  final KeyedWeakReference reference =</div><div class="line">      new KeyedWeakReference(activity, key, referenceName, queue);</div><div class="line"></div><div class="line">  watchExecutor.execute(new Runnable() &#123;</div><div class="line">    @Override public void run() &#123;</div><div class="line">      ensureGone(reference, watchStartNanoTime);</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">final class KeyedWeakReference extends WeakReference&lt;Object&gt; &#123;</div><div class="line">  public final String key;</div><div class="line">  public final String name;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以看到，它首先把我们传入的 <code>activity</code> 包装成了一个 <code>KeyedWeakReference</code>（可以暂时看成一个普通的 WeakReference），然后 <code>watchExecutor</code> 会去执行一个 Runnable，这个 Runnable 会调用 <code>ensureGone(reference, watchStartNanoTime)</code> 函数。</p>
+<p>看这个函数之前猜测下，我们知道 <code>watch</code> 函数本身就是用来监听 <code>activity</code> 是否被正常回收，这就涉及到两个问题：</p>
+<ol>
+<li>何时去检查它是否回收？</li>
+<li>如何有效地检查它真的被回收？</li>
+</ol>
+<p>所以我们觉得 <code>ensureGone</code> 函数本身要做的事正如它的名字，就是确保 <code>reference</code> 被回收掉了，否则就意味着内存泄漏。</p>
+<h4 id="核心函数：ensureGone-reference- 检测回收"><a href="# 核心函数：ensureGone-reference- 检测回收" class="headerlink" title="核心函数：ensureGone(reference) 检测回收"></a>核心函数：ensureGone(reference) 检测回收 </h4><p> 下面来看这个函数实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">void ensureGone(KeyedWeakReference reference, long watchStartNanoTime) &#123;</div><div class="line">  removeWeaklyReachableReferences();</div><div class="line">  if (gone(reference) || debuggerControl.isDebuggerAttached()) &#123;</div><div class="line">    return;</div><div class="line">  &#125;</div><div class="line">  gcTrigger.runGc();</div><div class="line">  removeWeaklyReachableReferences();</div><div class="line">  if (!gone(reference)) &#123;</div><div class="line">    File heapDumpFile = heapDumper.dumpHeap();</div><div class="line">    heapdumpListener.analyze(</div><div class="line">        new HeapDump(heapDumpFile, reference.key, reference.name, excludedRefs, watchDurationMs,</div><div class="line">            gcDurationMs, heapDumpDurationMs));</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">private boolean gone(KeyedWeakReference reference) &#123;</div><div class="line">  return !retainedKeys.contains(reference.key);</div><div class="line">&#125;</div><div class="line"></div><div class="line">private void removeWeaklyReachableReferences() &#123;</div><div class="line">  KeyedWeakReference ref;</div><div class="line">  while ((ref = (KeyedWeakReference) queue.poll()) != null) &#123;</div><div class="line">    retainedKeys.remove(ref.key);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里先来解释下 <code>WeakReference</code> 和 <code>ReferenceQueue</code> 的工作原理。</p>
+<ol>
+<li>弱引用 WeakReference<br>被强引用的对象就算发生 OOM 也永远不会被垃圾回收机回收；被弱引用的对象，只要被垃圾回收器发现就会立即被回收；被软引用的对象，具备内存敏感性，只有内存不足时才会被回收，常用来做内存敏感缓存器；虚引用则任意时刻都可能被回收，使用较少。</li>
+<li>引用队列 ReferenceQueue<br>我们常用一个 <code>WeakReference&lt;Activity&gt; reference = new WeakReference(activity);</code>，这里我们创建了一个 <code>reference</code> 来弱引用到某个 <code>activity</code>，当这个 <code>activity</code> 被垃圾回收器回收后，这个 <code>reference</code> 会被放入内部的 <code>ReferenceQueue</code> 中。也就是说，从队列 <code>ReferenceQueue</code> 取出来的所有 <code>reference</code>，它们指向的真实对象都已经成功被回收了。</li>
+</ol>
+<p>然后再回到上面的代码。</p>
+<p>在一个 activity 传给 RefWatcher 时会创建一个唯一的 key 对应这个 activity，该 key 存入一个集合 <code>retainedKeys</code> 中。也就是说，所有我们想要观测的 <code>activity</code> 对应的唯一 key 都会被放入 <code>retainedKeys</code> 集合中。</p>
+<p>基于我们对 <code>ReferenceQueue</code> 的了解，只要把队列中所有的 reference 取出来，并把对应 retainedKeys 里的 key 移除，剩下的 key 对应的对象都没有被回收。</p>
+<ol>
+<li>ensureGone 首先调用 <code>removeWeaklyReachableReferences</code> 把已被回收的对象的 key 从 retainedKeys 移除，剩下的 key 都是未被回收的对象；</li>
+<li>if (gone(reference)) 用来判断某个 reference 的 key 是否仍在 retainedKeys 里，若不在，表示已回收，否则继续；</li>
+<li>gcTrigger.runGc(); 手动出发 GC，立即把所有 WeakReference 引用的对象回收；</li>
+<li>removeWeaklyReachableReferences(); 再次清理 retainedKeys，如果该 reference 还在 retainedKeys 里 (if (!gone(reference)))，表示泄漏；</li>
+<li>利用 heapDumper 把内存情况 dump 成文件，并调用 heapdumpListener 进行内存分析，进一步确认是否发生内存泄漏。</li>
+<li>如果确认发生内存泄漏，调用 <code>DisplayLeakService</code> 发送通知。</li>
+</ol>
+<p>至此，核心的内存泄漏检测机制便看完了。</p>
+<h2 id="内存泄漏检测小结"><a href="# 内存泄漏检测小结" class="headerlink" title="内存泄漏检测小结"></a>内存泄漏检测小结 </h2><p> 从上面我们大概了解了内存泄漏检测机制，大概是以下几个步骤：</p>
+<ol>
+<li>利用 <code>application.registerActivityLifecycleCallbacks(lifecycleCallbacks)</code> 来监听整个生命周期内的 Activity <code>onDestoryed</code> 事件;</li>
+<li>当某个 <code>Activity</code> 被 destory 后，将它传给 RefWatcher 去做观测，确保其后续会被正常回收；</li>
+<li>RefWatcher 首先把 <code>Activity</code> 使用 KeyedWeakReference 引用起来，并使用一个 ReferenceQueue 来记录该 KeyedWeakReference 指向的对象是否已被回收；</li>
+<li><code>AndroidWatchExecutor</code> 会在 5s 后，开始检查这个弱引用内的 <code>Activity</code> 是否被正常回收。判断条件是：若 <code>Activity</code> 被正常回收，那么引用它的 KeyedWeakReference 会被自动放入 ReferenceQueue 中。</li>
+<li>判断方式是：先看 <code>Activity</code> 对应的 <code>KeyedWeakReference</code> 是否已经放入 <code>ReferenceQueue</code> 中；如果没有，则手动 GC：<code>gcTrigger.runGc();</code>；然后再一次判断 <code>ReferenceQueue</code> 是否已经含有对应的 <code>KeyedWeakReference</code>。若还未被回收，则认为可能发生内存泄漏。</li>
+<li>利用 HeapAnalyzer 对 dump 的内存情况进行分析并进一步确认，若确定发生泄漏，则利用 <code>DisplayLeakService</code> 发送通知。</li>
+</ol>
+<h2 id="探讨一些关于 -LeakCanary- 有趣的问题"><a href="# 探讨一些关于 -LeakCanary- 有趣的问题" class="headerlink" title="探讨一些关于 LeakCanary 有趣的问题"></a>探讨一些关于 <code>LeakCanary</code> 有趣的问题 </h2><p> 在学习了 <code>LeakCanary</code> 的源码之后，我想再提几个有趣的问题做些探讨。</p>
+<h3 id="LeakCanary- 项目目录结构为什么这样分？"><a href="#LeakCanary- 项目目录结构为什么这样分？" class="headerlink" title="LeakCanary 项目目录结构为什么这样分？"></a><code>LeakCanary</code> 项目目录结构为什么这样分？</h3><p>下面是整个 <code>LeakCanary</code> 的项目结构：<br><img src="/img/leakcanary/project.png" alt=""></p>
+<p>对于开发者而言，只需要使用到 <code>LeakCanary.install(this);</code> 这一句即可。那整个项目为什么要分成这么多个 module 呢？</p>
+<p>实际上，这里面每一个 module 都有自己的角色。</p>
+<ul>
+<li><p><code>leakcanary-watcher</code>: 这是一个通用的内存检测器，对外提供一个 RefWatcher#watch(Object watchedReference)，可以看出，它不仅能够检测 <code>Activity</code>，还能监测任意常规的 Java Object 的泄漏情况。</p>
+</li>
+<li><p><code>leakcanary-android</code>: 这个 module 是与 <code>Android</code> 世界的接入点，用来专门监测 <code>Activity</code> 的泄漏情况，内部使用了 application#registerActivityLifecycleCallbacks 方法来监听 onDestory 事件，然后利用 <code>leakcanary-watcher</code> 来进行弱引用＋手动 GC 机制进行监控。</p>
+</li>
+<li><p><code>leakcanary-analyzer</code>: 这个 module 提供了 <code>HeapAnalyzer</code>，用来对 dump 出来的内存进行分析并返回内存分析结果 <code>AnalysisResult</code>，内部包含了泄漏发生的路径等信息供开发者寻找定位。</p>
+</li>
+<li><p><code>leakcanary-android-no-op</code>: 这个 module 是专门给 release 的版本用的，内部只提供了两个完全空白的类 <code>LeakCanary</code> 和 <code>RefWatcher</code>，这两个类不会做任何内存泄漏相关的分析。为什么？因为 <code>LeakCanary</code> 本身会由于不断 gc 影响到 app 本身的运行，而且主要用于开发阶段的内存泄漏检测。因此对于 release 则可以 disable 所有泄漏分析。</p>
+</li>
+<li><p><code>leakcanary-sample</code>: 这个很简单，就是提供了一个用法 sample。</p>
+</li>
+</ul>
+<h3 id="当 -Activity- 被 -destory- 后，LeakCanary- 多久后会去进行检查其是否泄漏呢？"><a href="# 当 -Activity- 被 -destory- 后，LeakCanary- 多久后会去进行检查其是否泄漏呢？" class="headerlink" title="当 Activity 被 destory 后，LeakCanary 多久后会去进行检查其是否泄漏呢？"></a>当 Activity 被 destory 后，LeakCanary 多久后会去进行检查其是否泄漏呢？</h3><p>在源码中可以看到，LeakCanary 并不会在 destory 后立即去检查，而是让一个 <code>AndroidWatchExecutor</code> 去进行检查。它会做什么呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">@Override public void execute(final Runnable command) &#123;</div><div class="line">  if (isOnMainThread()) &#123;</div><div class="line">    executeDelayedAfterIdleUnsafe(command);</div><div class="line">  &#125; else &#123;</div><div class="line">    mainHandler.post(new Runnable() &#123;</div><div class="line">      @Override public void run() &#123;</div><div class="line">        executeDelayedAfterIdleUnsafe(command);</div><div class="line">      &#125;</div><div class="line">    &#125;);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void executeDelayedAfterIdleUnsafe(final Runnable runnable) &#123;</div><div class="line">  // This needs to be called from the main thread.</div><div class="line">  Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() &#123;</div><div class="line">    @Override public boolean queueIdle() &#123;</div><div class="line">      backgroundHandler.postDelayed(runnable, delayMillis);</div><div class="line">      return false;</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，它首先会向主线程的 MessageQueue 添加一个 <code>IdleHandler</code>。</p>
+<p>什么是 <code>IdleHandler</code>？我们知道 Looper 会不断从 MessageQueue 里取出 Message 并执行。当没有新的 Message 执行时，Looper 进入 Idle 状态时，就会取出 <code>IdleHandler</code> 来执行。</p>
+<p>换句话说，<code>IdleHandler</code>就是 <code> 优先级别较低的 Message</code>，只有当 Looper 没有消息要处理时才得到处理。而且，内部的 <code>queueIdle()</code> 方法若返回 <code>true</code>，表示该任务一直存活，每次 Looper 进入 Idle 时就执行；反正，如果返回 <code>false</code>，则表示只会执行一次，执行完后丢弃。</p>
+<p>那么，这件优先级较低的任务是什么呢？<code>backgroundHandler.postDelayed(runnable, delayMillis);</code>，runnable 就是之前 <code>ensureGone()</code>。</p>
+<p>也就是说，当主线程空闲了，没事做了，开始向后台线程发送一个延时消息，告诉后台线程，5s(delayMillis)后开始检查 <code>Activity</code> 是否被回收了。</p>
+<p>所以，当 <code>Activity</code> 发生 <code>destory</code> 后，首先要等到主线程空闲，然后再延时 5s(delayMillis)，才开始执行泄漏检查。</p>
+<h5 id="知识点："><a href="# 知识点：" class="headerlink" title="知识点："></a>知识点：</h5><ol>
+<li><p>如何创建一个优先级低的主线程任务，它只会在主线程空闲时才执行，不会影响到 app 的性能？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Looper.myQueue().addIdleHandler(new MessageQueue.IdleHandler() &#123;</div><div class="line">      @Override public boolean queueIdle() &#123;</div><div class="line">        // do task</div><div class="line">        return false; // only once</div><div class="line">      &#125;</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>如何快速创建一个主／子线程 handler？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// 主线程 handler</div><div class="line">mainHandler = new Handler(Looper.getMainLooper());</div><div class="line"></div><div class="line">// 子线程 handler</div><div class="line">HandlerThread handlerThread = new HandlerThread(“子线程任务”);</div><div class="line">handlerThread.start();</div><div class="line">Handler backgroundHandler = new Handler(handlerThread.getLooper());</div></pre></td></tr></table></figure>
+</li>
+<li><p>如何快速判断当前是否运行在主线程？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Looper.getMainLooper().getThread() == Thread.currentThread();</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="System-gc- 可以触发立即 -gc- 吗？如果不行那怎么才能触发即时 -gc- 呢？"><a href="#System-gc- 可以触发立即 -gc- 吗？如果不行那怎么才能触发即时 -gc- 呢？" class="headerlink" title="System.gc() 可以触发立即 gc 吗？如果不行那怎么才能触发即时 gc 呢？"></a>System.gc() 可以触发立即 gc 吗？如果不行那怎么才能触发即时 gc 呢？</h3><p>在 LeakCanary 里，需要立即触发 gc，并在之后立即判断弱引用是否被回收。这意味着该 gc 必须能够立即同步执行。</p>
+<p>常用的触发 gc 方法是 <code>System.gc()</code>，那它能达到我们的要求吗？</p>
+<p>我们来看下其实现方式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Indicates to the VM that it would be a good time to run the</div><div class="line"> * garbage collector. Note that this is a hint only. There is no guarantee</div><div class="line"> * that the garbage collector will actually be run.</div><div class="line"> */</div><div class="line">public static void gc() &#123;</div><div class="line">    boolean shouldRunGC;</div><div class="line">    synchronized(lock) &#123;</div><div class="line">        shouldRunGC = justRanFinalization;</div><div class="line">        if (shouldRunGC) &#123;</div><div class="line">            justRanFinalization = false;</div><div class="line">        &#125; else &#123;</div><div class="line">            runGC = true;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    if (shouldRunGC) &#123;</div><div class="line">        Runtime.getRuntime().gc();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>注释里清楚说了，<code>System.gc()</code>只是建议垃圾回收器来执行回收，但是 <code> 不能保证真的去回收</code>。从代码也能看出，必须先判断 <code>shouldRunGC</code> 才能决定是否真的要 gc。</p>
+<h5 id="知识点：-1"><a href="# 知识点：-1" class="headerlink" title="知识点："></a>知识点：</h5><p>那要怎么实现 即时 GC 呢？</p>
+<p><code>LeakCanary</code> 参考了一段 <a href="https://android.googlesource.com/platform/libcore/+/master/support/src/test/java/libcore/java/lang/ref/FinalizationTester.java" target="_blank" rel="external">AOSP 的代码</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">// System.gc() does not garbage collect every time. Runtime.gc() is</div><div class="line">// more likely to perfom a gc.</div><div class="line">Runtime.getRuntime().gc();</div><div class="line">enqueueReferences();</div><div class="line">System.runFinalization();</div><div class="line">public static void enqueueReferences() &#123;</div><div class="line">    /*</div><div class="line">     * Hack. We don&apos;t have a programmatic way to wait for the reference queue</div><div class="line">     * daemon to move references to the appropriate queues.</div><div class="line">     */</div><div class="line">    try &#123;</div><div class="line">        Thread.sleep(100);</div><div class="line">    &#125; catch (InterruptedException e) &#123;</div><div class="line">        throw new AssertionError();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="可以怎样来改造 -LeakCanary- 呢？"><a href="# 可以怎样来改造 -LeakCanary- 呢？" class="headerlink" title="可以怎样来改造 LeakCanary 呢？"></a>可以怎样来改造 LeakCanary 呢？</h3><h5 id="忽略某些已知泄漏的类或 Activity"><a href="# 忽略某些已知泄漏的类或 Activity" class="headerlink" title="忽略某些已知泄漏的类或 Activity"></a>忽略某些已知泄漏的类或 Activity</h5><p>LeakCanary 提供了 ExcludedRefs 类，可以向里面添加某些主动忽略的类。比如已知 Android 源代码里有某些内存泄漏，不属于我们 App 的泄漏，那么就可以 exclude 掉。</p>
+<p>另外，如果不想监控某些特殊的 Activity，那么可以在 <code>onActivityDestroyed(Activity activity)</code> 里，过滤掉特殊的 Activity，只对其它 Activity 调用 <code>refWatcher.watch(activity)</code> 监控。</p>
+<h5 id="把内存泄漏数据上传至服务器"><a href="# 把内存泄漏数据上传至服务器" class="headerlink" title="把内存泄漏数据上传至服务器"></a>把内存泄漏数据上传至服务器 </h5><p> 在 LeakCanary 提供了 <code>AbstractAnalysisResultService</code>，它是一个 intentService，接收到的 intent 内包含了 <code>HeapDump</code> 数据和 <code>AnalysisResult</code> 结果，我们只要继承这个类，实现自己的 <code>listenerServiceClass</code>，就可以将堆数据和分析结果上传到我们自己的服务器上。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 本文通过源代码分析了 LeakCanary 的原理，并提出了一些有趣的问题，学习了一些实用的知识点。希望对读者有所启发，欢迎与我讨论。</p>
+<p>之后会继续挑选优质开源项目进行分析，欢迎提意见。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/带你学开源项目/" rel="tag">#带你学开源项目</a>
+          
+            <a href="/tags/内存泄漏/" rel="tag">#内存泄漏</a>
+          
+            <a href="/tags/性能优化/" rel="tag">#性能优化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/08/java_classloader/" rel="next" title="Java 技术之类加载机制">
+                <i class="fa fa-chevron-left"></i> Java 技术之类加载机制
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/24/Java-技术之垃圾回收机制/" rel="prev" title="Java 技术之垃圾回收机制">
+                Java 技术之垃圾回收机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/3')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/3/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#LeakCanary- 使用方式"><span class="nav-number">1.</span> <span class="nav-text">LeakCanary 使用方式 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从 -LeakCanary-install-this- 开始"><span class="nav-number">2.</span> <span class="nav-text">从 LeakCanary.install(this); 开始 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RefWatcher- 如何监控 -activity- 是否被正常回收呢？"><span class="nav-number">3.</span> <span class="nav-text">RefWatcher 如何监控 activity 是否被正常回收呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心函数：ensureGone-reference- 检测回收"><span class="nav-number">3.0.1.</span> <span class="nav-text">核心函数：ensureGone(reference) 检测回收 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存泄漏检测小结"><span class="nav-number">4.</span> <span class="nav-text">内存泄漏检测小结 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#探讨一些关于 -LeakCanary- 有趣的问题"><span class="nav-number">5.</span> <span class="nav-text">探讨一些关于 LeakCanary 有趣的问题 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LeakCanary- 项目目录结构为什么这样分？"><span class="nav-number">5.1.</span> <span class="nav-text">LeakCanary 项目目录结构为什么这样分？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#当 -Activity- 被 -destory- 后，LeakCanary- 多久后会去进行检查其是否泄漏呢？"><span class="nav-number">5.2.</span> <span class="nav-text">当 Activity 被 destory 后，LeakCanary 多久后会去进行检查其是否泄漏呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#知识点："><span class="nav-number">5.2.0.1.</span> <span class="nav-text">知识点：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#System-gc- 可以触发立即 -gc- 吗？如果不行那怎么才能触发即时 -gc- 呢？"><span class="nav-number">5.3.</span> <span class="nav-text">System.gc() 可以触发立即 gc 吗？如果不行那怎么才能触发即时 gc 呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#知识点：-1"><span class="nav-number">5.3.0.1.</span> <span class="nav-text">知识点：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可以怎样来改造 -LeakCanary- 呢？"><span class="nav-number">5.4.</span> <span class="nav-text">可以怎样来改造 LeakCanary 呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#忽略某些已知泄漏的类或 Activity"><span class="nav-number">5.4.0.1.</span> <span class="nav-text">忽略某些已知泄漏的类或 Activity</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#把内存泄漏数据上传至服务器"><span class="nav-number">5.4.0.2.</span> <span class="nav-text">把内存泄漏数据上传至服务器 </span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

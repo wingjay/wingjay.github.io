@@ -1,0 +1,1166 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="React Native," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。">
+<meta name="keywords" content="React Native">
+<meta property="og:type" content="article">
+<meta property="og:title" content="写给移动开发者的 React Native 指南">
+<meta property="og:url" content="http://wingjay.com/2017/03/14/写给移动开发者的-React-Native-指南/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-fdd239b44898ea4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-8691544719a34a57.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-09965625af9b3a49.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-c8f4990d8334f3ca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-6531d24c41982690.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-d2fb4470d8ae27b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.484Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="写给移动开发者的 React Native 指南">
+<meta name="twitter:description" content="React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/281665-fdd239b44898ea4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 写给移动开发者的 React Native 指南 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                写给移动开发者的 React Native 指南
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-rocket"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-03-14T12:07:06+08:00" content="2017-03-14">
+              2017-03-14
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/React-Native/" itemprop="url" rel="index">
+                    <span itemprop="name">React Native</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            6,245 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="前言"><a href="# 前言" class="headerlink" title="前言"></a>前言</h3><p>React Native 诞生于 2015 年，名副其实的富二代，主要使命是为父出征，与 Apple 和 Google 抗衡，为开发者带去一套跨平台、动态更新的 Javascript 框架，口号是：Learn once, write anywhere：Build mobile apps with React。在试图推翻 Android 和 iOS 压制的同时，还提携了一把自家兄弟：React。</p>
+<p>从诞生之日 React Native 就充满了期待和争议。期待是无数开发者希望不用忍受频繁发版的噩梦，也不用同时为两个平台开发业务逻辑几无差别的两个 App；争议是 React Native 真的能以一己之力救大众于水火吗？React Native 在跨平台时还能保持良好的用户体验吗？</p>
+<p>当然我们知道，这种问题向来都是仁者见仁，智者见智。比起一味的疑惑、争论，还不如来好好看看这货究竟是个啥？甚至自己动手来玩一把。</p>
+<p>本文主要针对两类读者：</p>
+<ul>
+<li>想要入门 RN 的人，在阅读官方文档前先对 RN 形成一个整体的印象</li>
+<li>对 RN 心存好奇，在犹豫是否要入坑的开发者，可以通过本文对 RN 更客观全面的认识</li>
+</ul>
+<h3 id="目录"><a href="# 目录" class="headerlink" title="目录"></a>目录</h3><ul>
+<li>React Native 好在哪<ul>
+<li>跨平台＋动态更新</li>
+<li>代码复用</li>
+<li>RN vs Weex</li>
+<li>RN vs Hybrid</li>
+<li>RN 劣势</li>
+</ul>
+</li>
+<li>React Native 运行机制</li>
+<li>RN 开发环境搭建</li>
+<li>引入 React Native<ul>
+<li>Build from Scratch</li>
+<li>集成到已有项目</li>
+</ul>
+</li>
+<li>Javascript、React 及 ES6、JSX 语法</li>
+<li>UI 层</li>
+<li>网络请求层</li>
+<li>Debugging 调试<ul>
+<li>In-App 报错</li>
+<li>Console.log</li>
+<li>大杀器：Chrome 逐行调试</li>
+</ul>
+</li>
+<li>从 JS 调用 Native 方法或显示自定义 Native View<ul>
+<li>Native Modules：JS 里直接调用 Native(Java/Swift) 方法</li>
+<li>Native UI Component：JS 里直接调用自定义的 Native View</li>
+</ul>
+</li>
+<li>React Native 适合你吗？</li>
+<li>为什么要写这篇文章</li>
+</ul>
+<h3 id="React-Native- 好在哪"><a href="#React-Native- 好在哪" class="headerlink" title="React Native 好在哪"></a>React Native 好在哪 </h3><p> 下面我们来看下 Hybrid 及 React Native 等开发模式包含了哪些常规移动开发所不具备的优势。</p>
+<h5 id="1- 跨平台＋动态更新"><a href="#1- 跨平台＋动态更新" class="headerlink" title="1. 跨平台＋动态更新"></a>1. 跨平台＋动态更新 </h5><p> 传统的客户端开发模式是怎样的呢？</p>
+<p>Android 与 iOS Team 分别编写客户端代码，打包，分发到 Play Store 和 Apple Store，通过更新 JSON 数据来更新页面。</p>
+<p>不过，当客户端发生严重问题而服务器上无法 quick fix 时，就不得不重新发版。</p>
+<p>对国外 Android 市场而言还好，因为能通过 Play Store 快速更新；国内 Android 市场则由于分发渠道太杂，很难及时把新版本立即推送给所有用户，当然这也是为何热修复技术在国内盛行而国外冷清的原因；而 Apple Store 则需要一定的审核时间，而且最近又在抓 iOS 热修复框架如 JsPatch、Rollout 等。</p>
+<p>相比而言，Hybrid 和 RN/Weex 模式除了能下发 Json 数据来刷新界面内容，更能直接下发业务逻辑代码，直接实现整体 App 的更新。而且，它们不用在乎 Android 和 iOS 两个平台，因为一份 JS 代码写好后，把 JS Bundle 放在服务器上，所有的客户端立即更新。</p>
+<h5 id="2- 代码复用"><a href="#2- 代码复用" class="headerlink" title="2. 代码复用"></a>2. 代码复用 </h5><p> 一般而言，同一款产品的 Android 和 iOS 两端除 UI 有些许不同外，多数业务逻辑几乎完全一致，这便造成了人力的浪费。</p>
+<p>而最近 Instagram 的官博 <a href="https://engineering.instagram.com/react-native-at-instagram-dd828a9a90c7#.ugk9ncjyz" target="_blank" rel="external">React Native at Instagram</a> 一文中已经提到，利用 RN (React Native 缩写，下同) 开发的 feature 可以实现 <code>85% - 99%</code> 的代码复用率。这意味着我们可以用更少的人力成本来达到相同的效果。</p>
+<h5 id="3-RN-vs-Weex"><a href="#3-RN-vs-Weex" class="headerlink" title="3. RN  vs Weex"></a>3. RN  vs Weex</h5><p>实现上面的效果有两种开发框架：混合开发框架 Cordova 和基于 Javascript 的 React-Native、Weex 框架。</p>
+<p>下面我从自己的实践经验出发做些比较，也欢迎读者提出自己看法。</p>
+<p>最开始觉得 RN 的学习成本比较大，所以首先考虑了 <a href="https://github.com/alibaba/weex" target="_blank" rel="external">Weex 框架</a>，据说是阿里巴巴良心出品。不过在尝试后不得不选择了放弃，原因有这几点：</p>
+<ul>
+<li>Bug 较多。我们最先测试了 <code> 最基本 </code> 的 ListView，在 iOS 运行良好，而同样的 Demo 代码到了 Android 这边的 <code> 下拉刷新 </code> 就出现了问题，这使得我们开始警惕；</li>
+<li>社区、文档弱，GitHub Issue 基本是中文。当然我毫无歧视中文之意。我认为，<strong>一套项目开源是真正意义是希望借助开源社区的力量，一起来完善改进，因此要优先推崇英文，使项目国际化，得到全世界开发者的共同支持，这样才是可持续的模式。</strong>而 Weex 的 <a href="https://github.com/alibaba/weex/issues" target="_blank" rel="external">Issue</a> 里放眼望去基本 90% 都是中文，无论提问者还是 <strong> 项目维护者 </strong>。这一点直接把国外优秀的开发者拒之门外，也很难让我看到多么长远的未来。<br> 下面是摘取的 RN 里的一则中文 issue：</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-fdd239b44898ea4c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="**Issue is for bug report, not for Q&amp;A**"></p>
+<ul>
+<li>Contributor 差别。因为上面一点，<a href="https://github.com/apache/incubator-weex/graphs/contributors" target="_blank" rel="external">Weex 的 Contributor</a> 只有 91 个人，而 <a href="https://github.com/facebook/react-native/graphs/contributors" target="_blank" rel="external">React-Native 的 Contributor</a> 有 1214 人。Contributor 是用来干嘛的？除了支持新功能，还有就是修复 bug 啊。Weex/RN 都是希望一统 Android + iOS 的，这么伟大的目标，这么艰巨的工程，不是几个人可以轻轻松松搞定的。 </li>
+<li>公司背景（来自 YY）。大家都知道 RN 来自 Facebook，Weex 来自阿里巴巴。如果想一窥它们的未来，需要先想一下这种技术对他们各自的意义。大家都清楚，Facebook、Google、Apple 是当今当之无愧的巨头，在移动互联网这波浪潮里，Google 掌握了 Android 法器，Apple 控制了 iOS 神器，Facebook 呢？并没有这些系统级入口。当然 Windows 的经历也让 Facebook 并不那么倾向去开发一个新的移动操作系统来竞争。那怎么办？React Native 应运而生，打出的口号就是： <strong>Learn once, write anywhere</strong>。什么意思，没错，就是明确告诉你学一次就可以同时开发两个平台了。这一点可一直都是移动端开发人员和创业公司的理想。有人说了，Apple 这么强势，RN 要是太嚣张，分分钟把你禁掉。这时我们就要来看看 RN 的 <a href="http://facebook.github.io/react-native/showcase.html" target="_blank" rel="external">Showcase</a> 了，哪些 App 应用了 RN 呢？Facebook, Instagram, Airbnb, Walmart, QQ, 京东等，这回 Apple 要禁 RN 就要稍微掂量下这些大厂的意见吧。</li>
+</ul>
+<p>当然，我是很希望国内也能推出优质的开源项目来和国外大厂抗衡的，不过真正优质的大型开源项目往往除了开发者的个人能力，和公司的战略和制度关系也很大。</p>
+<h5 id="4-RN-vs-Hybrid"><a href="#4-RN-vs-Hybrid" class="headerlink" title="4. RN vs Hybrid"></a>4. RN vs Hybrid</h5><p>这里的 Hybrid 开发主要针对 Cordova 框架，其实在放弃 Weex 之后我们还是没考虑 RN，而是转过去了解 Cordova，不过做了大致了解后也放弃了。主要硬伤有两点：</p>
+<ul>
+<li>性能短板。大家知道 Hybrid 是基于 WebView 的，在 Android 上的性能缺陷非常明显；而 RN 是利用 JSCore 转化成 Native 运行的，性能相对而言好不少；</li>
+<li>用户体验。了解移动产品的人都知道用户体验的重要性，RN 的体验和原生的几乎没有差别，而 Webview 的实现是网页开发思路，体验会相差很大。</li>
+</ul>
+<p><strong>性能和用户体验是移动 App 的命根子。</strong></p>
+<p>因此，综合考虑下来，我们还是决定相信 Facebook 并采用 RN。</p>
+<h5 id="5-RN- 劣势"><a href="#5-RN- 劣势" class="headerlink" title="5. RN 劣势"></a>5. RN 劣势 </h5><p> 上面我提到了 RN 的一些优势，不过作为开发者更加需要明确其劣势，我总结了下大概有以下几点劣势：</p>
+<ul>
+<li>学习成本。Weex 的写法就是类似常规的 Html/JS，对于前端人员来说很容易上手，就算了非前端人员来说也花不了多久。而 RN 是在 React.js 上进行改进形成的一套语法，和常规前端差别较大，因此需要好几天的学习适应。当然我觉得优秀的程序员的基本素质之一就是能快速学习、练习并熟练一种新语言的。我个人的话大概花了两三天的时间已经能完成一套涵盖网络、JS 与 Native 通信的页面了，对于 React.js 语法也上手很快。</li>
+<li>安装包 Size。对于 iOS 而言影响不算很大，对于 Android 来说，我尝试后发现引入 RN 会给 apk 带来 6MB 左右的增幅，不过利用 <code>split apk</code> 的技术就能缩小到到 1MB 左右的增幅。</li>
+<li>首次加载耗时。大家知道 RN 需要从服务器下载 JS bundle，然后在本地转化成 Native code 运行的，所以在第一次打开 App 时需要花费一些时间进行下载和刷新。当然我们可以在发布 client 时内置一个写好的 js 文件在本地作缓存用。</li>
+</ul>
+<h3 id="二、React-Native- 运行机制"><a href="# 二、React-Native- 运行机制" class="headerlink" title="二、React Native 运行机制"></a>二、React Native 运行机制 </h3><p> 对于一个用 RN 搭建的移动 App，在启动后会从服务器下载最新的 JS Bundle 文件，然后由本地 JavascriptCore 引擎对 JS 文件进行解析，并利用 Bridge 映射到对应的 Native 方法和 UI 控件。得到的效果是：</p>
+<ol>
+<li>同样的 RN 代码，下发到 Android 和 iOS 不同平台中，会自动调用对应 Native 的 UI 控件，保证了各平台用户体验的连贯性；</li>
+<li>开发者就算是移动端小白，只要有 Web 基础，通过编写一套 RN 端代码就可以同时完成 Android 与 iOS App 的开发；</li>
+<li>由于可以利用 JS bundle 同时下发数据和业务逻辑，这意味着你可以像 Web 开发一样，实时迭代更新你的移动端 App，无需在了解各自平台的热修复技术；</li>
+<li>Native Modules，这是 RN 强大的一个扩展性，允许你通过简单的代码就能实现在 JS 里直接调用你自己的 Native 方法；</li>
+<li>Native Components，如果你自己实现了一些复杂的 Native UI 组件，而这些组件尚未被 RN 支持，你可以利用 Native Components 快速把原生组件引入到 RN 中并可以直接在 JS 里更新这些组件的状态。</li>
+</ol>
+<h3 id="三、RN- 开发环境搭建"><a href="# 三、RN- 开发环境搭建" class="headerlink" title="三、RN 开发环境搭建"></a>三、RN 开发环境搭建 </h3><p> 首先 IDE 方面，RN 推荐了一些工具：</p>
+<ul>
+<li><a href="https://nuclide.io/" target="_blank" rel="external">Nuclide</a> 是 Facebook 内部用来开发 RN 的工具，Debug 功能强大。只不过这是一款 <a href="https://github.com/atom/atom" target="_blank" rel="external">Atom</a> 的插件，意味着你必须先安装 Atom，再来安装这款开发插件；</li>
+<li><a href="https://www.decosoftware.com/" target="_blank" rel="external">Deco</a> 是专为开发 RN 诞生的工具，可以快速搜索开源的第三方 RN 组件并直接插入到代码中，用 MacOS 的同学可以尝试下。我本人最开始也是试用这个，上手简单、小巧简洁。不足的是功能有点简单，无论是 Debug 功能还是代码检查之类的都不具备；</li>
+<li><a href="https://www.sublimetext.com/" target="_blank" rel="external">Sublime</a> 可以通过第三方包来达到不错的开发效率，各方面还算可圈可点；</li>
+<li><a href="https://code.visualstudio.com/" target="_blank" rel="external">Visual Studio</a> 这款也是蛮强大的 IDE，之前有用过的小伙伴可以试一下。</li>
+</ul>
+<p>本人的话目前采用的是 <code>Sublime</code>，因为个人常用 Sublime，而且第三方插件很丰富，轻量方便。下面简单说下配置，感兴趣的小伙伴可以看下。</p>
+<ol>
+<li><a href="https://packagecontrol.io/packages/Babel" target="_blank" rel="external">Babel</a> 用来高亮 React JSX 语法，支持 ES6，而 React-Native 就是搭建在 <a href="https://facebook.github.io/react/" target="_blank" rel="external">React.js</a> 基础上的；</li>
+<li><a href="https://github.com/Shrugs/react-native-snippets" target="_blank" rel="external">React-Native-Snippets</a> 可以快速生成 RN 的一些模版代码；</li>
+<li><a href="http://eslint.cn/docs/user-guide/configuring" target="_blank" rel="external">ESLint</a> 超级强大的 Lint 工具，支持 ES6、JSX 语法检查，而且还有 React 和 RN 的插件，比纯粹的 JSXHint/JSLint 都强大；</li>
+</ol>
+<p>当然，用 Atom 的小伙伴自然要首先考虑 <a href="https://nuclide.io/" target="_blank" rel="external">Nuclide</a>。</p>
+<h3 id="四、引入 -React-Native"><a href="# 四、引入 -React-Native" class="headerlink" title="四、引入 React Native"></a>四、引入 React Native</h3><p>引入 RN 有两种方法：从零构建；集成到已有项目。</p>
+<h5 id="1-Build-from-Scratch"><a href="#1-Build-from-Scratch" class="headerlink" title="1. Build from Scratch"></a>1. Build from Scratch</h5><p>先说第一种，从零开始构建，比较简单，遵循官方文档 <a href="http://facebook.github.io/react-native/releases/0.42/docs/getting-started.html" target="_blank" rel="external">Getting Started</a> 基于你自己的操作系统和平台一步步安装相关的依赖，然后利用如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">react-native init AwesomeProject</div></pre></td></tr></table></figure></p>
+<p>你就创建好一个 RN 工程项目了，结构如下：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-8691544719a34a57.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RN 目录结构"></p>
+<p>里面有四个文件夹：</p>
+<ul>
+<li><code>android</code> / <code>ios</code>：各自存放了一个相关平台的工程 project，可以直接下拉 JS Bundle 并运行，对于移动端小白而言可以不用管里面的具体实现；</li>
+<li><code>node_modules</code>：里面是自动生成的 <code>node</code> 依赖之类的文件，通过读取 <code>package.json</code> 里的配置来生成；</li>
+<li><code>js</code>：这个文件夹最为重要，我们的开发都在这个文件夹里，把写好的 <code>js</code> 文件打包下发给 client 就会自动生效。</li>
+</ul>
+<h5 id="2- 集成到已有项目"><a href="#2- 集成到已有项目" class="headerlink" title="2. 集成到已有项目"></a>2. 集成到已有项目 </h5><p> 有很多公司是希望在现有 App 的基础上集成 <code>RN</code> 来开发一些特定的 Feature，这种情况就不能参考上面的方法了。在 RN 的官方文档里有一节 <a href="http://facebook.github.io/react-native/releases/0.42/docs/integration-with-existing-apps.html" target="_blank" rel="external">Integration with Existing Apps</a> , 只需要按照一步步做即可。</p>
+<p>以 Android 为例，大概要做以下几步：</p>
+<ol>
+<li>添加 <code>gradle</code> 依赖：<code>compile &quot;com.facebook.react:react-native:+&quot; // From node_modules.</code>；</li>
+<li>创建空的 <code>Activity</code> ，指定 <code>JS bundle</code> 和入口 <code>Component</code> 名字即会自动在这个 <code>Activity</code> 里去加载 <code>JS bundle</code> 文件；</li>
+<li>在 Activity 里监听 onBackPressed 事件，用来与 JS 端协作处理返回键点击事件。</li>
+<li>启动 server，运行 App 即可。</li>
+</ol>
+<p>总之需要说明的是，即使是移动端小白，也可以遵循文档里的指示完成这一步。接下来的大部分时间只要关心 JS 端开发就行了。</p>
+<h3 id="五、Javascript、React- 及 -ES6、JSX- 语法"><a href="# 五、Javascript、React- 及 -ES6、JSX- 语法" class="headerlink" title="五、Javascript、React 及 ES6、JSX 语法"></a>五、Javascript、React 及 ES6、JSX 语法 </h3><p> 我们知道 RN 采用了 React 和 ES6 的语法，所以我们必须先对这些语法有一定了解才能去读 RN 的代码。</p>
+<p>关于 <code>Javascript</code>，我推荐 W3School 里的 <a href="http://www.w3school.com.cn/js/" target="_blank" rel="external">JS 语法</a> 和 MDN 里的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript" target="_blank" rel="external">JS 手册</a>，大家只要对一些基础语法做些了解就可以。</p>
+<p>关于 <code>React</code>，我推荐 <a href="http://www.ruanyifeng.com/" target="_blank" rel="external">阮一峰</a> 写的 <a href="http://www.ruanyifeng.com/blog/2015/03/react.html" target="_blank" rel="external">React 入门实例教程</a>，基本上把文章读一遍，再自己动手写一遍，就能理会到 React 的大致用法了。</p>
+<p>关于 <code>ES6</code>、<code>ES7</code>、<code>JSX</code>等，感兴趣的可以看一下 RN 文档中 <a href="http://facebook.github.io/react-native/releases/0.42/docs/javascript-environment.html" target="_blank" rel="external">Javascript Environment</a> 里提到的支持的方法，需要时再来查询也可以。也可以看 <code>Babel</code> 出的 <a href="https://babeljs.io/learn-es2015/" target="_blank" rel="external">Learn ES2015 手册</a>。</p>
+<p>这里有一个很不错的 GitHub 项目，帮助你通过交互性的例子来快速上手语法知识：<a href="http://www.reactnativeexpress.com/" target="_blank" rel="external">React Native Express</a>。</p>
+<h3 id="六、UI- 层"><a href="# 六、UI- 层" class="headerlink" title="六、UI 层"></a>六、UI 层 </h3><p> 简单熟悉了 <code>React</code> 语法后，基本能正常阅读 RN 的示例代码了。</p>
+<p>正式开发 App 的第一步当然就是写 UI 界面了，由于 RN 已经封装好了一套 JS 的 UI 组件，这些组件会自动在 Android/iOS 端调用对应的原生 UI 组件，因此我们只需要熟悉这些 UI 组件的用法及属性、回调方法即可。</p>
+<p>我们可以在文档的 <a href="http://facebook.github.io/react-native/releases/0.42/docs/getting-started.html" target="_blank" rel="external">Components</a> 看到不少组件，比如<code>View, Text, Button, Image, Switch</code>, 还有我们用的最多的 <code>ScrollView</code> 和 <code>ListView</code>。</p>
+<p>在读文档时，我们可以先通过一边写代码一边读文档的方式进行，RN 非常贴心，直接在 Web 里嵌入了模拟器，我们只要修改编辑框里的代码，立即就能在右边的模拟器看到效果。这极大的降低了我们的学习成本。<br><img src="http://upload-images.jianshu.io/upload_images/281665-09965625af9b3a49.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Text Component"></p>
+<p>另外，在学习一个组件时，我们要区分哪个属性是某个平台特有的。比如下面两个 Text 的属性：<code>textBreakStrategy</code> 只会在 Android 上生效，而 <code>adjustsFontSizeToFit</code> 只可以用在 iOS 上。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-c8f4990d8334f3ca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Platform Specific Properties"></p>
+<p>然后，如果你希望在 Android 和 iOS 里显示不同的内容怎么办呢？RN 里有一节是<a href="http://facebook.github.io/react-native/releases/0.42/docs/platform-specific-code.html" target="_blank" rel="external">Platform Specific Code</a>，可以有如下几种形式来进行区分：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">if (Platform.OS === &apos;ios&apos;) &#123;</div><div class="line">  // stuff for ios</div><div class="line">&#125; else &#123;</div><div class="line">  // stuff for android</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>除此之外，UI 组件的用法学习就很类似常规的 Html 标签了，只要知道其使用方式即可，甚至需要用的时候再来查文档也行。</p>
+<h3 id="七、网络请求层"><a href="# 七、网络请求层" class="headerlink" title="七、网络请求层"></a>七、网络请求层 </h3><p> 学完上面的我们已经能够写出 UI 界面了，而且这套界面已经能够在不同平台上转化成各自平台的 Native UI 了。然后，我们就需要去网络层请求真实数据了。</p>
+<p>RN 里提供了 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API" target="_blank" rel="external">Fetch API</a> 来进行实现。举个例子，你想要通过 GET 方法去请求数据并转化成 JSON，可以通过如下代码实现：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">fetch(&apos;https://facebook.github.io/react-native/movies.json&apos;)</div><div class="line">      .then((response) =&gt; response.json())</div><div class="line">      .then((responseJson) =&gt; &#123;</div><div class="line">        return responseJson.movies;</div><div class="line">      &#125;)</div><div class="line">      .catch((error) =&gt; &#123;</div><div class="line">        console.error(error);</div><div class="line">      &#125;);</div></pre></td></tr></table></figure></p>
+<p>熟悉 Reactive 编程的伙伴应该对这样的语法不陌生，比如 Android 上的 <a href="https://github.com/ReactiveX/RxJava" target="_blank" rel="external">RxJava</a>； iOS 上的 <a href="https://github.com/ReactiveX/RxSwift" target="_blank" rel="external">RxSwift</a>；Web 上的 <a href="https://github.com/Reactive-Extensions/RxJS" target="_blank" rel="external">RxJS</a>。上面 function 的功能就是：请求网址 <code>https://facebook.github.io/react-native/movies.json</code>，把返回的 Response 转化成 JSON object，取出 JSON object 里的 <code>movies</code> 字段。同时，如果发生 error 会被 catch 住。</p>
+<p>当然，上面是最基本的 GET 请求，Fetch API 还支持自定义 Headers，更换 Method，添加 Body 等。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">fetch(&apos;https://mywebsite.com/endpoint/&apos;, &#123;</div><div class="line">  method: &apos;POST&apos;,</div><div class="line">  headers: &#123;</div><div class="line">    &apos;Accept&apos;: &apos;application/json&apos;,</div><div class="line">    &apos;Content-Type&apos;: &apos;application/json&apos;,</div><div class="line">  &#125;,</div><div class="line">  body: JSON.stringify(&#123;</div><div class="line">    firstParam: &apos;yourValue&apos;,</div><div class="line">    secondParam: &apos;yourOtherValue&apos;,</div><div class="line">  &#125;)</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>上面构建了一个基本的 POST 请求，添加了自己的 Headers:<code>Accept</code>和<code>Content-Type</code>，添加了 Body。</p>
+<p>因此看下来，RN 里的网络请求不仅具备了 Reactive 编程的简洁，也能自定义常规的 Http 请求，写法简单。</p>
+<p>除了 Fetch API 之外，RN 还内置了 <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest" target="_blank" rel="external">XMLHttpRequest API(俗称 AJAX)</a>，而且支持<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket" target="_blank" rel="external">TCP 全双工通信方式 WebSocket</a>。</p>
+<h3 id="八、Debugging- 调试"><a href="# 八、Debugging- 调试" class="headerlink" title="八、Debugging 调试"></a>八、Debugging 调试 </h3><p> 调试是很多程序员非常关注的一个环节，因为 RN 是用 JS 写完后到 Native 解释成 Native 方法来执行的，因此如果能快速调试 JS 代码是非常重要的一环。</p>
+<p>最开始 RN 的调试功能比较弱，不过现在的 Debugging 功能在我看来还是很不错的。一般来讲可以有以下几个调试方式：</p>
+<p>#####1. In-App 报错<br>RN 里默认集成了 In-App 的错误提示方式，即在 App 运行过程中会弹出全屏的报错信息呈现给你，而你也可以通过阅读具体的错误信息快速找到错误原因。通过点击这个错误信息里的某一行，会立即自动打开对应的代码。<br><img src="http://upload-images.jianshu.io/upload_images/281665-6531d24c41982690.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="In-App Error"></p>
+<p>#####2. Console.log<br>在开发 Client 时，我们一般都会用 <code>Log.log()</code> 来打印一些运行时变量的值，然后实时查看打印出来的 log 来调试，在 RN 也一样，你只要在 JS 里写一句 <code>console.log(&#39;this is log data&#39;)</code>，就会自动在 Client 的常规 log 里能看到，比如 Android 的 <code>adb logcat</code> 里就会自动打印出 <code>&#39;this is log data&#39;</code> 一行。</p>
+<p>#####3. 大杀器：Chrome 逐行调试 <br> 这个杀器的最牛逼之处就是可以像 Client 一样，逐行调试代码！</p>
+<p>我们来看下面一张图。从左往右。先是文件目录，我们选中了 <code>index.js</code> 文件夹，然后第二个 Tab，是 <code>index.js</code> 的内容。这里关键的是我可以直接选中某一行代码设断点。当 Client 运行到这一行时，就会在第三个 Tab 里打印出运行时环境及变量。我们可以看到 <code>props</code> 里就有我们传进去的变量值。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-d2fb4470d8ae27b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Chrome Debug"></p>
+<p>有了以上几种调试方式，我们几乎可以和常规的 Native 开发一样来调试 RN 代码了，不得不说 RN Team 确实牛 x 啊！</p>
+<h3 id="九、从 -JS- 调用 -Native- 方法或显示自定义 -Native-View"><a href="# 九、从 -JS- 调用 -Native- 方法或显示自定义 -Native-View" class="headerlink" title="九、从 JS 调用 Native 方法或显示自定义 Native View"></a>九、从 JS 调用 Native 方法或显示自定义 Native View</h3><p>这又是另一个牛 x 之处啊。</p>
+<p>很多人觉得 RN 限制太多，只能支持有限的 View 组件和有限的方法，难以发挥 Client 的最大性能。简单点说，在 Client 可以绘制复杂的 View，可以调用高性能 C++ 等底层代码，但 RN 却做不到。</p>
+<p>于是，RN 里提出了 <code>Native Modules</code> 和 <code>Native UI Component</code> 两种技术。</p>
+<p>#####Native Modules：JS 里直接调用 Native(Java/Swift) 方法 <br> 所谓 Native Modules，就是自己在 Client 写好了某些方法，由于某些原因这些方法不太方便或者无法搬到 RN 里面，那么，我们可以在 Client 把这些方法暴露出来给 RN，然后在 JS 里可以像 import 普通的 module 一样把这些 Native Modules 引入进去，直接调用。</p>
+<p>具体的实现方法可以参考文档 <a href="http://facebook.github.io/react-native/releases/0.42/docs/native-modules-ios.html" target="_blank" rel="external">iOS Native Modules</a> 和 <a href="http://facebook.github.io/react-native/releases/0.42/docs/native-modules-android.html" target="_blank" rel="external">Android Native Modules</a>。</p>
+<p>#####Native UI Component：JS 里直接调用自定义的 Native View<br>很多时候我们在写 Client 时，为了实现 Designer 天马行空的设计，常常需要自定义 View，即自己绘制某些系统并不提供的特定 UI。可想而知，这些 View 肯定不会出现在 RN 的 UI Component 里。</p>
+<p>那么，我们就需要首先在 Native 层自己写好一个自定义 View，然后利用<code>Native UI Component</code> 技术把这个 View 及其中某些 public 方法暴露给 RN，那么 RN 就能直接 import 进来并显示了。</p>
+<p>具体的实现方法可以参考文档 <a href="http://facebook.github.io/react-native/releases/0.42/docs/native-components-ios.html" target="_blank" rel="external">iOS Native UI Component</a> 和 <a href="http://facebook.github.io/react-native/releases/0.42/docs/native-components-android.html" target="_blank" rel="external">Android Native UI Component</a>。</p>
+<p><strong>如果读过文档不是很理解的小伙伴可以留言，我再 post 一些 demo 代码上来</strong></p>
+<h3 id="十、React-Native- 适合你吗？"><a href="# 十、React-Native- 适合你吗？" class="headerlink" title="十、React Native 适合你吗？"></a>十、React Native 适合你吗？</h3><p>这里借鉴下前段时间旧金山的 React Native 会议上的一些优劣总结给读者以参考。当然不一定对，仅供参考。</p>
+<p>RN 的优点：</p>
+<ul>
+<li>跨平台</li>
+<li>原生的用户体验</li>
+<li>开发者体验好</li>
+<li>动态更新代码逻辑</li>
+<li>社区强大</li>
+<li>有个好爹</li>
+</ul>
+<p>RN 的缺点：</p>
+<ul>
+<li>不够成熟</li>
+<li>不够稳定</li>
+<li>生态系统在搭建中</li>
+<li>优质的 App 需要时间打磨</li>
+<li>偶尔需要写 Native 代码(也就是 JS + Swift + Java)</li>
+</ul>
+<p>适合下面这些人 / 公司：</p>
+<ul>
+<li>你对 JS/React 有一定了解</li>
+<li>Web 开发人员比 Mobile 开发人员多</li>
+<li>有意愿投资精力给 RN</li>
+<li>App 设计不是特别区分 Android 和 iOS</li>
+<li>希望热更新</li>
+</ul>
+<p>下面这些人要稍微考虑下：</p>
+<ul>
+<li>完全不了解 JS/React</li>
+<li>已经有现成的 Android/iOS team</li>
+<li>App 设计严格遵守 Android、iOS 各自设计规范</li>
+<li>不想要投入时间／金钱给 RN</li>
+</ul>
+<h3 id="十一、为什么要写这篇文章"><a href="# 十一、为什么要写这篇文章" class="headerlink" title="十一、为什么要写这篇文章"></a>十一、为什么要写这篇文章 </h3><p> 几个月前我对 React Native 也非常不看好，当然现在也没有说非常看好。或者说，写这篇文章毫无为 React Native 布道之意。</p>
+<p>接触 React Native 主要是因为业务需要，PM 希望能够随时改动某块变化较大的模块，常规的开发提交流程往往需要较长的时间，而热修复技术本身并未得到 Google 和 Apple 的官方认可，也就是随时可能因破坏生态安全之名被取缔。</p>
+<p>因此才考虑去了解 Hybrid 开发和 JS Native 开发模式，在了解过程中，又由于性能差、用户体验不好而放弃 Hybrid，由于社区不完善、Bug 较多等原因放弃 Weex，最终才选择了 React Native，开始学习 React、JSX 等语法。</p>
+<p>目前使用下来对 React Native 的一些个人感受：</p>
+<ol>
+<li>学习门槛并没有开始想象那么高。大概只花了两三天时间就熟悉了 Javascript、React 框架、JSX 语法，然后就开始着手业务开发。</li>
+<li>对 Android App 的影响。React Native 会给 Android 端带来 <code>6MB</code> 左右的 size 增幅，不过在采用了 <code>split apk</code> 后就只有 <code>1MB</code> 左右增幅。</li>
+<li>Debug 功能比较完善，至少不用担心发生问题后不知从哪下手。</li>
+<li>性能还行。最初担心的是 React Native 性能不好，但自己上手后，并没有明显感觉到很明显的 React Native 对 App 性能的负面影响，无论是 iOS 还是 Android，当然，这一点还在继续考察中。</li>
+<li>动态部署真的很不错。以前每次写好代码都要花不少时间来编译运行，而现在只要写一份代码，就可以同时在 Android 和 iOS 实时更新了，这无疑节省了生命。</li>
+<li>有待完善。当然，React Native 中确实还存在着不少问题，生态系统也还不够完善。不过我相信，这只是时间问题。</li>
+</ol>
+<p>关于 React Native 一直以来都有很多争议。</p>
+<p>不过我想说的是，<strong>React Native 所代表的跨平台、动态更新技术已经引起了全世界开发者关注，而且这种技术势必会是未来的需求和潮流。React Native 不一定会成功，但至少目前 React Native 已经是这一领域的领跑者。</strong></p>
+<p>而写这篇文章的目的，就是希望告诉更多开发者，<strong>React Native 并不完美，但值得一试。</strong></p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="https://github.com/wingjay" target="_blank" rel="external">我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a></p>
+<p>如果有问题，可以给我留言或发邮件<a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x79;&#105;&#110;&#x6a;&#105;&#x65;&#115;&#x68;&#x40;&#x31;&#x32;&#x36;&#x2e;&#x63;&#x6f;&#109;">&#x79;&#105;&#110;&#x6a;&#105;&#x65;&#115;&#x68;&#x40;&#x31;&#x32;&#x36;&#x2e;&#x63;&#x6f;&#109;</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/React-Native/" rel="tag">#React Native</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/05/今年之计－2017/" rel="next" title="今年之计－2017">
+                <i class="fa fa-chevron-left"></i> 今年之计－2017
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/29/对未来个人技术博客的一些思考/" rel="prev" title="对未来个人技术博客的一些思考">
+                对未来个人技术博客的一些思考 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/10')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/10/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目录"><span class="nav-number">2.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#React-Native- 好在哪"><span class="nav-number">3.</span> <span class="nav-text">React Native 好在哪 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1- 跨平台＋动态更新"><span class="nav-number">3.0.1.</span> <span class="nav-text">1. 跨平台＋动态更新 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2- 代码复用"><span class="nav-number">3.0.2.</span> <span class="nav-text">2. 代码复用 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-RN-vs-Weex"><span class="nav-number">3.0.3.</span> <span class="nav-text">3. RN  vs Weex</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-RN-vs-Hybrid"><span class="nav-number">3.0.4.</span> <span class="nav-text">4. RN vs Hybrid</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-RN- 劣势"><span class="nav-number">3.0.5.</span> <span class="nav-text">5. RN 劣势 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、React-Native- 运行机制"><span class="nav-number">4.</span> <span class="nav-text">二、React Native 运行机制 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、RN- 开发环境搭建"><span class="nav-number">5.</span> <span class="nav-text">三、RN 开发环境搭建 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、引入 -React-Native"><span class="nav-number">6.</span> <span class="nav-text">四、引入 React Native</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Build-from-Scratch"><span class="nav-number">6.0.1.</span> <span class="nav-text">1. Build from Scratch</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2- 集成到已有项目"><span class="nav-number">6.0.2.</span> <span class="nav-text">2. 集成到已有项目 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五、Javascript、React- 及 -ES6、JSX- 语法"><span class="nav-number">7.</span> <span class="nav-text">五、Javascript、React 及 ES6、JSX 语法 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六、UI- 层"><span class="nav-number">8.</span> <span class="nav-text">六、UI 层 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七、网络请求层"><span class="nav-number">9.</span> <span class="nav-text">七、网络请求层 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八、Debugging- 调试"><span class="nav-number">10.</span> <span class="nav-text">八、Debugging 调试 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#九、从 -JS- 调用 -Native- 方法或显示自定义 -Native-View"><span class="nav-number">11.</span> <span class="nav-text">九、从 JS 调用 Native 方法或显示自定义 Native View</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#十、React-Native- 适合你吗？"><span class="nav-number">12.</span> <span class="nav-text">十、React Native 适合你吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#十一、为什么要写这篇文章"><span class="nav-number">13.</span> <span class="nav-text">十一、为什么要写这篇文章 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

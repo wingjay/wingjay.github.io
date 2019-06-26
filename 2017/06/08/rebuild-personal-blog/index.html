@@ -1,0 +1,1085 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="一天变cool,个人博客,GitHub,Blog,Hexo," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="个人博客不仅是个人写作的地方，更是一个展示自己个性、扩大个人影响力的产品。 之前我写过一篇《如何在一天之内搭建以你自己名字为域名且具备cool属性的个人博客》帮助不少人从零开始搭建了自己的博客。而今天想做的是把博客当成个人产品来进行迭代开发，以更好地展示个人形象。">
+<meta name="keywords" content="一天变cool,个人博客,GitHub,Blog,Hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手改造个人博客">
+<meta property="og:url" content="http://wingjay.com/2017/06/08/rebuild-personal-blog/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="个人博客不仅是个人写作的地方，更是一个展示自己个性、扩大个人影响力的产品。 之前我写过一篇《如何在一天之内搭建以你自己名字为域名且具备cool属性的个人博客》帮助不少人从零开始搭建了自己的博客。而今天想做的是把博客当成个人产品来进行迭代开发，以更好地展示个人形象。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.487Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手改造个人博客">
+<meta name="twitter:description" content="个人博客不仅是个人写作的地方，更是一个展示自己个性、扩大个人影响力的产品。 之前我写过一篇《如何在一天之内搭建以你自己名字为域名且具备cool属性的个人博客》帮助不少人从零开始搭建了自己的博客。而今天想做的是把博客当成个人产品来进行迭代开发，以更好地展示个人形象。">
+<meta name="twitter:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 自己动手改造个人博客 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手改造个人博客
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-bicycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-06-08T12:12:37+08:00" content="2017-06-08">
+              2017-06-08
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/个人博客/" itemprop="url" rel="index">
+                    <span itemprop="name">个人博客</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/个人博客/一天变cool/" itemprop="url" rel="index">
+                    <span itemprop="name">一天变cool</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,904 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>个人博客不仅是个人写作的地方，更是一个展示自己个性、扩大个人影响力的产品。</p>
+<p>之前我写过一篇《<a href="http://www.jianshu.com/p/99665608d295" target="_blank" rel="external">如何在一天之内搭建以你自己名字为域名且具备 cool 属性的个人博客</a>》帮助不少人从零开始搭建了自己的博客。而今天想做的是把博客当成个人产品来进行迭代开发，以更好地展示个人形象。</p>
+<a id="more"></a>
+<blockquote>
+<p>更新：利用脚本为即将发表的文章自动创建一个 Github issue。</p>
+</blockquote>
+<p>下面我将介绍一些关于个人博客的新功能，以及实现功能的过程。[注：建议进入 <a href="http://wingjay.com/2017/06/08/rebuild-personal-blog/"> 原文阅读</a>，可以查看到功能的具体效果。本站搭建在 Hexo 平台上]</p>
+<ul>
+<li>中英文自动添加空格</li>
+<li>推荐相关文章</li>
+<li>基于 GitHub Issue 来实现评论功能</li>
+<li>个人简历页面</li>
+<li>RSS 订阅</li>
+</ul>
+<h2 id="中英文自动添加空格"><a href="# 中英文自动添加空格" class="headerlink" title="中英文自动添加空格"></a>中英文自动添加空格 </h2><p> 不少有追求的开发者在写博客时追求格式优雅，比如 <code> 中英文间隔</code>。为了达到这个目的，很多时候就不得不在写文时反复调整英文单词与中文的空格。</p>
+<p>这里介绍一个小巧的插件：<a href="https://github.com/hexojs/hexo-filter-auto-spacing" target="_blank" rel="external">Auto-Spacing</a>，它会在 markdown 文章转化成 html 时，自动为中英文添加空格。</p>
+<p>安装方法：<br>在项目根目录下，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install hexo-filter-auto-spacing --save</div></pre></td></tr></table></figure></p>
+<p>执行完后可以在根目录的 <code>package.json</code> 里找到一行 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">denpendency`:`&quot;hexo-filter-auto-spacing&quot;: &quot;^0.2.1&quot;</div></pre></td></tr></table></figure>
+<p><strong>提醒 </strong><br> 使用这个工具要留意一点：如果你在文章里使用了中英文混合的 url，如我本地的图片 <code>http://wingjay.com/img/ 我的博客.png</code>，它会变成 <code>http://wingjay.com/img/ 我的博客.png</code>，因此，这里推荐所有图片等资源的 url 都使用英文。</p>
+<h2 id="相关文章推荐"><a href="# 相关文章推荐" class="headerlink" title="相关文章推荐"></a>相关文章推荐 </h2><p> 原生的 Hexo 等第三方博客框架并不能提供 <code>相关文章推荐</code> 的功能，而对于一款产品而言，增加用户的使用时间是非常好的。</p>
+<p>博客也是，当一位读者读完你的某篇文章感觉不错时，再推荐一些相关的文章，读者点击的几率是非常大的。</p>
+<p>在连续读完几遍文章后，读者便对你形成了基本的印象：xxx 作者在 Android 方面的 xxx 技术点有不少的研究，以后可以来多关注关注。</p>
+<p>下面讲解下如何实现 <code>相关文章推荐</code> 功能。</p>
+<p>基本思路是：</p>
+<ol>
+<li>改造 hexo theme 里的 <code> 博客模板 </code> 文件，在模板底部添加一块 html/swig 片段；</li>
+<li>利用 Hexo 提供的 <code>Helper</code> 功能，使用 <code>javascript</code> 去获取几篇相似文章的链接；</li>
+<li>此处的 <code>相似</code>，可以找出相同 tag 的文章，也可以通过其他指标来定义；</li>
+<li>找到了文章列表后，填充在文章模板底部即可。</li>
+</ol>
+<p>具体代码实现如下：</p>
+<ol>
+<li>先阅读 Hexo 提供的 <code>Helper</code> 功能，<a href="https://hexo.io/zh-cn/api/helper.html" target="_blank" rel="external">https://hexo.io/zh-cn/api/helper.html</a></li>
+<li><p>向 <code>Helper</code> 里注册函数 <code>related_posts</code>，用来抓取相关文章列表。<br>进入博客目录的 <code>themes/next/scripts</code> 里面，创建 <code>related_posts.js</code> 文件，内容如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line">hexo.extend.helper.register(<span class="string">'related_posts'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">currentPost, allPosts</span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> relatedPosts = [];</div><div class="line">    currentPost.tags.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">tag</span>) </span>&#123;</div><div class="line">        allPosts.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">post</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (isTagRelated(tag.name, post.tags)) &#123;</div><div class="line">                <span class="keyword">var</span> relatedPost = &#123;</div><div class="line">                    title: post.title,</div><div class="line">                    path: post.path,</div><div class="line">                    weight: <span class="number">1</span></div><div class="line">                &#125;;</div><div class="line"></div><div class="line">                <span class="keyword">var</span> index = findItem(relatedPosts, <span class="string">'path'</span>, post.path);</div><div class="line"></div><div class="line">                <span class="keyword">if</span> (index != <span class="number">-1</span>) &#123;</div><div class="line">                    relatedPosts[index].weight += <span class="number">1</span>;</div><div class="line">                &#125; <span class="keyword">else</span>&#123;</div><div class="line">                    <span class="keyword">if</span> (currentPost.path != post.path) &#123;</div><div class="line">                        relatedPosts.push(relatedPost);</div><div class="line">                    &#125;;</div><div class="line">                &#125;;</div><div class="line">            &#125;;</div><div class="line">        &#125;);</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (relatedPosts.length == <span class="number">0</span>) &#123;<span class="keyword">return</span> <span class="string">''</span>&#125;;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> result = <span class="string">'&lt;h3&gt; 相关文章：&lt;/h3&gt;&lt;ul class="related-posts"&gt;'</span>;</div><div class="line">    relatedPosts = relatedPosts.sort(compare(<span class="string">'weight'</span>));</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="built_in">Math</span>.min(relatedPosts.length, <span class="number">10</span>); i++) &#123;</div><div class="line">        result += <span class="string">'&lt;li&gt;&lt;a href="/'</span> + relatedPosts[i].path + <span class="string">'"&gt;'</span> + relatedPosts[i].title + <span class="string">'&lt;/a&gt;&lt;/li&gt;'</span>;</div><div class="line">    &#125;;</div><div class="line">    result += <span class="string">'&lt;/ul&gt;'</span>;</div><div class="line"></div><div class="line">    <span class="comment">// console.log(relatedPosts);</span></div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;);</div><div class="line"></div><div class="line">hexo.extend.helper.register(<span class="string">'echo'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">path</span>)</span>&#123;</div><div class="line">  <span class="keyword">return</span> path;</div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isTagRelated</span> (<span class="params">tagName, TBDtags</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> result = <span class="literal">false</span>;</div><div class="line">    TBDtags.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">tag</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (tagName == tag.name) &#123;</div><div class="line">            result = <span class="literal">true</span>;</div><div class="line">        &#125;;</div><div class="line">    &#125;)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">findItem</span> (<span class="params">arrayToSearch, attr, val</span>) </span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; arrayToSearch.length; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (arrayToSearch[i][attr] == val) &#123;</div><div class="line">            <span class="keyword">return</span> i</div><div class="line">        &#125;;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">compare</span> (<span class="params">attr</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">a, b</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> val1 = a[attr];</div><div class="line">        <span class="keyword">var</span> val2 = b[attr];</div><div class="line">        <span class="keyword">return</span> val2 - val1;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改文章模板 theme/next/layout/_macro/post.swig。在文章底部添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;% if not is_index %&#125; // 不需要显示在首页。</div><div class="line">	&#123;&#123; related_posts(post, site.posts) &#125;&#125; // 调用 related_posts</div><div class="line">&#123;% endif %&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>注意，如果是 ejs 文件，则要把 <code>{{}}</code> 换成”&lt;\%- \%&gt;”格式，这是 swig 和 ejs 的语法差别。</p>
+<p>重新 generate 即可以看到文章底部出现了相关文章推荐。如果想要修改 UI，可以在上面的 <code>related_posts.js</code> 里返回的 html 片段里添加一些 css 即可。</p>
+<h2 id="基于 GitHub-Issue 来实现评论功能"><a href="# 基于 GitHub-Issue 来实现评论功能" class="headerlink" title="基于 GitHub Issue 来实现评论功能"></a>基于 GitHub Issue 来实现评论功能 </h2><p> 个人博客里的评论功能一直是个很麻烦的存在，博主也一直在寻找合适的解决方案。</p>
+<p>“多说”挺好用的，但是今年关闭了；“disqus”是第二个选择，简洁美观，但 tm 国内经常不打开；“网易云跟帖”也不错，本来是个很好的选择，不过里面的广告留言超级多，过滤机制不好。</p>
+<p>本来我都已经放弃了，不过突发奇想，既然我的整个博客都是架在 GitHub 上，那么能不能让 GitHub 来帮我管理评论呢？对于一条评论而言，要能够实现：</p>
+<ol>
+<li>创建评论</li>
+<li>展示评论</li>
+<li>能够过滤广告评论</li>
+</ol>
+<p>然后，我想到了 GitHub Issue 和 GitHub API。</p>
+<p>不过我几乎没见过国内有博主这么做，于是搜了些国外的文章，做了些调研，果然发现国外也有开发者做过这样的尝试，而且效果我感觉还不错。</p>
+<p>具体有两种实现方案：</p>
+<ol>
+<li>读者直接在阅读个人博客时，直接登录 Github 并在文章页面进行评论；</li>
+<li>读者跳转到博客对应的 Github issue 处，在 issue 下进行评论，文章展示时会实时获取评论数据。</li>
+</ol>
+<p>第一处的用户体验比较好，但是要管理 Github 的第三方登录机制相对麻烦，而且我认为带来的好处没有那么明显。因此我采取了第二种方案，读者跳转到 GitHub Issue 进行评论，文章中利用 Github API 来拉取最新的评论数据。</p>
+<p>可以参考文末的评论区，也可以尝试点击到 GitHub Issue 进行评论，给出建议。</p>
+<p>实现代码如下：</p>
+<ol>
+<li><p>在 <code>themes/myNext/layout/_partials</code> 创建一个评论 html 片段：<code>github-comments.swig</code>，它会自动去 Github 拉取相关的评论，你可以更改 <code>$.ajax(&quot;https://api.github.com/repos/wingjay/wingjay.github.io/issues/1/comments&quot;,</code> 这句里的 issue url，放上你自己的 Github 地址。另外，评论里面的 UI 是我自己模仿 GitHub Issue 写的，就是为了保持一个一致性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div></pre></td><td class="code"><pre><div class="line">&lt;!doctype html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">&lt;div class=&quot;clearfix&quot;&gt;&lt;/div&gt;</div><div class="line">&lt;br&gt;</div><div class="line">&lt;div id=&quot;comments&quot;&gt;</div><div class="line">&lt;div class=&quot;post-header bg-&#123;&#123;site.default_post_color&#125;&#125;&quot;&gt;</div><div class="line">  &lt;h1 class=&quot;h1 post-title&quot;&gt; 评论 &lt;/h1&gt;</div><div class="line">&lt;/div&gt;</div><div class="line"></div><div class="line">&lt;article class=&quot;post-content&quot;&gt;</div><div class="line">&lt;p&gt; 本站评论搭建在 Github Issue 上，请前往 &lt;a href=&quot;https://github.com/wingjay/wingjay.github.io/issues/1/&#123;&#123;page.commentIssueId&#125;&#125;&quot;&gt;  此文 issue&lt;/a&gt; 进行评论。（你需要有 Github 账号）&lt;br/&gt;</div><div class="line">Want to leave a comment? Visit &lt;a href=&quot;https://github.com/wingjay/wingjay.github.io/issues/1/&#123;&#123;page.commentIssueId&#125;&#125;&quot;&gt; this post&apos;s issue page on GitHub&lt;/a&gt; (you&apos;ll need a GitHub account).&lt;/p&gt;</div><div class="line">&lt;/article&gt;</div><div class="line">&lt;/div&gt;</div><div class="line"></div><div class="line">&lt;style type=&quot;text/css&quot;&gt;</div><div class="line">.timeline-comment-wrapper &#123;</div><div class="line">    margin-top: 0;</div><div class="line">    position: relative;</div><div class="line">    padding-left: 60px;</div><div class="line">    margin-top: 15px;</div><div class="line">    margin-bottom: 15px;</div><div class="line">    border-top: 2px solid #fff;</div><div class="line">    border-bottom: 2px solid #fff;</div><div class="line">&#125;</div><div class="line">.timeline-comment-avatar &#123;</div><div class="line">    float: left;</div><div class="line">    margin-left: -60px;</div><div class="line">    border-radius: 3px;</div><div class="line">&#125;</div><div class="line">.avatar-parent-child &#123;</div><div class="line">    position: relative;</div><div class="line">&#125;</div><div class="line">.timeline-comment-wrapper a &#123;</div><div class="line">    color: #0366d6;</div><div class="line">    text-decoration: none;</div><div class="line">    background-color: transparent;</div><div class="line">&#125;</div><div class="line">.timeline-comment-wrapper .avatar &#123;</div><div class="line">    display: inline-block;</div><div class="line">    overflow: hidden;</div><div class="line">    line-height: 1;</div><div class="line">    vertical-align: middle;</div><div class="line">    border-radius: 3px;</div><div class="line">&#125;</div><div class="line">.timeline-comment-wrapper .rounded-1 &#123;</div><div class="line">    border-radius: 3px !important;</div><div class="line">&#125;</div><div class="line">.timeline-comment.current-user &#123;</div><div class="line">    border-color: #c0d3eb;</div><div class="line">&#125;</div><div class="line">.timeline-comment &#123;</div><div class="line">    position: relative;</div><div class="line">    background-color: #fff;</div><div class="line">    border: 1px solid #d1d5da;</div><div class="line">    border-radius: 3px;</div><div class="line">&#125;</div><div class="line">.timeline-comment.current-user .timeline-comment-header &#123;</div><div class="line">    background-color: #f1f8ff;</div><div class="line">    border-bottom-color: #c0d3eb;</div><div class="line">&#125;</div><div class="line">.timeline-comment-header &#123;</div><div class="line">    padding-right: 15px;</div><div class="line">    padding-left: 15px;</div><div class="line">    color: #586069;</div><div class="line">    background-color: #f6f8fa;</div><div class="line">    border-bottom: 1px solid #d1d5da;</div><div class="line">    border-top-left-radius: 3px;</div><div class="line">    border-top-right-radius: 3px;</div><div class="line">&#125;</div><div class="line">.timeline-comment-header-text &#123;</div><div class="line">    padding-top: 10px;</div><div class="line">    padding-bottom: 10px;</div><div class="line">&#125;</div><div class="line">.timeline-comment-header h3 &#123;</div><div class="line">    margin-top: 0px;</div><div class="line">    margin-bottom: 0px;</div><div class="line">&#125;</div><div class="line">.timeline-comment-header-text .post-meta &#123;</div><div class="line">    margin-left: 6px;</div><div class="line">&#125;</div><div class="line">.timeline-comment article p &#123;</div><div class="line">    margin: 0px;</div><div class="line">&#125;</div><div class="line">.text-normal &#123;</div><div class="line">    font-weight: normal !important;</div><div class="line">&#125;</div><div class="line">.f5 &#123;</div><div class="line">    font-size: 14px !important;</div><div class="line">&#125;</div><div class="line">&lt;/style&gt;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">&lt;script type=&quot;text/javascript&quot;&gt;</div><div class="line">  function loadComments(data) &#123;</div><div class="line">    for (var i=0; i&lt;data.length; i++) &#123;</div><div class="line">      var cuser = data[i].user.login;</div><div class="line">      var cuserlink = data[i].user.html_url;</div><div class="line">      var avatarlink = data[i].user.avatar_url;</div><div class="line">      var clink = data[i].html_url;</div><div class="line">      var cbody = data[i].body_html;</div><div class="line">      var cavatarlink = data[i].user.avatar_url;      </div><div class="line">      var cdate = new Date(data[i].created_at);</div><div class="line">      var dopts = &#123; month: &apos;short&apos;, day: &apos;numeric&apos;, year: &apos;numeric&apos; &#125;</div><div class="line"></div><div class="line">      $(&quot;#comments&quot;).append(&apos;&lt;div class=&quot;timeline-comment-wrapper&quot;&gt;&lt;div class=&quot;avatar-parent-child timeline-comment-avatar&quot;&gt;&lt;a href=&quot;&apos; + cuserlink +&apos;&quot;&gt;&lt;img width=&quot;44&quot; height=&quot;44&quot; class=&quot;avatar rounded-1&quot; src=&quot;&apos; + avatarlink + &apos;&quot;&gt;&lt;/a&gt;&lt;/div&gt;&lt;div class=&quot;timeline-comment current-user&quot;&gt;&lt;div class=&quot;timeline-comment-header&quot;&gt;&lt;h3 class=&quot;timeline-comment-header-text text-normal f5&quot;&gt;&lt;strong&gt;&apos; + cuser + &apos;&lt;/strong&gt;&lt;span class=&quot;post-meta&quot;&gt;&apos; + cdate.toLocaleDateString(&quot;en&quot;, dopts) + &apos;&lt;/span&gt;&lt;/h3&gt;&lt;/div&gt;&lt;div style=&quot;display: block !important; padding: 15px;&quot;&gt;&lt;article class=&quot;post-content&quot;&gt;&apos; + cbody + &apos;&lt;/article&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&apos;);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  console.log(&apos;start load&apos;);</div><div class="line">  $.ajax(&quot;https://api.github.com/repos/wingjay/wingjay.github.io/issues/1/comments&quot;, &#123;</div><div class="line">    headers: &#123;Accept: &quot;application/vnd.github.v3.html+json&quot;&#125;,</div><div class="line">    dataType: &quot;json&quot;,</div><div class="line">    success: function(msg)&#123;</div><div class="line">      console.log(msg);</div><div class="line">      loadComments(msg);</div><div class="line">   &#125;</div><div class="line">  &#125;);</div><div class="line">&lt;/script&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>然后把上面的 html 片段放入文章模板里面。<code>themes/myNext/layout/_macro/post.swig</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;% if page.commentIssueId %&#125;</div><div class="line">  &#123;% include &apos;../_partials/github-comments.swig&apos; %&#125;</div><div class="line">&#123;% endif %&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>由于上面的 js 代码里用到了 jQuery 的 ajax 语法，因此，还要在 <code>themes/myNext/layout/_partials/head.swig</code> 加载 jQuery，此处使用的是国内的 CDN url，加载时间 30ms。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123;% if page.commentIssueId %&#125;</div><div class="line">  &lt;script src=&quot;https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js&quot;&gt;&lt;/script&gt;</div><div class="line">&#123;% endif %&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><strong>更新内容</strong> 通过脚本，自动在 Github 上为该篇文章创建一个 Issue，得到该 Issue ID，设置为该文章的 commentIssueId 值即可。</p>
+<ul>
+<li>指定文章路径，脚本自动读取 commentIssueId 值，若为空，则开始创建 Issue;</li>
+<li><p>利用 curl 和 Github API 自动创建一个 Issue。其中 YOUR_TOKEN 需要在 Github 的 <code>Personal access tokens</code> 里生成一个具备 repo 权限的 token。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">curl -H &quot;Content-Type: application/json&quot; -u wingjay:YOUR_TOKEN -X POST -d &apos;&#123;&quot;title&quot;: &quot;test&quot;&#125;&apos; https://api.github.com/repos/wingjay/wingjay.github.io/issues</div></pre></td></tr></table></figure>
+</li>
+<li><p>上面 POST 请求的返回值里的 <code>number</code> 值即为需要的 commentIssueId。通过脚本把这个 commentIssueId 添加到原文章中</p>
+</li>
+<li>最后 deploy 即可。</li>
+</ul>
+</li>
+</ol>
+<p>上面的步骤都是通过 <a href="https://github.com/wingjay/hacker_scripts/blob/master/hexodeploy" target="_blank" rel="external"> 这个脚本 </a> 实现的，有兴趣的可以看下。</p>
+<h2 id="个人简历页面"><a href="# 个人简历页面" class="headerlink" title="个人简历页面"></a>个人简历页面 </h2><p> 对于一个优秀的博主而言，每天会有很多开发者进入到他的博客。</p>
+<p>而无论出于职业生涯还是个人影响力的角度考虑，在博客里放置个人简历是一个很好的展示自己的机会。</p>
+<p>下面我们来利用 <code>hexo</code> 的 <code>page</code> 功能来创建一个新页面，然后用 markdown 来填充这个简历页面。</p>
+<ol>
+<li>利用 <code>hexo new page &quot;resume&quot;</code>，可以看到 <code>source</code> 文件夹下出现了 <code>resume</code> 目录，里面有一个 <code>index.md</code> 文件；</li>
+<li>在 <code>themes/next/_config.yml</code> 里的 <code>menu:</code> 下添加 <code>resume: /resume</code>，它会在首页创建一个新的 menu: resume 入口；</li>
+<li>在 <code>index.md</code> 文件里填写自己的简历即可。</li>
+</ol>
+<p>最终效果参考本人 <a href="/resume"> 简历</a></p>
+<h2 id="RSS 订阅"><a href="#RSS 订阅" class="headerlink" title="RSS 订阅"></a>RSS 订阅 </h2><p> 目前很多人喜欢用 RSS 阅读器来实时更新某些作者的文章，如果你希望有更多死忠粉，那 RSS 是非常好的渠道把你的文章快速传达给你的读者。</p>
+<p>这里我们利用插件 <a href="https://github.com/hexojs/hexo-generator-feed" target="_blank" rel="external"><code>hexo-generator-feed</code></a> 来实现这个功能。</p>
+<ol>
+<li>安装<br>npm install hexo-generator-feed –save</li>
+<li><p>修改 _config.yml，具体设置可以参考官方链接里的指示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">feed:</div><div class="line">  type: atom</div><div class="line">  path: atom.xml</div><div class="line">  limit: 20</div><div class="line">  hub:</div><div class="line">  content:</div></pre></td></tr></table></figure>
+</li>
+<li><p>在 themes/next/_config.yml 里的 menu 添加<br>rss: /atom.xml</p>
+</li>
+<li>在 themes/next/languages/zh-Hans.yml 里的 menu 添加中文翻译<br>rss: RSS</li>
+</ol>
+<p>重新 generate 一下即可看到。</p>
+<h2 id="总结"><a href="# 总结" class="headerlink" title="总结"></a>总结 </h2><p> 好了，这次的功能性博客改造告一段落，欢迎读者提出意见想法。</p>
+<p>之后还会对博客做一些加载速度、图片及 js 文件加载方式等的优化，偏向于流畅性和加载方面。</p>
+<p>下次见。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+<h2 id="参考文章"><a href="# 参考文章" class="headerlink" title="参考文章"></a>参考文章 </h2><p>《<a href="https://ethanblog.com/tech/hexo-related-posts.html" target="_blank" rel="external">Hexo 相关文章的代码实现</a>》<br>《<a href="http://jinfang.oschina.io/posts/124966c9/" target="_blank" rel="external">next 主题的模板引擎 swig 语法介绍</a>》<br>《<a href="http://hydroecology.net/using-github-to-host-blog-comments/" target="_blank" rel="external">Using GitHub to host blog comments: a working example</a>》<br>《<a href="http://ivanzuzak.info/2011/02/18/github-hosted-comments-for-github-hosted-blogs.html" target="_blank" rel="external">GitHub hosted comments for GitHub hosted blogs</a>》<br>《<a href="https://imququ.com/post/summary-of-my-blog-optimization.html" target="_blank" rel="external"> 博客优化点汇总</a>》</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/一天变cool/" rel="tag">#一天变cool</a>
+          
+            <a href="/tags/个人博客/" rel="tag">#个人博客</a>
+          
+            <a href="/tags/GitHub/" rel="tag">#GitHub</a>
+          
+            <a href="/tags/Blog/" rel="tag">#Blog</a>
+          
+            <a href="/tags/Hexo/" rel="tag">#Hexo</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2015/12/07/如何在一天之内搭建以你自己名字为域名的很cool的个人博客/">如何在一天之内搭建以你自己名字为域名又具备 cool 属性的个人博客</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/24/Java-技术之垃圾回收机制/" rel="next" title="Java 技术之垃圾回收机制">
+                <i class="fa fa-chevron-left"></i> Java 技术之垃圾回收机制
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/18/new_start_hangzhou/" rel="prev" title="新的城市，新的开始">
+                新的城市，新的开始 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/1')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/1/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#中英文自动添加空格"><span class="nav-number">1.</span> <span class="nav-text">中英文自动添加空格 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关文章推荐"><span class="nav-number">2.</span> <span class="nav-text">相关文章推荐 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于 GitHub-Issue 来实现评论功能"><span class="nav-number">3.</span> <span class="nav-text">基于 GitHub Issue 来实现评论功能 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#个人简历页面"><span class="nav-number">4.</span> <span class="nav-text">个人简历页面 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RSS 订阅"><span class="nav-number">5.</span> <span class="nav-text">RSS 订阅 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">7.</span> <span class="nav-text">参考文章 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

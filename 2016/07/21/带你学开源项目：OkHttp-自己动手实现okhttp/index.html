@@ -1,0 +1,1078 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,带你学开源项目," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 OkHttp 源码的分析。">
+<meta name="keywords" content="Android,带你学开源项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="带你学开源项目：OkHttp-- 自己动手实现 okhttp">
+<meta property="og:url" content="http://wingjay.com/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 OkHttp 源码的分析。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-62df4e64fd04dc24.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-00ec5b478499a386.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-aa94adfc49da4e40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-1b58154250ce74d7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="带你学开源项目：OkHttp-- 自己动手实现 okhttp">
+<meta name="twitter:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 OkHttp 源码的分析。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/281665-62df4e64fd04dc24.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 带你学开源项目：OkHttp-- 自己动手实现 okhttp | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                带你学开源项目：OkHttp-- 自己动手实现 okhttp
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-07-21T14:54:33+08:00" content="2016-07-21">
+              2016-07-21
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/带你学开源项目/" itemprop="url" rel="index">
+                    <span itemprop="name">带你学开源项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,776 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。<br>此次来分享下 OkHttp 源码的分析。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="一、开源项目 -OkHttp"><a href="# 一、开源项目 -OkHttp" class="headerlink" title="一、开源项目 OkHttp"></a>一、开源项目 OkHttp</h2><p>在 Android、Java 开发领域中，相信大家都听过或者在使用 Square 家大名鼎鼎的网络请求库——<a href="https://github.com/square/okhttp" target="_blank" rel="external">OkHttp</a>——<a href="https://github.com/square/okhttp" target="_blank" rel="external">https://github.com/square/okhttp</a> ，当前多数著名的开源项目如 <a href="https://github.com/facebook/fresco" target="_blank" rel="external">Fresco</a>、<a href="https://github.com/bumptech/glide" target="_blank" rel="external">Glide</a>、 <a href="https://github.com/square/picasso" target="_blank" rel="external">Picasso</a>、 <a href="https://github.com/square/retrofit" target="_blank" rel="external">Retrofit</a>都在使用 OkHttp，这足以说明其质量，而且该项目仍处在 <a href="https://github.com/square/okhttp/commits/master" target="_blank" rel="external"> 不断维护中</a>。</p>
+<h2 id="二、问题"><a href="# 二、问题" class="headerlink" title="二、问题"></a>二、问题 </h2><p> 在分析 okhttp 源码之前，我想先提出一个问题，如果我们自己来设计一个网络请求库，这个库应该长什么样子？大致是什么结构呢？</p>
+<p>下面我和大家一起来构建一个网络请求库，并在其中融入 okhttp 中核心的设计思想，希望借此让读者感受并学习到 okhttp 中的精华之处，而非仅限于了解其实现。</p>
+<p>笔者相信，如果你能耐心阅读完本篇，不仅能对 http 协议有进一步理解，更能够学习到世界级项目的思维精华，提高自身思维方式。</p>
+<h2 id="三、思考"><a href="# 三、思考" class="headerlink" title="三、思考"></a>三、思考 </h2><p> 首先，我们假设要构建的的网络请求库叫做<code>WingjayHttpClient</code>，那么，作为一个网络请求库，它最基本功能是什么呢？</p>
+<p>在我看来应该是：接收用户的请求 -&gt; 发出请求 -&gt; 接收响应结果并返回给用户。</p>
+<p>那么从使用者角度而言，需要做的事是：</p>
+<ol>
+<li>创建一个<code>Request</code>：在里面设置好目标 URL；请求 method 如 GET/POST 等；一些 header 如 Host、User-Agent 等；如果你在 POST 上传一个表单，那么还需要 body。</li>
+<li>将创建好的 <code>Request</code> 传递给<code>WingjayHttpClient</code>。</li>
+<li><code>WingjayHttpClient</code>去执行 <code>Request</code>，并把返回结果封装成一个<code>Response</code> 给用户。而一个 <code>Response</code> 里应该包括 statusCode 如 200，一些 header 如 content-type 等，可能还有 body</li>
+</ol>
+<p>到此即为一次完整请求的雏形。那么下面我们来具体实现这三步。</p>
+<h2 id="四、雏形实现"><a href="# 四、雏形实现" class="headerlink" title="四、雏形实现"></a>四、雏形实现 </h2><p> 下面我们先来实现一个 httpClient 的雏形，只具备最基本的功能。</p>
+<h4 id="1- 创建 Request 类"><a href="#1- 创建 Request 类" class="headerlink" title="1. 创建 Request 类"></a>1. 创建 <code>Request</code> 类</h4><p>首先，我们要建立一个 <code>Request</code> 类，利用 <code>Request</code> 类用户可以把自己需要的参数传入进去，基本形式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">class Request &#123;</div><div class="line">	String url;</div><div class="line">	String method;</div><div class="line">	Headers headers;</div><div class="line">	Body requestBody;</div><div class="line"></div><div class="line">	public Request(String url, String method, @Nullable Headers headers, @Nullable Body body) &#123;</div><div class="line">		this.url = url;</div><div class="line">		...</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="2- 将 Request 对象传递给 WingjayHttpClient"><a href="#2- 将 Request 对象传递给 WingjayHttpClient" class="headerlink" title="2. 将 Request 对象传递给 WingjayHttpClient"></a>2. 将 <code>Request</code> 对象传递给 <code>WingjayHttpClient</code></h4><p> 我们可以设计 <code>WingjayHttpClient</code> 如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">class WingjayHttpClient &#123;</div><div class="line">	public Response sendRequest(Request request) &#123;</div><div class="line">		return executeRequest(request);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="3- 执行 Request，并把返回结果封装成一个 Response 返回"><a href="#3- 执行 Request，并把返回结果封装成一个 Response 返回" class="headerlink" title="3. 执行 Request，并把返回结果封装成一个 Response 返回"></a>3. 执行 <code>Request</code>，并把返回结果封装成一个<code>Response</code> 返回</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">class WingjayHttpClient &#123;</div><div class="line">	...</div><div class="line">	private Response executeRequest(Request request) &#123;</div><div class="line">		// 使用 socket 来进行访问</div><div class="line">		Socket socket = new Socket(request.getUrl(), 80);</div><div class="line">		ResponseData data = socket.connect().getResponseData();</div><div class="line">		return new Response(data);</div><div class="line">	&#125;</div><div class="line">	...</div><div class="line">&#125;</div><div class="line"></div><div class="line">class Response &#123;</div><div class="line">	int statusCode;</div><div class="line">	Headers headers;</div><div class="line">	Body responseBody</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="五、功能扩展"><a href="# 五、功能扩展" class="headerlink" title="五、功能扩展"></a>五、功能扩展 </h2><p> 利用上面的雏形，可以得到其使用方法如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Request request = new Request(&quot;http://wingjay.com&quot;);</div><div class="line">WingjayHttpClient client = new WingjayHttpClient();</div><div class="line">Response response = client.sendRequest(request);</div><div class="line">handle(response);</div></pre></td></tr></table></figure></p>
+<p>然而，上面的雏形是远远不能胜任常规的应用需求的，因此，下面再来对它添加一些常用的功能模块。</p>
+<h4 id="1- 重新把简陋的 user-Request 组装成一个规范的 http-request"><a href="#1- 重新把简陋的 user-Request 组装成一个规范的 http-request" class="headerlink" title="1. 重新把简陋的 user Request 组装成一个规范的 http request"></a>1. 重新把简陋的 user Request 组装成一个规范的 http request</h4><p>一般的 request 中，往往用户只会指定一个 URL 和 method，这个简单的 user request 是不足以成为一个 http request，我们还需要为它添加一些 header，如 Content-Length, Transfer-Encoding, User-Agent, Host, Connection, 和 Content-Type，如果这个 request 使用了 cookie，那我们还要将 cookie 添加到这个 request 中。</p>
+<p>我们可以扩展上面的 <code>sendRequest(request)</code> 方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">[class WingjayHttpClient]</div><div class="line"></div><div class="line">public Response sendRequest(Request userRequest) &#123;</div><div class="line">    Request httpRequest = expandHeaders(userRequest);</div><div class="line">    return executeRequest(httpRequest);</div><div class="line">&#125;</div><div class="line"></div><div class="line">private Request expandHeaders(Request userRequest) &#123;</div><div class="line">    if (userRequest.header(&quot;Connection&quot;) == null) &#123;</div><div class="line">      requestBuilder.header(&quot;Connection&quot;, &quot;Keep-Alive&quot;);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    if (userRequest.header(&quot;User-Agent&quot;) == null) &#123;</div><div class="line">      requestBuilder.header(&quot;User-Agent&quot;, Version.userAgent());</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="2- 支持自动重定向"><a href="#2- 支持自动重定向" class="headerlink" title="2. 支持自动重定向"></a>2. 支持自动重定向 </h4><p> 有时我们请求的 URL 已经被移走了，此时 server 会返回 301 状态码和一个重定向的新 URL，此时我们要能够支持自动访问新 URL 而不是向用户报错。</p>
+<p>对于重定向这里有一个测试性 URL：<a href="http://www.publicobject.com/helloworld.txt" target="_blank" rel="external">http://www.publicobject.com/helloworld.txt</a> ，通过访问并抓包，可以看到如下信息：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-62df4e64fd04dc24.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>因此，我们在接收到 Response 后要根据 status_code 是否为重定向，如果是，则要从 Response Header 里解析出新的 URL－<code>Location</code>并自动请求新 URL。那么，我们可以继续改写 <code>sendRequest(request)</code> 方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">[class WingjayHttpClient]</div><div class="line"></div><div class="line"><span class="keyword">private</span> <span class="keyword">boolean</span> allowRedirect = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// user can set redirect status when building WingjayHttpClient</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAllowRedirect</span><span class="params">(<span class="keyword">boolean</span> allowRedirect)</span> </span>&#123;</div><div class="line">	<span class="keyword">this</span>.allowRedirect = allowRedirect;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">sendRequest</span><span class="params">(Request userRequest)</span> </span>&#123;</div><div class="line">		Request httpRequest = expandHeaders(userRequest);</div><div class="line">		Response response = executeRequest(httpRequest);</div><div class="line">		<span class="keyword">switch</span> (response.statusCode()) &#123;</div><div class="line">			<span class="comment">// 300: multi choice; 301: moven permanently; </span></div><div class="line">			<span class="comment">// 302: moved temporarily; 303: see other; </span></div><div class="line">			<span class="comment">// 307: redirect temporarily; 308: redirect permanently</span></div><div class="line">			<span class="keyword">case</span> <span class="number">300</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">301</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">302</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">303</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">307</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">308</span>:</div><div class="line">				<span class="keyword">return</span> handleRedirect(response);</div><div class="line">			<span class="keyword">default</span>:</div><div class="line">				<span class="keyword">return</span> response;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">&#125;</div><div class="line"><span class="comment">// the max times of followup request</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_FOLLOW_UPS = <span class="number">20</span>;</div><div class="line"><span class="keyword">private</span> <span class="keyword">int</span> followupCount = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> Response <span class="title">handleRedirect</span><span class="params">(Response response)</span> </span>&#123;</div><div class="line">	<span class="comment">// Does the WingjayHttpClient allow redirect?</span></div><div class="line">	<span class="keyword">if</span> (!client.allowRedirect()) &#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// Get the redirecting url</span></div><div class="line">	String nextUrl = response.header(<span class="string">"Location"</span>);</div><div class="line"></div><div class="line">	<span class="comment">// Construct a redirecting request</span></div><div class="line">	Request followup = <span class="keyword">new</span> Request(nextUrl);</div><div class="line"></div><div class="line">	<span class="comment">// check the max followupCount</span></div><div class="line">	<span class="keyword">if</span> (++followupCount &gt; MAX_FOLLOW_UPS) &#123;</div><div class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Too many follow-up requests:"</span> + followUpCount);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// not reach the max followup times, send followup request then.</span></div><div class="line">	<span class="keyword">return</span> sendRequest(followup);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>利用上面的代码，我们通过获取原始 <code>userRequest</code> 的返回结果，判断结果是否为重定向，并做出自动 followup 处理。</p>
+<blockquote>
+<p>一些常用的状态码<br>100~199：指示信息，表示请求已接收，继续处理<br>200~299：请求成功，表示请求已被成功接收、理解、接受<br>300~399：重定向，要完成请求必须进行更进一步的操作<br>400~499：客户端错误，请求有语法错误或请求无法实现<br>500~599：服务器端错误，服务器未能实现合法的请求</p>
+</blockquote>
+<h4 id="3- 支持重试机制"><a href="#3- 支持重试机制" class="headerlink" title="3. 支持重试机制"></a>3. 支持重试机制 </h4><p> 所谓重试，和重定向非常类似，即通过判断 <code>Response</code> 状态，如果连接服务器失败等，那么可以尝试获取一个新的路径进行重新连接，大致的实现和重定向非常类似，此不赘述。</p>
+<h4 id="4-Request-amp-Response- 拦截机制"><a href="#4-Request-amp-Response- 拦截机制" class="headerlink" title="4. Request &amp; Response 拦截机制"></a>4. Request &amp; Response 拦截机制 </h4><p> 这是非常核心的部分。</p>
+<p>通过上面的重新组装 <code>request</code> 和重定向机制，我们可以感受的，一个 <code>request</code> 从 user 创建出来后，会经过层层处理后，才真正发出去，而一个<code>response</code>，也会经过各种处理，最终返回给用户。</p>
+<p>笔者认为这和网络协议栈非常相似，用户在应用层发出简单的数据，然后经过传输层、网络层等，层层封装后真正把请求从物理层发出去，当请求结果回来后又层层解析，最终把最直接的结果返回给用户使用。</p>
+<p>最重要的是，每一层都是抽象的，互不相关的！</p>
+<p>因此在我们设计时，也可以借鉴这个思想，通过设置 <code> 拦截器 Interceptor</code>，每个拦截器会做两件事情：</p>
+<ol>
+<li>接收上一层拦截器封装后的 request，然后自身对这个 request 进行处理，例如添加一些 header，处理后向下传递；</li>
+<li>接收下一层拦截器传递回来的 response，然后自身对 response 进行处理，例如判断返回的 statusCode，然后进一步处理。</li>
+</ol>
+<p>那么，我们可以为拦截器定义一个抽象接口，然后去实现具体的拦截器。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Interceptor</span> </span>&#123;</div><div class="line">	<span class="function">Response <span class="title">intercept</span><span class="params">(Request request)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>大家可以看下上面这个拦截器设计是否有问题？</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-00ec5b478499a386.jpeg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>我们想象这个拦截器能够接收一个 request，进行拦截处理，并返回结果。</p>
+<p>但实际上，它无法返回结果，而且它在处理 request 后，并不能继续向下传递，因为它并不知道下一个 <code>Interceptor</code> 在哪里，也就无法继续向下传递。</p>
+<p>那么，如何解决才能把所有 <code>Interceptor</code> 串在一起，并能够依次传递下去。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Interceptor</span> </span>&#123;</div><div class="line">  <span class="function">Response <span class="title">intercept</span><span class="params">(Chain chain)</span></span>;</div><div class="line"></div><div class="line">  <span class="class"><span class="keyword">interface</span> <span class="title">Chain</span> </span>&#123;</div><div class="line">    <span class="function">Request <span class="title">request</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function">Response <span class="title">proceed</span><span class="params">(Request request)</span></span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>使用方法如下：假如我们现在有三个 <code>Interceptor</code> 需要依次拦截：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Build a full stack of interceptors.</span></div><div class="line">List&lt;Interceptor&gt; interceptors = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">interceptors.add(<span class="keyword">new</span> MyInterceptor1());</div><div class="line">interceptors.add(<span class="keyword">new</span> MyInterceptor2());</div><div class="line">interceptors.add(<span class="keyword">new</span> MyInterceptor3());</div><div class="line"></div><div class="line">Interceptor.Chain chain = <span class="keyword">new</span> RealInterceptorChain(</div><div class="line">        interceptors, <span class="number">0</span>, originalRequest);</div><div class="line">chain.proceed(originalRequest);</div></pre></td></tr></table></figure></p>
+<p>里面的 <code>RealInterceptorChain</code> 的基本思想是：我们把所有 <code>interceptors</code> 传进去，然后 <code>chain</code> 去依次把 <code>request</code> 传入到每一个 <code>interceptors</code> 进行拦截即可。</p>
+<p>通过下面的示意图可以明确看出拦截流程：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-aa94adfc49da4e40.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>其中，<code>RetryAndFollowupInterceptor</code>是用来做自动重试和自动重定向的拦截器；<code>BridgeInterceptor</code>是用来扩展 <code>request</code> 的<code>header</code>的拦截器。这两个拦截器存在于 <code>okhttp</code> 里，实际上在 <code>okhttp</code> 里还有好几个拦截器，这里暂时不做深入分析。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-1b58154250ce74d7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<ol>
+<li><p><code>CacheInterceptor</code><br>这是用来拦截请求并提供缓存的，当 request 进入这一层，它会自动去检查缓存，如果有，就直接返回缓存结果；否则的话才将 request 继续向下传递。而且，当下层把 response 返回到这一层，它会根据需求进行缓存处理；</p>
+</li>
+<li><p><code>ConnectInterceptor</code><br>这一层是用来与目标服务器建立连接</p>
+</li>
+<li><p><code>CallServerInterceptor</code><br>这一层位于最底层，直接向服务器发出请求，并接收服务器返回的 response，并向上层层传递。</p>
+</li>
+</ol>
+<p>上面几个都是 okhttp 自带的，也就是说需要在 <code>WingjayHttpClient</code> 自己实现的。除了这几个功能性的拦截器，我们还要支持用户 <code> 自定义拦截器</code>，主要有以下两种（见图中非虚线框蓝色字部分）：</p>
+<ol>
+<li><p><code>interceptors</code><br>这里的拦截器是拦截用户最原始的 request。</p>
+</li>
+<li><p><code>NetworkInterceptor</code><br>这是最底层的 request 拦截器。</p>
+</li>
+</ol>
+<p>如何区分这两个呢？举个例子，我创建两个 <code>LoggingInterceptor</code>，分别放在<code>interceptors</code> 层和 <code>NetworkInterceptor</code> 层，然后访问一个会重定向的 <code>URL_1</code>，当访问完<code>URL_1</code> 后会再去访问重定向后的新地址 <code>URL_2</code>。对于这个过程，<code>interceptors</code> 层的拦截器只会拦截到 <code>URL_1</code> 的 request，而在 <code>NetworkInterceptor</code> 层的拦截器则会同时拦截到 <code>URL_1</code> 和<code>URL_2</code>两个 request。具体原因可以看上面的图。</p>
+<h4 id="5- 同步、异步 -Request 池管理机制"><a href="#5- 同步、异步 -Request 池管理机制" class="headerlink" title="5. 同步、异步 Request 池管理机制"></a>5. 同步、异步 Request 池管理机制 </h4><p> 这是非常核心的部分。</p>
+<p>通过上面的工作，我们修改 <code>WingjayHttpClient</code> 后得到了下面的样子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">WingjayHttpClient</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> Response <span class="title">sendRequest</span><span class="params">(Request userRequest)</span> </span>&#123;</div><div class="line">		Request httpRequest = expandHeaders(userRequest);</div><div class="line">		Response response = executeRequest(httpRequest);</div><div class="line">		<span class="keyword">switch</span> (response.statusCode()) &#123;</div><div class="line">			<span class="comment">// 300: multi choice; 301: moven permanently; </span></div><div class="line">			<span class="comment">// 302: moved temporarily; 303: see other; </span></div><div class="line">			<span class="comment">// 307: redirect temporarily; 308: redirect permanently</span></div><div class="line">			<span class="keyword">case</span> <span class="number">300</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">301</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">302</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">303</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">307</span>:</div><div class="line">			<span class="keyword">case</span> <span class="number">308</span>:</div><div class="line">				<span class="keyword">return</span> handleRedirect(response);</div><div class="line">			<span class="keyword">default</span>:</div><div class="line">				<span class="keyword">return</span> response;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> Request <span class="title">expandHeaders</span><span class="params">(Request userRequest)</span> </span>&#123;...&#125;</div><div class="line">	<span class="function"><span class="keyword">private</span> Response <span class="title">executeRequest</span><span class="params">(Request httpRequest)</span> </span>&#123;...&#125;</div><div class="line">	<span class="function"><span class="keyword">private</span> Response <span class="title">handleRedirect</span><span class="params">(Response response)</span> </span>&#123;...&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>也就是说，<code>WingjayHttpClient</code>现在能够 <code> 同步 </code> 地处理单个 <code>Request</code> 了。</p>
+<p>然而，在实际应用中，一个 <code>WingjayHttpClient</code> 可能会被用于同时处理几十个用户 request，而且这些 request 里还分成了 <code> 同步 </code> 和<code>异步 </code> 两种不同的请求方式，所以我们显然不能简单把一个 request 直接塞给<code>WingjayHttpClient</code>。</p>
+<p>我们知道，一个 request 除了上面定义的 http 协议相关的内容，还应该要设置其处理方式 <code> 同步 </code> 和<code>异步</code>。那这些信息应该存在哪里呢？两种选择：</p>
+<ol>
+<li><p>直接放入 <code>Request</code><br> 从理论上来讲是可以的，但是却违背了初衷。我们最开始是希望用 <code>Request</code> 来构造符合 http 协议的一个请求，里面应该包含的是请求目标网址 URL，请求端口，请求方法等等信息，而 http 协议是不关心这个 request 是同步还是异步之类的信息</p>
+</li>
+<li><p>创建一个类，专门来管理 <code>Request</code> 的状态 <br> 这是更为合适的，我们可以更好的拆分职责。</p>
+</li>
+</ol>
+<p>因此，这里选择创建两个类 <code>SyncCall</code> 和<code>AsyncCall</code>，用来区分 <code> 同步 </code> 和<code>异步</code>。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">SyncCall</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> Request userRequest;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SyncCall</span><span class="params">(Request userRequest)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.userRequest = userRequest;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AsyncCall</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> Request userRequest;</div><div class="line">	<span class="keyword">private</span> Callback callback;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">AsyncCall</span><span class="params">(Request userRequest, Callback callback)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.userRequest = userRequest;</div><div class="line">		<span class="keyword">this</span>.callback = callback;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="class"><span class="keyword">interface</span> <span class="title">Callback</span> </span>&#123;</div><div class="line">		<span class="function"><span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call call, IOException e)</span></span>;</div><div class="line">		<span class="function"><span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call call, Response response)</span> <span class="keyword">throws</span> IOException</span>;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>基于上面两个类，我们的使用场景如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">WingjayHttpClient client = <span class="keyword">new</span> WingjayHttpClient();</div><div class="line"><span class="comment">// Sync</span></div><div class="line">Request syncRequest = <span class="keyword">new</span> Request(<span class="string">"http://wingjay.com"</span>);</div><div class="line">SyncCall syncCall = <span class="keyword">new</span> SyncCall(request);</div><div class="line">Response response = client.sendSyncCall(syncCall);</div><div class="line">handle(response);</div><div class="line"></div><div class="line"><span class="comment">// Async</span></div><div class="line">AsyncCall asyncCall = <span class="keyword">new</span> AsyncCall(request, <span class="keyword">new</span> CallBack() &#123;</div><div class="line">	  <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call call, IOException e)</span> </span>&#123;&#125;</div><div class="line"></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call call, Response response)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        handle(response);</div><div class="line">      &#125;</div><div class="line">&#125;);</div><div class="line">client.equeueAsyncCall(asyncCall);</div></pre></td></tr></table></figure></p>
+<p>从上面的代码可以看到，<code>WingjayHttpClient</code>的职责发生了变化：以前是<strong>response = client.sendRequest(request);</strong>，而现在变成了<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">response = client.sendSyncCall(syncCall);</div><div class="line"></div><div class="line">client.equeueAsyncCall(asyncCall);</div></pre></td></tr></table></figure></p>
+<p>那么，我们也需要对 <code>WingjayHttpClient</code> 进行改造，基本思路是在内部添加 <code> 请求池 </code> 来对所有 request 进行管理。那么这个 <code> 请求池 </code> 我们怎么来设计呢？有两个方法：</p>
+<ol>
+<li><p>直接在 <code>WingjayHttpClient</code> 内部创建几个容器 <br> 同样，从理论上而言是可行的。当用户把(a)syncCall 传给 client 后，client 自动把 call 存入对应的容器进行管理。</p>
+</li>
+<li><p>创建一个独立的类进行管理 <br> 显然这样可以更好的分配职责。我们把 <code>WingjayHttpClient</code> 的职责定义为，接收一个 call，内部进行处理后返回结果。这就是 <code>WingjayHttpClient</code> 的任务，那么具体如何去管理这些 request 的执行顺序和生命周期，自然不需要由它来管。</p>
+</li>
+</ol>
+<p>因此，我们创建一个新的类：<code>Dispatcher</code>，这个类的作用是：</p>
+<ol>
+<li>存储外界不断传入的 <code>SyncCall</code> 和<code>AsyncCall</code>，如果用户想取消则可以遍历所有的 call 进行 cancel 操作;</li>
+<li>对于 <code>SyncCall</code>，由于它是即时运行的，因此<code>Dispatcher</code> 只需要在 <code>SyncCall</code> 运行前存储进来，在运行结束后移除即可；</li>
+<li>对于 <code>AsyncCall</code>，<code>Dispatcher</code> 首先启动一个 ExecutorService，不断取出 <code>AsyncCall</code> 去进行执行，然后，我们设置最多执行的 request 数量为 64，如果已经有 64 个 request 在执行中，那么就将这个 asyncCall 存入等待区。</li>
+</ol>
+<p>根据设计可以得到 <code>Dispatcher</code> 构造：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dispatcher</span> </span>&#123;</div><div class="line">	<span class="comment">// sync call</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Deque&lt;SyncCall&gt; runningSyncCalls = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</div><div class="line">	<span class="comment">// async call</span></div><div class="line">	<span class="keyword">private</span> <span class="keyword">int</span> maxRequests = <span class="number">64</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Deque&lt;AsyncCall&gt; waitingAsyncCalls = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Deque&lt;AsyncCall&gt; runningAsyncCalls = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</div><div class="line">	<span class="keyword">private</span> ExecutorService executorService;</div><div class="line"></div><div class="line">	<span class="comment">// begin execute Sync call</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startSyncCall</span><span class="params">(SyncCall syncCall)</span> </span>&#123;</div><div class="line">		runningSyncCalls.add(syncCall);</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// finish Sync call</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">finishSyncCall</span><span class="params">(SyncCall syncCall)</span> </span>&#123;</div><div class="line">		runningSyncCalls.remove(syncCall);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// enqueue a new AsyncCall</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">enqueue</span><span class="params">(AsyncCall asyncCall)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (runningAsyncCalls.size() &lt; <span class="number">64</span>) &#123;</div><div class="line">			<span class="comment">// run directly</span></div><div class="line">			runningAsyncCalls.add(asyncCall);</div><div class="line">			executorService.execute(asyncCall);</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			readyAsyncCalls.add(asyncCall);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// finish a AsyncCall</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">finishAsyncCall</span><span class="params">(AsyncCall asyncCall)</span> </span>&#123;</div><div class="line">		runningAsyncCalls.remove(asyncCall);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>有了这个 <code>Dispatcher</code>，那我们就可以去修改<code>WingjayHttpClient</code> 以实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">response = client.sendSyncCall(syncCall);</div><div class="line"></div><div class="line">client.equeueAsyncCall(asyncCall);</div></pre></td></tr></table></figure></p>
+<p>这两个方法了。具体实现如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">[class WingjayHttpClient]</div><div class="line"></div><div class="line">	<span class="keyword">private</span> Dispatcher dispatcher;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> Response <span class="title">sendSyncCall</span><span class="params">(SyncCall syncCall)</span> </span>&#123;</div><div class="line">		<span class="keyword">try</span> &#123;</div><div class="line">			<span class="comment">// store syncCall into dispatcher;</span></div><div class="line">			dispatcher.startSyncCall(syncCall);</div><div class="line">			<span class="comment">// execute</span></div><div class="line">			<span class="keyword">return</span> sendRequest(syncCall.getRequest());</div><div class="line">		&#125; <span class="keyword">finally</span> &#123;</div><div class="line">			<span class="comment">// remove syncCall from dispatcher</span></div><div class="line">			dispatcher.finishSyncCall(syncCall);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">equeueAsyncCall</span><span class="params">(AsyncCall asyncCall)</span> </span>&#123;</div><div class="line">		<span class="comment">// store asyncCall into dispatcher;</span></div><div class="line">		dispatcher.enqueue(asyncCall);</div><div class="line">		<span class="comment">// it will be removed when this asyncCall be executed</span></div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>基于以上，我们能够很好的处理 <code> 同步 </code> 和<code>异步 </code> 两种请求，使用场景如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">WingjayHttpClient client = <span class="keyword">new</span> WingjayHttpClient();</div><div class="line"><span class="comment">// Sync</span></div><div class="line">Request syncRequest = <span class="keyword">new</span> Request(<span class="string">"http://wingjay.com"</span>);</div><div class="line">SyncCall syncCall = <span class="keyword">new</span> SyncCall(request);</div><div class="line">Response response = client.sendSyncCall(syncCall);</div><div class="line">handle(response);</div><div class="line"></div><div class="line"><span class="comment">// Async</span></div><div class="line">AsyncCall asyncCall = <span class="keyword">new</span> AsyncCall(request, <span class="keyword">new</span> CallBack() &#123;</div><div class="line">	  <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onFailure</span><span class="params">(Call call, IOException e)</span> </span>&#123;&#125;</div><div class="line"></div><div class="line">      <span class="meta">@Override</span></div><div class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResponse</span><span class="params">(Call call, Response response)</span> <span class="keyword">throws</span> IOException </span>&#123;</div><div class="line">        handle(response);</div><div class="line">      &#125;</div><div class="line">&#125;);</div><div class="line">client.equeueAsyncCall(asyncCall);</div></pre></td></tr></table></figure></p>
+<h2 id="六、总结"><a href="# 六、总结" class="headerlink" title="六、总结"></a>六、总结 </h2><p> 到此，我们基本把 <code>okhttp</code> 里核心的机制都讲解了一遍，相信读者对于 okhttp 的整体结构和核心机制都有了较为详细的了解。</p>
+<p>如果有问题欢迎联系我。</p>
+<p>谢谢！</p>
+<p>wingjay</p>
+<p>欢迎各位关注 <br><a href="https://github.com/wingjay" target="_blank" rel="external"> 我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和 <br><a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external"> 我的简书 </a>: <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">http://www.jianshu.com/users/da333fd63fe5/latest_articles</a><br> 和<br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a><br>如果有问题，可以给我留言或发邮件<a href="&#109;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#121;&#x69;&#110;&#106;&#105;&#x65;&#115;&#x68;&#64;&#49;&#x32;&#x36;&#46;&#99;&#111;&#x6d;">&#121;&#x69;&#110;&#106;&#105;&#x65;&#115;&#x68;&#64;&#49;&#x32;&#x36;&#46;&#99;&#111;&#x6d;</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/带你学开源项目/" rel="tag">#带你学开源项目</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/" rel="next" title="RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求">
+                <i class="fa fa-chevron-left"></i> RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/30/谈谈移动应用的安全性实践/" rel="prev" title="谈谈移动应用的安全性实践">
+                谈谈移动应用的安全性实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/14')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/14/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、开源项目 -OkHttp"><span class="nav-number">1.</span> <span class="nav-text">一、开源项目 OkHttp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、问题"><span class="nav-number">2.</span> <span class="nav-text">二、问题 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、思考"><span class="nav-number">3.</span> <span class="nav-text">三、思考 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、雏形实现"><span class="nav-number">4.</span> <span class="nav-text">四、雏形实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 创建 Request 类"><span class="nav-number">4.0.1.</span> <span class="nav-text">1. 创建 Request 类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 将 Request 对象传递给 WingjayHttpClient"><span class="nav-number">4.0.2.</span> <span class="nav-text">2. 将 Request 对象传递给 WingjayHttpClient</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 执行 Request，并把返回结果封装成一个 Response 返回"><span class="nav-number">4.0.3.</span> <span class="nav-text">3. 执行 Request，并把返回结果封装成一个Response 返回</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、功能扩展"><span class="nav-number">5.</span> <span class="nav-text">五、功能扩展 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1- 重新把简陋的 user-Request 组装成一个规范的 http-request"><span class="nav-number">5.0.1.</span> <span class="nav-text">1. 重新把简陋的 user Request 组装成一个规范的 http request</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2- 支持自动重定向"><span class="nav-number">5.0.2.</span> <span class="nav-text">2. 支持自动重定向 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3- 支持重试机制"><span class="nav-number">5.0.3.</span> <span class="nav-text">3. 支持重试机制 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-Request-amp-Response- 拦截机制"><span class="nav-number">5.0.4.</span> <span class="nav-text">4. Request & Response 拦截机制 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5- 同步、异步 -Request 池管理机制"><span class="nav-number">5.0.5.</span> <span class="nav-text">5. 同步、异步 Request 池管理机制 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、总结"><span class="nav-number">6.</span> <span class="nav-text">六、总结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

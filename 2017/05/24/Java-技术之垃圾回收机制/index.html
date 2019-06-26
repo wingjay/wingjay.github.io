@@ -1,0 +1,1051 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="垃圾回收机制是 Java 非常重要的特性之一，也是面试题的常客。它让开发者无需关注空间的创建和释放，而是以守护进程的形式在后台自动回收垃圾。这样做不仅提高了开发效率，更改善了内存的使用状况。 今天本文来对垃圾回收机制进行讲解，主要涉及下面几个问题：  什么是堆内存？ 什么是垃圾？ 有哪些方法回收这些垃圾？ 什么是分代回收机制？">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 技术之垃圾回收机制">
+<meta property="og:url" content="http://wingjay.com/2017/05/24/Java-技术之垃圾回收机制/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="垃圾回收机制是 Java 非常重要的特性之一，也是面试题的常客。它让开发者无需关注空间的创建和释放，而是以守护进程的形式在后台自动回收垃圾。这样做不仅提高了开发效率，更改善了内存的使用状况。 今天本文来对垃圾回收机制进行讲解，主要涉及下面几个问题：  什么是堆内存？ 什么是垃圾？ 有哪些方法回收这些垃圾？ 什么是分代回收机制？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wingjay.com/img/gc/reachable.JPG">
+<meta property="og:image" content="http://wingjay.com/img/gc/garbage.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/mark-sweep.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/mark-compact.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/copying.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/young_1.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/young_2.png">
+<meta property="og:image" content="http://wingjay.com/img/gc/young_3.png">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 技术之垃圾回收机制">
+<meta name="twitter:description" content="垃圾回收机制是 Java 非常重要的特性之一，也是面试题的常客。它让开发者无需关注空间的创建和释放，而是以守护进程的形式在后台自动回收垃圾。这样做不仅提高了开发效率，更改善了内存的使用状况。 今天本文来对垃圾回收机制进行讲解，主要涉及下面几个问题：  什么是堆内存？ 什么是垃圾？ 有哪些方法回收这些垃圾？ 什么是分代回收机制？">
+<meta name="twitter:image" content="http://wingjay.com/img/gc/reachable.JPG">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 技术之垃圾回收机制 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 技术之垃圾回收机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-rocket"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-24T21:19:26+08:00" content="2017-05-24">
+              2017-05-24
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            3,041 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>垃圾回收机制是 Java 非常重要的特性之一，也是面试题的常客。它让开发者无需关注空间的创建和释放，而是以守护进程的形式在后台自动回收垃圾。这样做不仅提高了开发效率，更改善了内存的使用状况。</p>
+<p>今天本文来对垃圾回收机制进行讲解，主要涉及下面几个问题：</p>
+<ul>
+<li>什么是堆内存？</li>
+<li>什么是垃圾？</li>
+<li>有哪些方法回收这些垃圾？</li>
+<li>什么是分代回收机制？</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<h2 id="什么是 -Java- 堆内存"><a href="# 什么是 -Java- 堆内存" class="headerlink" title="什么是 Java 堆内存"></a>什么是 Java 堆内存 </h2><p> 堆是在 JVM 启动时创建的，主要用来维护运行时数据，如运行过程中创建的对象和数组都是基于这块内存空间。Java 堆是非常重要的元素，如果我们动态创建的对象没有得到及时回收，持续堆积，最后会导致堆空间被占满，内存溢出。</p>
+<p>因此，Java 提供了一种垃圾回收机制，在后台创建一个守护进程。该进程会在内存紧张的时候自动跳出来，把堆空间的垃圾全部进行回收，从而保证程序的正常运行。</p>
+<h2 id="那什么是垃圾呢？"><a href="# 那什么是垃圾呢？" class="headerlink" title="那什么是垃圾呢？"></a>那什么是垃圾呢？</h2><p>所谓“垃圾”，就是指所有不再存活的对象。常见的判断是否存活有两种方法：引用计数法和可达性分析。</p>
+<h3 id="引用计数法"><a href="# 引用计数法" class="headerlink" title="引用计数法"></a>引用计数法 </h3><p> 为每一个创建的对象分配一个引用计数器，用来存储该对象被引用的个数。当该个数为零，意味着没有人再使用这个对象，可以认为“对象死亡”。但是，这种方案存在严重的问题，就是无法检测“循环引用”：当两个对象互相引用，即时它俩都不被外界任何东西引用，它俩的计数都不为零，因此永远不会被回收。而实际上对于开发者而言，这两个对象已经完全没有用处了。</p>
+<p>因此，Java 里没有采用这样的方案来判定对象的“存活性”。</p>
+<h3 id="可达性分析"><a href="# 可达性分析" class="headerlink" title="可达性分析"></a>可达性分析 </h3><p> 这种方案是目前主流语言里采用的对象存活性判断方案。基本思路是把所有引用的对象想象成一棵树，从树的根结点 GC Roots 出发，持续遍历找出所有连接的树枝对象，这些对象则被称为“可达”对象，或称“存活”对象。其余的对象则被视为“死亡”的“不可达”对象，或称“垃圾”。</p>
+<p>参考下图，object5,object6 和 object7 便是不可达对象，视为“死亡状态”，应该被垃圾回收器回收。</p>
+<p><img src="/img/gc/reachable.JPG" alt=""></p>
+<h4 id="GC-Roots- 究竟指谁呢？"><a href="#GC-Roots- 究竟指谁呢？" class="headerlink" title="GC Roots 究竟指谁呢？"></a>GC Roots 究竟指谁呢？</h4><p>我们可以猜测，GC Roots 本身一定是可达的，这样从它们出发遍历到的对象才能保证一定可达。那么，Java 里有哪些对象是一定可达呢？主要有以下四种：</p>
+<ul>
+<li>虚拟机栈（帧栈中的本地变量表）中引用的对象。</li>
+<li>方法区中静态属性引用的对象。</li>
+<li>方法区中常量引用的对象。</li>
+<li>本地方法栈中 JNI 引用的对象。</li>
+</ul>
+<p>不少读者可能对这些 GC Roots 似懂非懂，这涉及到 JVM 本身的内存结构等等，未来的文章会再做深入讲解。这里只要知道有这么几种类型的 GC Roots，每次垃圾回收器会从这些根结点开始遍历寻找所有可达节点。</p>
+<h2 id="有哪些方式来回收这些垃圾呢？"><a href="# 有哪些方式来回收这些垃圾呢？" class="headerlink" title="有哪些方式来回收这些垃圾呢？"></a>有哪些方式来回收这些垃圾呢？</h2><p>上面已经知道，所有 GC Roots 不可达的对象都称为垃圾，参考下图，黑色的表示垃圾，灰色表示存活对象，绿色表示空白空间。</p>
+<p><img src="/img/gc/garbage.png" alt=""></p>
+<p>那么，我们如何来回收这些垃圾呢？</p>
+<h4 id="标记－清理"><a href="# 标记－清理" class="headerlink" title="标记－清理"></a>标记－清理 </h4><p> 第一步，所谓“标记”就是利用可达性遍历堆内存，把“存活”对象和“垃圾”对象进行标记，得到的结果如上图；<br>第二步，既然“垃圾”已经标记好了，那我们再遍历一遍，把所有“垃圾”对象所占的空间直接 <code> 清空 </code> 即可。</p>
+<p>结果如下：<br><img src="/img/gc/mark-sweep.png" alt=""></p>
+<p>这便是 <code> 标记－清理 </code> 方案，<code>简单方便 </code>，但是容易产生<code> 内存碎片</code>。</p>
+<h4 id="标记－整理"><a href="# 标记－整理" class="headerlink" title="标记－整理"></a>标记－整理 </h4><p> 既然上面的方法会产生内存碎片，那好，我在清理的时候，把所有 <code> 存活 </code> 对象扎堆到同一个地方，让它们待在一起，这样就没有内存碎片了。</p>
+<p>结果如下：<br><img src="/img/gc/mark-compact.png" alt=""></p>
+<p>这两种方案适合 <code> 存活对象多，垃圾少 </code> 的情况，它只需要清理掉少量的垃圾，然后挪动下存活对象就可以了。</p>
+<h4 id="复制"><a href="# 复制" class="headerlink" title="复制"></a>复制 </h4><p> 这种方法比较粗暴，直接把堆内存分成两部分，一段时间内只允许在其中一块内存上进行分配，当这块内存被分配完后，则执行垃圾回收，把所有 <code> 存活 </code> 对象全部复制到另一块内存上，当前内存则直接全部清空。</p>
+<p>参考下图：<br><img src="/img/gc/copying.png" alt=""></p>
+<p>起初时只使用上面部分的内存，直到内存使用完毕，才进行垃圾回收，把所有存活对象搬到下半部分，并把上半部分进行清空。</p>
+<p>这种做法不容易产生碎片，也简单粗暴；但是，它意味着你在一段时间内只能使用一部分的内存，超过这部分内存的话就意味着堆内存里频繁的 <code> 复制清空</code>。</p>
+<p>这种方案适合 <code> 存活对象少，垃圾多 </code> 的情况，这样在复制时就不需要复制多少对象过去，多数垃圾直接被清空处理。</p>
+<h2 id="Java- 的分代回收机制"><a href="#Java- 的分代回收机制" class="headerlink" title="Java 的分代回收机制"></a>Java 的分代回收机制 </h2><p> 上面我们看到有至少三种方法来回收内存，那么 Java 里是如何选择利用这三种回收算法呢？是只用一种还是三种都用呢？</p>
+<h3 id="Java- 的堆结构"><a href="#Java- 的堆结构" class="headerlink" title="Java 的堆结构"></a>Java 的堆结构 </h3><p> 在选择回收算法前，我们先来看一下 Java 堆的结构。</p>
+<p>一块 Java 堆空间一般分成三部分，这三部分用来存储三类数据：</p>
+<ul>
+<li>刚刚创建的对象。在代码运行时会持续不断地创造新的对象，这些新创建的对象会被统一放在一起。因为有很多局部变量等在新创建后很快会变成 <code> 不可达 </code> 的对象，<code>快速死去 </code>，因此这块区域的特点是<code> 存活对象少，垃圾多 </code>。形象点描述这块区域为：<code> 新生代</code>；</li>
+<li>存活了一段时间的对象。这些对象早早就被创建了，而且一直活了下来。我们把这些 <code> 存活时间较长 </code> 的对象放在一起，它们的特点是 <code> 存活对象多，垃圾少 </code>。形象点描述这块区域为：<code> 老年代</code>；</li>
+<li>永久存在的对象。比如一些静态文件，这些对象的特点是不需要垃圾回收，永远存活。形象点描述这块区域为：<code>永久代 </code>。（不过在 Java 8 里已经把<code> 永久代 </code> 删除了，把这块内存空间给了 <code> 元空间</code>，后续文章再讲解。）</li>
+</ul>
+<p>也就是说，常规的 Java 堆至少包括了 <code>新生代 </code> 和 <code> 老年代</code> 两块内存区域，而且这两块区域有很明显的特征：</p>
+<ul>
+<li>新生代：存活对象少、垃圾多</li>
+<li>老年代：存活对象多、垃圾少</li>
+</ul>
+<p>结合新生代／老年代的存活对象特点和之前提过的几种垃圾回收算法，可以得到如下的回收方案：</p>
+<h3 id="新生代－复制回收机制"><a href="# 新生代－复制回收机制" class="headerlink" title="新生代－复制回收机制"></a>新生代－<code>复制 </code> 回收机制 </h3><p> 对于新生代区域，由于每次 GC 都会有大量新对象死去，只有少量存活。因此采用 <code> 复制 </code> 回收算法，GC 时把少量的存活对象复制过去即可。</p>
+<p>那么如何设计这个 <code> 复制 </code> 算法比较好呢？有以下几种方式：</p>
+<h5 id="思路 1- 把内存均分成 -1-1- 两等份"><a href="# 思路 1- 把内存均分成 -1-1- 两等份" class="headerlink" title="思路 1. 把内存均分成 1:1 两等份"></a>思路 1. 把内存均分成 <code>1:1</code> 两等份 </h5><p> 如下图拆分内存。<br><img src="/img/gc/young_1.png" alt=""></p>
+<p>每次只使用一半的内存，当这一半满了后，就进行垃圾回收，把存活的对象直接复制到另一半内存，并清空当前一半的内存。</p>
+<p>这种分法的缺陷是相当于只有一半的可用内存，对于新生代而言，新对象持续不断地被创建，如果只有一半可用内存，那显然要持续不断地进行垃圾回收工作，反而影响到了正常程序的运行，得不偿失。</p>
+<h5 id="思路 2- 把内存按 -9-1- 分"><a href="# 思路 2- 把内存按 -9-1- 分" class="headerlink" title="思路 2. 把内存按 9:1 分"></a>思路 2. 把内存按 <code>9:1</code> 分 </h5><p> 既然上面的分法导致可用内存只剩一半，那么我做些调整，把 <code>1:1</code>变成<code>9:1</code>，<br><img src="/img/gc/young_2.png" alt=""></p>
+<p>最开始在 <code>9</code> 的内存区使用，当 <code>9</code> 快要满时，执行复制回收，把 <code>9</code> 内仍然存活的对象复制到 <code>1</code> 区，并清空 <code>9</code> 区。</p>
+<p>这样看起来是比上面的方法好了，但是它存在比较严重的问题。</p>
+<p>当我们把 <code>9</code> 区存活对象复制到 <code>1</code> 区时，由于内存空间比例相差比较大，所以很有可能 <code>1</code> 区放不满，此时就不得不把对象移到 <code>老年区 </code>。而这就意味着，可能会有一部分 <code> 并不老 </code> 的 <code>9</code> 区对象由于 <code>1</code> 区放不下了而被放到了 <code> 老年区 </code>，可想而知，这破坏了 <code> 老年区 </code> 的规则。或者说，一定程度上的 <code> 老年区 </code> 并不一定全是 <code> 老年对象</code>。</p>
+<p>那应该如何才能把真正比较 <code>老 </code> 的对象挪到 <code> 老年区</code> 呢？ </p>
+<h5 id="思路 3- 把内存按 -8-1-1- 分"><a href="# 思路 3- 把内存按 -8-1-1- 分" class="headerlink" title="思路 3. 把内存按 8:1:1 分"></a>思路 3. 把内存按 <code>8:1:1</code> 分</h5><p><img src="/img/gc/young_3.png" alt=""></p>
+<p>既然 <code>9:1</code> 有可能把年轻对象放到 <code>老年区 </code>，那就换成 <code>8:1:1</code>，依次取名为 <code>Eden</code>、<code>Survivor A</code>、<code>Survivor B</code> 区，其中 <code>Eden</code> 意为伊甸园，形容有很多新生对象在里面创建；<code>Survivor</code>区则为幸存者，即经历 GC 后仍然存活下来的对象。</p>
+<p>工作原理如下：</p>
+<ol>
+<li>首先，<code>Eden</code>区最大，对外提供堆内存。当 <code>Eden</code> 区快要满了，则进行 <code>Minor GC</code>，把存活对象放入 <code>Survivor A</code> 区，清空 <code>Eden</code> 区；</li>
+<li><code>Eden</code>区被清空后，继续对外提供堆内存；</li>
+<li>当 <code>Eden</code> 区再次被填满，此时对 <code>Eden</code> 区和 <code>Survivor A</code> 区同时进行 <code>Minor GC</code>，把存活对象放入 <code>Survivor B</code> 区，同时清空 <code>Eden</code> 区和<code>Survivor A</code> 区；</li>
+<li><code>Eden</code>区继续对外提供堆内存，并重复上述过程，即在 <code>Eden</code> 区填满后，把 <code>Eden</code> 区和某个 <code>Survivor</code> 区的存活对象放到另一个 <code>Survivor</code> 区；</li>
+<li>当某个 <code>Survivor</code> 区被填满，且仍有对象未被复制完毕时，或者某些对象在反复 <code>Survive</code> <code>15</code> 次左右时，则把这部分剩余对象放到<code>Old</code> 区；</li>
+<li>当 <code>Old</code> 区也被填满时，进行 <code>Major GC</code>，对 <code>Old</code> 区进行垃圾回收。</li>
+</ol>
+<p>[注意，在真实的 JVM 环境里，可以通过参数 <code>SurvivorRatio</code> 手动配置 <code>Eden</code> 区和单个 <code>Survivor</code> 区的比例，默认为 8。]</p>
+<p>那么，所谓的 <code>Old</code> 区垃圾回收，或称<code>Major GC</code>，应该如何执行呢？</p>
+<h3 id="老年代－标记整理回收机制"><a href="# 老年代－标记整理回收机制" class="headerlink" title="老年代－标记整理回收机制"></a>老年代－<code>标记整理 </code> 回收机制 </h3><p> 根据上面我们知道，老年代一般存放的是存活时间较久的对象，所以每一次 GC 时，存活对象比较较大，也就是说每次只有少部分对象被回收。</p>
+<p>因此，根据不同回收机制的特点，这里选择 <code> 存活对象多，垃圾少 </code> 的<code>标记整理 </code> 回收机制，仅仅通过少量地移动对象就能清理垃圾，而且不存在内存碎片化。</p>
+<p>至此，我们已经了解了 Java 堆内存的分代原理，并了解了不同代根据各自特点采用了不同的回收机制，即 <code> 新生代 </code> 采用 <code> 回收 </code> 机制，<code>老年代 </code> 采用 <code> 标记整理 </code> 机制。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 垃圾回收是 Java 非常重要的特性，也是高级 Java 工程师的必经之路。</p>
+<p>如有问题欢迎与我联系。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p>参考文章：</p>
+<ul>
+<li>《<a href="http://jayfeng.com/2016/03/11/%E7%90%86%E8%A7%A3Java%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%9C%BA%E5%88%B6/" target="_blank" rel="external">理解 Java 垃圾回收机制</a>》</li>
+<li>《<a href="https://segmentfault.com/a/1190000002579346#articleHeader6" target="_blank" rel="external">JVM 的 工作原理，层次结构 以及 GC 工作原理</a>》</li>
+<li>《<a href="http://howiefh.github.io/2015/04/08/jvm-note-2/" target="_blank" rel="external">深入理解 Java 虚拟机笔记二（垃圾收集器与内存分配策略）</a>》</li>
+</ul>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/14/dig_into_leakcanary/" rel="next" title="带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏">
+                <i class="fa fa-chevron-left"></i> 带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/08/rebuild-personal-blog/" rel="prev" title="自己动手改造个人博客">
+                自己动手改造个人博客 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/2')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/2/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是 -Java- 堆内存"><span class="nav-number">1.</span> <span class="nav-text">什么是 Java 堆内存 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#那什么是垃圾呢？"><span class="nav-number">2.</span> <span class="nav-text">那什么是垃圾呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#引用计数法"><span class="nav-number">2.1.</span> <span class="nav-text">引用计数法 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可达性分析"><span class="nav-number">2.2.</span> <span class="nav-text">可达性分析 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GC-Roots- 究竟指谁呢？"><span class="nav-number">2.2.1.</span> <span class="nav-text">GC Roots 究竟指谁呢？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有哪些方式来回收这些垃圾呢？"><span class="nav-number">3.</span> <span class="nav-text">有哪些方式来回收这些垃圾呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标记－清理"><span class="nav-number">3.0.1.</span> <span class="nav-text">标记－清理 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标记－整理"><span class="nav-number">3.0.2.</span> <span class="nav-text">标记－整理 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复制"><span class="nav-number">3.0.3.</span> <span class="nav-text">复制 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java- 的分代回收机制"><span class="nav-number">4.</span> <span class="nav-text">Java 的分代回收机制 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java- 的堆结构"><span class="nav-number">4.1.</span> <span class="nav-text">Java 的堆结构 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新生代－复制回收机制"><span class="nav-number">4.2.</span> <span class="nav-text">新生代－复制  回收机制 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#思路 1- 把内存均分成 -1-1- 两等份"><span class="nav-number">4.2.0.1.</span> <span class="nav-text">思路 1. 把内存均分成 1:1 两等份 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#思路 2- 把内存按 -9-1- 分"><span class="nav-number">4.2.0.2.</span> <span class="nav-text">思路 2. 把内存按 9:1 分 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#思路 3- 把内存按 -8-1-1- 分"><span class="nav-number">4.2.0.3.</span> <span class="nav-text">思路 3. 把内存按 8:1:1 分</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#老年代－标记整理回收机制"><span class="nav-number">4.3.</span> <span class="nav-text">老年代－标记整理  回收机制 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

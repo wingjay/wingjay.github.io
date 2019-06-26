@@ -1,0 +1,1120 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,带你学开源项目," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 Meizhi Android 源码的分析。">
+<meta name="keywords" content="Android,带你学开源项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="带你学开源项目：Meizhi Android 之 RxJava &amp; Retrofit 最佳实践">
+<meta property="og:url" content="http://wingjay.com/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 Meizhi Android 源码的分析。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-50854bb575db05f9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-2129d871aff9a884.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-91320f2cce108a8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="带你学开源项目：Meizhi Android 之 RxJava &amp; Retrofit 最佳实践">
+<meta name="twitter:description" content="私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。此次来分享下 Meizhi Android 源码的分析。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/281665-50854bb575db05f9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-04-13T00:17:28+08:00" content="2016-04-13">
+              2016-04-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/带你学开源项目/" itemprop="url" rel="index">
+                    <span itemprop="name">带你学开源项目</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,978 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>私以为，阅读开源项目是与世界级技术大牛直接对话的最好方式。<br>此次来分享下 Meizhi Android 源码的分析。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="零、背景"><a href="# 零、背景" class="headerlink" title="零、背景"></a>零、背景 </h2><p> 比起阅读枯燥的技术文档，独自苦苦摸索新技术的基本用法，还有一种更好更快速也更有效的提高自身技术的方法，那就是阅读学习优质的开源项目，通过仿写、练习最终达到理解，潜移默化提升自身编程技能。</p>
+<p>《带你学开源项目》系列将带领你深入阅读及分析当前流行的一些开源项目，并针对其中采用的新技术与精妙之处进行细致的阐述，以期让你快速掌握 Android 开发中的多种强大技能点。</p>
+<h2 id="一、本期开源项目 Meizhi-Android"><a href="# 一、本期开源项目 Meizhi-Android" class="headerlink" title="一、本期开源项目 Meizhi Android"></a>一、本期开源项目 Meizhi Android</h2><p>本次的开源项目选择了 <a href="https://github.com/drakeet/Meizhi" target="_blank" rel="external">Meizhi Android</a>，本文主要介绍该项目中采用的<code>RxJava</code>、<code>Retrofit</code> 两种技术，这二者在 Android 开发者中非常流行，不仅能够 <code> 优美地处理异步回调 </code>，而且能<code> 提高代码的性能和稳定性</code>。而 Meizhi Android 中较好的覆盖了二者的多种应用场景，能够给多数开发者一个全面的学习。</p>
+<p>下面本人会 <code> 对原项目的代码进行详细的介绍</code>，同时为了读者看的清楚其中的逻辑关系，可能会做一定调整以帮助读者理解，比如把 lambda 表达式还原成普通 java 函数形式，以避免很多读者对 lambda 并不熟悉。</p>
+<h2 id="二、原项目分析"><a href="# 二、原项目分析" class="headerlink" title="二、原项目分析"></a>二、原项目分析 </h2><h3 id="0-clone 项目到本地"><a href="#0-clone 项目到本地" class="headerlink" title="0. clone 项目到本地"></a>0. clone 项目到本地</h3><p> 第一步当然是把项目 clone 下来，编译，运行。有兴趣的同学可以执行这一步。</p>
+<h3 id="1- 添加 Stetho 抓包工具"><a href="#1- 添加 Stetho 抓包工具" class="headerlink" title="1. 添加 Stetho 抓包工具"></a>1. 添加 <code>Stetho</code> 抓包工具 </h3><p> 首先，由于我们要分析 retrofit，所以为了查看 app 的网络请求，有兴趣的同学可以手动在代码里添加 <a href="http://facebook.github.io/stetho/" target="_blank" rel="external">Stetho</a>。<code>Stetho</code> 是 Facebook 推出的一款黑科技，能够在 chrome 里轻松查看 app 所有的网络请求，比起 iOS 需要装个 <a href="https://www.charlesproxy.com/" target="_blank" rel="external">Charles</a> 查看 http 请求方便多咯。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-50854bb575db05f9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Stetho 使用场景"></p>
+<h3 id="2-Retrofit 结构"><a href="#2-Retrofit 结构" class="headerlink" title="2. Retrofit 结构"></a>2. Retrofit 结构 </h3><p> 从下图我们可以看到，首页里有很多 card，每一个 card 里有两个元素：<code>妹纸图片 </code>， <code> 描述文字 </code>，具体 UI 实现我们不在乎，只要明白一点，这两个元素数据是来自于两个不同的 api。其中，<code> 妹纸图片 </code> 来自于 <code>http://gank.io/api/data/ 福利 /10</code>;<code> 描述文字 </code> 来自于<code>http://gank.io/api/data/ 休息视频 /10</code>。</p>
+<p>app 中为了请求网络数据，采用了<a href="http://square.github.io/retrofit/" target="_blank" rel="external">Retrofit</a>。具体关于 retrofit 如何配置请各位参考官网，这里只讲解如何使用<code>Retrofit</code>。</p>
+<p>该项目中主要创建了以下几个类来实现 <code>Retrofit</code> 结构，大家可以作为参考用于自己的项目中。</p>
+<h5 id="i-GankApi：这个类用来定义相关的 http 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 Observable-lt-T-gt- 格式结果，方便 RxJava 进行进一步处理。"><a href="#i-GankApi：这个类用来定义相关的 http 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 Observable-lt-T-gt- 格式结果，方便 RxJava 进行进一步处理。" class="headerlink" title="i. GankApi：这个类用来定义相关的 http 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 Observable&lt;T&gt; 格式结果，方便 RxJava 进行进一步处理。"></a>i. <code>GankApi</code>：这个类用来定义相关的 <code>http</code> 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 <code>Observable&lt;T&gt;</code> 格式结果，方便 <code>RxJava</code> 进行进一步处理。</h5><pre><code>@GET(&quot;/data/ 福利 /{page}&quot;) Observable&lt;MeizhiList&gt; getMeizhiList(@Path(&quot;page&quot;) int page);
+@GET(&quot;/data/ 休息视频 /{page}&quot;) Observable&lt;GankVideoList&gt; getGankVideoList(@Path(&quot;page&quot;) int page);
+</code></pre><h5 id="ii-DrakeetRetrofit：这个类用来对 Retrofit 进行相关配置并生成 GankApi 实例 gankApi"><a href="#ii-DrakeetRetrofit：这个类用来对 Retrofit 进行相关配置并生成 GankApi 实例 gankApi" class="headerlink" title="ii. DrakeetRetrofit：这个类用来对 Retrofit 进行相关配置并生成 GankApi 实例 gankApi"></a>ii. <code>DrakeetRetrofit</code>：这个类用来对 <code>Retrofit</code> 进行相关配置并生成 <code>GankApi</code> 实例<code>gankApi</code></h5><pre><code>OkHttpClient client = new OkHttpClient();
+RestAdapter.Builder builder = new RestAdapter.Builder();
+builder.setClient(new OkClient(client))
+      .setLogLevel(RestAdapter.LogLevel.FULL) 
+      .setEndpoint(&quot;http://gank.io/api&quot;)
+      .setConverter(new GsonConverter(gson));
+RestAdapter gankRestAdapter = builder.build();
+GankApi gankApi = gankRestAdapter.create(GankApi.class);
+
+public GankApi getGankApi() {return gankApi;}
+</code></pre><h5 id="iii-DrakeetFactory：- 这个类用来对外生成单例 GankApi 实例，为确保 GankApi 实例只生成一次。"><a href="#iii-DrakeetFactory：- 这个类用来对外生成单例 GankApi 实例，为确保 GankApi 实例只生成一次。" class="headerlink" title="iii. DrakeetFactory： 这个类用来对外生成单例 GankApi 实例，为确保 GankApi 实例只生成一次。"></a>iii. <code>DrakeetFactory</code>： 这个类用来对外生成单例 <code>GankApi</code> 实例，为确保 <code>GankApi</code> 实例只生成一次。</h5><pre><code>public static GankApi getGankApi() {if (sGankApi == null) {synchronized (monitor) {if (sGankApi == null) {sGankApi = new DrakeetRetrofit().getGankApi();}       
+           return sGankApi;    
+        }
+    }
+}
+</code></pre><p>所以，在实际应用场景中，比如我们想要发起一个 http 请求来获取 <code> 福利 </code> 数据，那么我们可以采用以下方式：</p>
+<pre><code>GankApi gankApi = DrakeetFactory.getGankApi();
+Observable&lt;MeizhiList&gt; meizhiList = gankApi. getMeizhiList(10);
+</code></pre><p><img src="http://upload-images.jianshu.io/upload_images/281665-2129d871aff9a884.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="首页.png"></p>
+<h3 id="3- 首页的 RxJava 的实现"><a href="#3- 首页的 RxJava 的实现" class="headerlink" title="3. 首页的 RxJava 的实现"></a>3. 首页的 RxJava 的实现 </h3><p> 既然我们已经把网络框架搭建好了，那么可以开始从服务器获取数据并显示了。我们首先看首页的数据。下面，我来对首页数据进行分析，一步步推出所需要的 RxJava 表达式。</p>
+<p>上面已经介绍过，每一个 card 里有两部分数据：<code>妹纸图片 </code>(红色方框) 和<code>描述文本</code>(绿色方框)。</p>
+<ul>
+<li><code>妹纸图片 </code> 数据来自于 <code>&quot;/data/ 福利 /{page}&quot;</code> 这个 api，该 api 会返回妹纸图片的 url；</li>
+<li><code>描述文本 </code> 来自于 <code>&quot;/data/ 休息视频 /{page}&quot;</code> 这个 api，该 api 会返回休息视频及相关描述信息，card 里会把描述信息显示出来；</li>
+<li>两个 api 均可以携带 <code>page</code> 字段，即一次请求可以获得多个数据。如我们在 <code>&quot;/data/ 福利 /{page}&quot;</code> 里设置 <code>page=10</code>，那么我们一次请求可以得到 10 条<code> 福利 </code> 数据，即<code>10 张妹纸图片 url</code>；</li>
+<li>由于我们一次可以获得多张妹纸图片 url 和多个视频信息，那我们就需要把 <code> 二者进行合并 </code>，即<code> 单拎出来一张妹纸图片和一个视频信息组装成一个 card</code>。然后按这种方式生成其他的 card。</li>
+</ul>
+<p>小结一下，根据以上描述，假如我们把两个 api 的 page 都设置为 <code>10</code>，那么两个请求同时发出去后，我们能得到<code>10 张妹纸图片 url</code>（如<code>http://img.com/1.png</code>, <code>http://img.com/2.png</code>, …）和<code>10 个视频信息</code>(如<code> 舌尖上的中国 </code>, <code> 星际穿越</code>， …)，然后我们将二者组装成<code>10 个 card 所需要的数据</code>，放入每个 card 里显示即可。</p>
+<p>好，终于可以开始动手写代码了。上面的分析看似复杂，然后只要你学会了如何分析，很快就能写出对应的 RxJava 代码。下面我结合 RxJava 的 <code> 数据流思想 </code> 和<code>具体操作符 </code> 来介绍实现代码。</p>
+<h5 id="i- 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object"><a href="#i- 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object" class="headerlink" title="i. 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object"></a>i. 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object</h5><pre><code>public class Meizhi {
+    public String url;
+    public Date publishDate;
+} // 这是一个 Meizhi 对象，存储妹纸图片的 url，图片描述信息和创建日期
+
+public class Video {
+  public String desc;
+  public Date publishDate;
+} // 这是一个视频对象，存储视频描述信息和创建日期
+
+public class MeizhiList {public List&lt;Meizhi&gt; meizhiList;} // 由于我们一次请求能获取到 10 个(根据 `page` 设置)，所以我们用 MeizhiList 来存储结果
+
+public class VideoList {public List&lt;Video&gt; videoList;} // 原理同上，存储多个 video 对象
+
+public class MeizhiWithVideo {
+  public String url;
+  public String desc;
+  public Date publishDate;
+}// 将 video 信息合并入 meizhi 对象中
+
+public class MeizhiWithVideoList {public List&lt;MeizhiWithVideoList&gt; data;}
+</code></pre><h5 id="ii-zip- 将两个 retrofit 接口请求后得到的两个数据源 Observable-Observable 进行合并"><a href="#ii-zip- 将两个 retrofit 接口请求后得到的两个数据源 Observable-Observable 进行合并" class="headerlink" title="ii. zip: 将两个 retrofit 接口请求后得到的两个数据源 Observable  Observable 进行合并"></a>ii. zip: 将两个 retrofit 接口请求后得到的两个数据源 Observable<meizhilist>  Observable<videolist>进行合并 </videolist></meizhilist></h5><p> 我们需要把这两个数据源的数据拼接起来，所以我们可以考虑使用<a href="http://reactivex.io/documentation/operators/zip.html" target="_blank" rel="external">zip 操作符</a>，该操作符可以将两个数据源发射出来的数据依次组装在一起。</p>
+<p>比如一个 <code>Observable 数据源</code> 依次发射出 <code>1, 3, 5, 7</code>, 另一个<code>Observable 数据源</code> 依次发射出 <code>a, b, c, d</code>，那么<code>zip 操作符</code> 组装后会对外发射出 <code>1a, 3b, 5c, 7d</code> 这样的数据。</p>
+<p>而我们需要的正是这样。</p>
+<p><code>Observable&lt;MeizhiList&gt;</code>一次对外发射一个 <code>MeizhiList</code> 对象，<code>Observable&lt;VideoList&gt;</code>一次对外发射一个 <code>VideoList</code> 对象，我们将二者合并成一个 <code>MeizhiWithVideoList</code> 对象。然后把 <code>MeizhiWithVideoList</code> 对象拿给 UI 去进行显示即可。</p>
+<p>所以，我们可以得到：</p>
+<pre><code>Observable&lt;MeizhiList&gt; meizhiListObservable = gankApi.getMeizhiList(10);
+Observable&lt;VideoList&gt; videoListObservable = gankApi.getVideoList(10);
+Observable&lt;MeizhiWithVideoList&gt; meizhiWithVideoListObservable = 
+Observable.zip(meizhiListObservable, videoListObservable, this::mergeVideoWithMeizhi)
+</code></pre><p>其中 <code>mergeVideoWithMeizhi</code> 是一个合并函数，把 <code>video</code> 信息与 <code>meizhi</code> 信息合并成新的<code>MeizhiWithVideo 对象</code>。</p>
+<pre><code>public MeizhiWithVideoList
+mergeVideoWithMeizhi(MeizhiList meizhiList, VideoList videoList) {// 省略...}
+</code></pre><p><img src="http://upload-images.jianshu.io/upload_images/281665-91320f2cce108a8e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="RxJava - zip"></p>
+<h5 id="iii- 对 MeizhiWithVideo 对象进行排序。"><a href="#iii- 对 MeizhiWithVideo 对象进行排序。" class="headerlink" title="iii. 对 MeizhiWithVideo 对象进行排序。"></a>iii. 对 MeizhiWithVideo 对象进行排序。</h5><p>在上面，我们通过合并，得到了  <code>Observable&lt;MeizhiWithVideoList&gt;</code>数据源，这个数据源对外发射出一个 <code>MeizhiWithVideoList</code> 对象，这个对象里有 10 个 <code>MeizhiWithVideo</code> 数据，我们可以对这 10 个数据利用它们的发布日期进行排序。</p>
+<p>所以我们要实现以下几步：</p>
+<ul>
+<li><p>先把 <code>Observable&lt;MeizhiWithVideoList&gt;</code> 数据源转化为 <code>Observable&lt;List&lt;MeizhiWithVideo&gt;&gt;</code>，从对外发一个<code>MeizhiWithVideoList</code> 对象变成对外发射一个 <code>List&lt;MeizhiWithVideo&gt;</code> 对象；</p>
+</li>
+<li><p>再把 <code>Observale&lt;List&lt;MeizhiWithVideo&gt;&gt;</code> 转化为 <code>Observable&lt;MeizhiWithVideo&gt;</code> 数据源，变成了对外发射出 10 个 <code>MeizhiWithVideo</code> 对象;</p>
+</li>
+<li><p>对这 10 个 <code>MeizhiWithVideo</code> 对象基于 <code>publishDate</code> 进行排序；</p>
+</li>
+<li><p>其中比较操作很耗 cpu，所以我们放在 <code>Schedulers.computation()</code> 线程中做</p>
+</li>
+</ul>
+<p>代码实现：</p>
+<pre><code>meizhiWithVideoListObservable.map(new Func1&lt;MeizhiWithVideoList, List&lt;MeizhiWithVideo&gt;&gt;() {    
+      @Override    
+      public List&lt;Meizhi&gt; call(MeizhiList meizhiList) {return MeizhiWithVideoList.data;}
+})
+.flatMap(new Func1&lt;List&lt;MeizhiWithVideo&gt;, Observable&lt;MeizhiWithVideo&gt;&gt;() {    
+      @Override    
+      public Observable&lt;MeizhiWithVideo&gt; call(List&lt;MeizhiWithVideo&gt; meizhiWithVideos) {return Observable.from(meizhiWithVideos);    
+      }
+})
+.toSortedList(new Func2&lt;MeizhiWithVideo, MeizhiWithVideo, Integer&gt;() {    
+      @Override    
+      public Integer call(MeizhiWithVideo meizhiWithVideo1, MeizhiWithVideo meizhiWithVideo2) {return meizhiWithVideo2.publishedAt.compareTo(meizhiWithVideo1.publishedAt);    
+      }
+})
+.subscribeOn(Schedulers.computation());
+</code></pre><h5 id="iv- 排序后，我们得到 Observable-lt-List-lt-MeizhiWithVideo-gt-gt- 数据源，传给 adapter 去更新 UI"><a href="#iv- 排序后，我们得到 Observable-lt-List-lt-MeizhiWithVideo-gt-gt- 数据源，传给 adapter 去更新 UI" class="headerlink" title="iv. 排序后，我们得到 Observable&lt;List&lt;MeizhiWithVideo&gt;&gt; 数据源，传给 adapter 去更新 UI"></a>iv. 排序后，我们得到 <code>Observable&lt;List&lt;MeizhiWithVideo&gt;&gt;</code> 数据源，传给 adapter 去更新 UI</h5><p>上面的 <code>toSortedList(xxx)</code> 方法会把 <code>Observable&lt;MeizhiWithVideo&gt;</code> 排序后重新组装成 <code>Observable&lt;List&lt;MeizhiWithVideo&gt;&gt;</code> 对象 <code>sortedMVListObservable</code>，该对象对外发射一个<code> 有序的 List&lt;MeizhiWithVideo&gt;</code>。我们将该数据源提供给 adapter 供显示。</p>
+<p>代码如下：</p>
+<pre><code>sortedMVListObservable.observeOn(AndroidSchedulers.mainThread())
+.subscribe(new Subscriber&lt;List&lt;MeizhiWithVideo&gt;&gt;() {    
+    @Override    
+    public void onCompleted() {setRefresh(false); // stop refreshing data.                 
+    }    
+    @Override    
+    public void onError(Throwable e) { }
+    @Override    
+    public void onNext(List&lt;MeizhiWithVideo&gt; meizhiWithVideoList) {adapter.setData(meizhiWithVideoList);
+        adapter.notifyDataSetChanged(); // update UI}
+})
+</code></pre><h3 id="4- 利用 Subscription 来管理异步处理与 Activity 生命周期"><a href="#4- 利用 Subscription 来管理异步处理与 Activity 生命周期" class="headerlink" title="4. 利用 Subscription 来管理异步处理与 Activity 生命周期"></a>4. 利用 <code>Subscription</code> 来管理异步处理与 Activity 生命周期 </h3><p> 对于异步我们知道一直存在一个问题，假设一个页面要同时发出很多个 http 请求，如 http1, http2, http3…，然后这些请求会被放在一个队列里依次发出，而且每个请求发出后需要等待一段时间才能得到返回数据。</p>
+<p>那么问题就来了，假设在 A 页面发出了多个网络请求，在这些网络请求还在等待响应时用户就跳转到了 B 页面，在以前的情况下是，A 页面的网络请求仍然进行直到所有数据返回，而且当数据返回时会尝试去调用 A 页面的 UI 进行修改，而此时已经进入了 B 页面，所以，这不仅造成了网络资源的浪费，也存在一定的风险。</p>
+<p>有了 RxJava，我们可以把每一个网络请求转化为一个 <code>Subscription</code> 对象，这个 <code>Subscription</code> 对象可以被手动<code>unsubscribe</code>，即停止订阅所请求的数据源，这样就可以暂定数据请求，而且即使数据返回回来，由于我已经取消订阅了，所以不会再接收到这些数据了。</p>
+<p>代码实现：<br>在 <code>BaseActivity</code> 中，创建一个 <code>CompositeSubscription</code> 对象来进行管理</p>
+<pre><code>`BaseActivity`
+private CompositeSubscription mCompositeSubscription;
+protected void addSubscription(Subscription s) {if (this.mCompositeSubscription == null) {this.mCompositeSubscription = new CompositeSubscription();    
+    }    
+    this.mCompositeSubscription.add(s);
+}
+
+@Override 
+protected void onDestroy() {super.onDestroy();    
+      if (this.mCompositeSubscription != null) {this.mCompositeSubscription.unsubscribe();    
+      }
+}
+</code></pre><p>在实际的 Activity 中的网络请求:</p>
+<pre><code>public class MyActivity extends BaseActivity {private void loadData() {Subscription s = gankApi.getMeizhiList(10)                           
+                                     .subscribeOn(Schedulers.io())
+                                     .observeOn(AndroidSchedulers.mainThread())
+                                     .subscribe(...);
+        addSubscription(s);
+    }
+}
+</code></pre><h2 id="三、改进及总结"><a href="# 三、改进及总结" class="headerlink" title="三、改进及总结"></a>三、改进及总结 </h2><p> 本文通过对开源项目 <a href="https://github.com/drakeet/Meizhi" target="_blank" rel="external">Meizhi Android</a> 进行分析，了解了 <code>Retrofit</code>，<code>RxJava</code> 的实际应用场景，也对于二者有了更加深入的认识。</p>
+<p>不过本人认为该项目还有一些可以改善的地方，比如 <code>Retrofit</code> 中利用 <code>DrakeetFactory</code> 工厂来生成 <code>GankApi</code> 的单例，但是 <code>new DrakeetRetrofit().getGankApi();</code> 也是一个可以生成 <code>GankApi</code> 的方法，而且是 <code>public</code> 的，那么如果新的开发者忘记调用 <code>DrakeetFactory</code> 来生成 <code>GankApi</code> 的实例，而是采用后者，那么工厂模式就达不到预期的目的了。我认为可以把 <code>new DrakeetRetrofit().getGankApi();</code> 这个操作内容放在 <code>DrakeetFactory</code> 工厂内部，并且设置为 <code>private</code> 属性，这样的话如果想要获得 <code>GankApi</code> 实例，就必须依靠 <code>DrakeetFactory</code> 来生成，从而真正保证了 <code> 单例 </code> 的优势。</p>
+<p>最后，如果读者有意见欢迎评论，本人后续还会挑选优质的开源项目，分析其精髓，供读者学习领悟。</p>
+<p>谢谢！</p>
+<p>wingjay</p>
+<p>欢迎各位关注 <br><a href="https://github.com/wingjay" target="_blank" rel="external"> 我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和 <br><a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external"> 我的简书 </a>: <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">http://www.jianshu.com/users/da333fd63fe5/latest_articles</a><br> 和<br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a><br>如果有问题，可以给我留言或发邮件<a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#x79;&#105;&#x6e;&#106;&#x69;&#x65;&#x73;&#x68;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#x6f;&#109;">&#x79;&#105;&#x6e;&#106;&#x69;&#x65;&#x73;&#x68;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/带你学开源项目/" rel="tag">#带你学开源项目</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/15/30条Android开发建议/" rel="next" title="30 条 Android 开发建议">
+                <i class="fa fa-chevron-left"></i> 30 条 Android 开发建议
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/06/梦想升起的地方/" rel="prev" title="梦想升起的地方">
+                梦想升起的地方 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/16')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/16/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#零、背景"><span class="nav-number">1.</span> <span class="nav-text">零、背景 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一、本期开源项目 Meizhi-Android"><span class="nav-number">2.</span> <span class="nav-text">一、本期开源项目 Meizhi Android</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、原项目分析"><span class="nav-number">3.</span> <span class="nav-text">二、原项目分析 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-clone 项目到本地"><span class="nav-number">3.1.</span> <span class="nav-text">0. clone 项目到本地</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1- 添加 Stetho 抓包工具"><span class="nav-number">3.2.</span> <span class="nav-text">1. 添加 Stetho 抓包工具 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Retrofit 结构"><span class="nav-number">3.3.</span> <span class="nav-text">2. Retrofit 结构 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#i-GankApi：这个类用来定义相关的 http 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 Observable-lt-T-gt- 格式结果，方便 RxJava 进行进一步处理。"><span class="nav-number">3.3.0.1.</span> <span class="nav-text">i. GankApi：这个类用来定义相关的 http 接口，这是符合 retrofit 规范的定义形式，每一个 api 返回的为 Observable<T> 格式结果，方便 RxJava 进行进一步处理。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ii-DrakeetRetrofit：这个类用来对 Retrofit 进行相关配置并生成 GankApi 实例 gankApi"><span class="nav-number">3.3.0.2.</span> <span class="nav-text">ii. DrakeetRetrofit：这个类用来对 Retrofit 进行相关配置并生成 GankApi 实例gankApi</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#iii-DrakeetFactory：- 这个类用来对外生成单例 GankApi 实例，为确保 GankApi 实例只生成一次。"><span class="nav-number">3.3.0.3.</span> <span class="nav-text">iii. DrakeetFactory： 这个类用来对外生成单例 GankApi 实例，为确保 GankApi 实例只生成一次。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3- 首页的 RxJava 的实现"><span class="nav-number">3.4.</span> <span class="nav-text">3. 首页的 RxJava 的实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#i- 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object"><span class="nav-number">3.4.0.1.</span> <span class="nav-text">i. 在网络请求数据之前，我们要创建几个数据 entry 对象来将获取回来的 json 字符串转化为 object</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ii-zip- 将两个 retrofit 接口请求后得到的两个数据源 Observable-Observable 进行合并"><span class="nav-number">3.4.0.2.</span> <span class="nav-text">ii. zip: 将两个 retrofit 接口请求后得到的两个数据源 Observable  Observable进行合并 </span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#iii- 对 MeizhiWithVideo 对象进行排序。"><span class="nav-number">3.4.0.3.</span> <span class="nav-text">iii. 对 MeizhiWithVideo 对象进行排序。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#iv- 排序后，我们得到 Observable-lt-List-lt-MeizhiWithVideo-gt-gt- 数据源，传给 adapter 去更新 UI"><span class="nav-number">3.4.0.4.</span> <span class="nav-text">iv. 排序后，我们得到 Observable<List<MeizhiWithVideo>> 数据源，传给 adapter 去更新 UI</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4- 利用 Subscription 来管理异步处理与 Activity 生命周期"><span class="nav-number">3.5.</span> <span class="nav-text">4. 利用 Subscription 来管理异步处理与 Activity 生命周期 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、改进及总结"><span class="nav-number">4.</span> <span class="nav-text">三、改进及总结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

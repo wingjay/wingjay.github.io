@@ -1,0 +1,1011 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="在阅读《Effective Java》第3章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多Java程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 的 equals 与 hashcode 对比分析">
+<meta property="og:url" content="http://wingjay.com/2017/03/29/Java的equals与hashcode对比分析/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="在阅读《Effective Java》第3章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多Java程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 的 equals 与 hashcode 对比分析">
+<meta name="twitter:description" content="在阅读《Effective Java》第3章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多Java程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 的 equals 与 hashcode 对比分析 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 的 equals 与 hashcode 对比分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-subway"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-03-29T21:23:53+08:00" content="2017-03-29">
+              2017-03-29
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            1,922 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>在阅读《Effective Java》第 3 章里读到了关于 equals() 和 hashcode() 的一些介绍，这两个方法是很多 Java 程序员容易弄混的，因此本文针对这两个方法的用法和具体实现来做一些介绍。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="equals- 与 -hashcode- 的用处？"><a href="#equals- 与 -hashcode- 的用处？" class="headerlink" title="equals() 与 hashcode() 的用处？"></a>equals() 与 hashcode() 的用处？</h2><p>我们一般用 <code>equals()</code> 来比较两个对象的 <code> 逻辑意义 </code> 上的值是否相同。举个例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</div><div class="line">    String name;</div><div class="line">    <span class="keyword">int</span> age;</div><div class="line">    <span class="keyword">long</span> id;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们现在有两个 Person 的对象，person1 和 person2，那么什么时候这两个是相等的呢？对于两个人而言，我们认为如果他们俩名字、年龄和 ID 都完全一样，那么就是同一个人。也就是说，如果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">person1.name = person2.name</div><div class="line">person1.age = person2.age</div><div class="line">person1.id = person2.id</div></pre></td></tr></table></figure></p>
+<p>那么我们就认为 <code>person1.equals(person2)=true</code>。这就是表示 equals 是指二者逻辑意义上相等即可。</p>
+<p>而 hashcode() 则是对一个对象进行 hash 计算得到的一个散列值，它有以下特点：</p>
+<ol>
+<li>对象 x 和 y 的 hashcode 相同，不代表两个对象就相同(x.equals(y)=true)，可能存在 hash 碰撞；不过 hashcode 如果不相同，那么一定是两个不同的对象</li>
+<li>如果两个对象的 equals()相等，那么 hashcode 一定相等。<br>所以我们一般可以用 hashcode 来快速比较两个对象 <code> 互异</code>，因为如果<code>x.hashcode() != y.hashcode()</code>，那么<code>x.equals(y)=false</code>。</li>
+</ol>
+<h2 id="equals- 的特性"><a href="#equals- 的特性" class="headerlink" title="equals() 的特性"></a>equals() 的特性 </h2><p> 很多时候我们想要重写某个自定义 object 的 equals()方法，那么一定要记住，你的 equals()方法必须满足下面四个条件：</p>
+<ol>
+<li>自反性：对于非 null 的对象 x，必须有 <code>x.equals(x)=true</code>；</li>
+<li>对称性：如果 <code>x.equals(y)=true</code>，那么 <code>y.equals(x)</code> 必须也为<code>true</code>；</li>
+<li>传递性：如果 <code>x.equals(y)=true</code> 而且 <code>y.equals(z)=true</code>，那么<code>x.equals(z)</code> 必须为<code>true</code>；</li>
+<li>对于非 null 的对象 x，一定有<code>x.equals(null)=false</code></li>
+</ol>
+<h2 id="如何重载 -equals- 方法呢？"><a href="# 如何重载 -equals- 方法呢？" class="headerlink" title="如何重载 equals() 方法呢？"></a>如何重载 equals() 方法呢？</h2><p>一般而言，如果你要重载 equals() 方法，有下面一套模版代码可以参考：</p>
+<ol>
+<li>首先使用 <code>==</code> 来判断 <code> 两个对象是否引用相同</code>；</li>
+<li>使用 <code>instanceof</code> 来判断 <code> 两个对象是否类型相同</code>；</li>
+<li>如果类型相同，则把待比较参数转型；</li>
+<li>比较两个对象内部每个逻辑值是否相等，只有全部相等才返回 true，或者返回 false；</li>
+<li>测试这个方法是否能满足上面几个特性。</li>
+</ol>
+<h2 id="Java- 源码 -String- 里 -equals- 和 -hashcode- 实现"><a href="#Java- 源码 -String- 里 -equals- 和 -hashcode- 实现" class="headerlink" title="Java 源码 String 里 equals() 和 hashcode() 实现"></a>Java 源码 String 里 equals() 和 hashcode() 实现 </h2><p> 看完上面的特性和重载方法你可能有点头大，下面我们来看一下 Java 里的 String 是如何实现的吧，是否满足上面几个特性呢。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">public boolean equals(Object anObject) &#123;</div><div class="line">    if (this == anObject) &#123;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    if (anObject instanceof String) &#123;</div><div class="line">        String anotherString = (String)anObject;</div><div class="line">        int n = value.length;</div><div class="line">        if (n == anotherString.value.length) &#123;</div><div class="line">            char v1[] = value;</div><div class="line">            char v2[] = anotherString.value;</div><div class="line">            int i = 0;</div><div class="line">            while (n-- != 0) &#123;</div><div class="line">                if (v1[i] != v2[i])</div><div class="line">                    return false;</div><div class="line">                i++;</div><div class="line">            &#125;</div><div class="line">            return true;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以看到，上面的方法依次执行了下面的步骤：</p>
+<ol>
+<li>比较引用<code>this == anObject</code>；</li>
+<li>判断类型 <code>anObject instanceof String</code>；</li>
+<li>转型 <code>String anotherString = (String)anObject</code>；</li>
+<li>比较逻辑值 对 String 而言，首先要 <code>length</code> 相等 <code>n == anotherString.value.length</code>；然后要每一个字符相等，见代码，最后返回结果。</li>
+</ol>
+<p>下面我写了一段测试代码来验证是否符合上面几点特性：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private static void testStringEquals() &#123;</div><div class="line">    String x = &quot;First&quot;;</div><div class="line">    String y = &quot;First&quot;;</div><div class="line">    String z = new String(&quot;First&quot;);</div><div class="line">    System.out.println(x.equals(x));</div><div class="line">    System.out.println((x.equals(y) &amp;&amp; y.equals(x)));</div><div class="line">    if (x.equals(y) &amp;&amp; y.equals(x)) &#123;</div><div class="line">        System.out.println(x.equals(z));</div><div class="line">    &#125;</div><div class="line">    System.out.println(x.equals(null));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">true</div><div class="line">true</div><div class="line">true</div><div class="line">false</div></pre></td></tr></table></figure></p>
+<p>说明是符合的。</p>
+<p>然后我们再看下 hashcode() 的源代码实现，我们知道，hashcode 的含义是计算 hash 散列值，其实就是对一个对象快速计算一个散列值，用来 <code> 判异 </code> 使用：只要 hashcode() 不同，那么两个对象一定不同。下面我们看下 String 是如何计算自己的 hash 值的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span> value[]; <span class="comment">/** The value is used for character storage. */</span></div><div class="line"><span class="keyword">private</span> <span class="keyword">int</span> hash; <span class="comment">/** Cache the hash code for the string Default to 0 */</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> h = hash; </div><div class="line">    <span class="keyword">if</span> (h == <span class="number">0</span> &amp;&amp; value.length &gt; <span class="number">0</span>) &#123; </div><div class="line">        <span class="keyword">char</span> val[] = value;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; value.length; i++) &#123;</div><div class="line">            h = <span class="number">31</span> * h + val[i];</div><div class="line">        &#125;</div><div class="line">        hash = h;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> h;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中用来计算 hashcode 主要是这段代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">for (int i = 0; i &lt; value.length; i++) &#123;</div><div class="line">    h = 31 * h + val[i];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中，value 是内部存储 string 值的字符数组。计算 hashcode 的方法就是依次遍历每一个字符，乘以 31 后再加上下一个字符。例如”a”的 hashcode 就是 97；”aa”的 hashcode 是 <code>31*97+97</code>=3104。因此可以看出，<code>hashcode 不同的两个 String 对象一定不是同一个对象</code>。</p>
+<h2 id="谨记：重载 -equals- 时要保证：两个 equal 的对象一定有相同的 hashcode"><a href="# 谨记：重载 -equals- 时要保证：两个 equal 的对象一定有相同的 hashcode" class="headerlink" title="谨记：重载 equals() 时要保证：两个 equal 的对象一定有相同的 hashcode"></a>谨记：重载 equals() 时要保证：两个 equal 的对象一定有相同的 hashcode</h2><p>很多人在重载 equals() 时忽视了这一点，没有保证两个 equal 的对象具备相同的 hashcode，从而导致了奇怪的错误。</p>
+<p>下面举一个例子，我先只重载 <code>PhoneNumberWithoutHashcode</code> 的 equals() 方法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">class PhoneNumberWithoutHashcode &#123;</div><div class="line">    final short countryCode;</div><div class="line">    final short number;</div><div class="line">    public PhoneNumberWithoutHashcode(int countryCode, int number) &#123;</div><div class="line">        this.countryCode = (short) countryCode;</div><div class="line">        this.number = (short) number;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean equals(Object obj) &#123;</div><div class="line">        // 1. check == reference</div><div class="line">        if(obj == this) &#123;</div><div class="line">            return true;</div><div class="line">        &#125;</div><div class="line">        // 2. check obj instance</div><div class="line">        if (!(obj instanceof PhoneNumberWithoutHashcode))</div><div class="line">            return false;</div><div class="line"></div><div class="line">        // 3. compare logic value</div><div class="line">        PhoneNumberWithoutHashcode anObj = (PhoneNumberWithoutHashcode) obj;</div><div class="line">        return anObj.countryCode == this.countryCode </div><div class="line">                &amp;&amp; anObj.number == this.number;</div><div class="line">    &#125;        </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面我们来创建两个相同的对象，看看它们的 equals() hashcode() 返回值如何。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">private static void test() &#123;</div><div class="line">    PhoneNumberWithoutHashcode p1 = new PhoneNumberWithoutHashcode(86, 123123);</div><div class="line">    PhoneNumberWithoutHashcode p2 = new PhoneNumberWithoutHashcode(86, 123123);</div><div class="line">    System.out.println(&quot;p1.equals(p2)=&quot; + p1.equals(p2));</div><div class="line">    System.out.println(&quot;p1.hashcode()=&quot; + p1.hashCode());</div><div class="line">    System.out.println(&quot;p2.hashcode()=&quot; + p2.hashCode());    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>可以得到结果如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">p1.equals(p2)=true</div><div class="line">p1.hashcode()=1846274136</div><div class="line">p2.hashcode()=1639705018</div></pre></td></tr></table></figure></p>
+<p>可以看出，二者是 equals 的，但是 hashcode 不一样。这违背了 Java 准则，会导致什么结果呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</div><div class="line">    PhoneNumberWithoutHashcode p1 = <span class="keyword">new</span> PhoneNumberWithoutHashcode(<span class="number">86</span>, <span class="number">123123</span>);</div><div class="line">    PhoneNumberWithoutHashcode p2 = <span class="keyword">new</span> PhoneNumberWithoutHashcode(<span class="number">86</span>, <span class="number">123123</span>);</div><div class="line">    System.out.println(<span class="string">"p1.equals(p2)="</span> + p1.equals(p2));</div><div class="line">    </div><div class="line">    HashMap&lt;PhoneNumberWithoutHashcode, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">    map.put(p1, <span class="string">"TheValue"</span>);</div><div class="line">    System.out.println(<span class="string">"Result:"</span> + map.get(p2));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>读者觉得会打印什么呢？<code>Result: TheValue</code> 吗？我们来看下运行结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">p1.equals(p2)=true</div><div class="line">Result:  null</div></pre></td></tr></table></figure></p>
+<p>问题来了，p1 和 p2 是 equal 的，但是确不是同样的 key，至少对于 HashMap 而言，它们俩不是同一个 key，为什么呢？</p>
+<p>我们看一下 HashMap 是怎么 put 和 get 的吧。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">public V put(K key, V value) &#123;</div><div class="line">    return putVal(hash(key), key, value, false, true);</div><div class="line">&#125;</div><div class="line">public V get(Object key) &#123;</div><div class="line">    Node&lt;K,V&gt; e;</div><div class="line">    return (e = getNode(hash(key), key)) == null ? null : e.value;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从这段代码可以看到，p1 和 p2 被存储时就计算了一次 <code>hash(key)</code>，如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">static final int hash(Object key) &#123;</div><div class="line">    int h;</div><div class="line">    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其实就是调用了 <code>key.hashCode()</code> 方法，而我们知道虽然 <code>p1.equals(p2)=true</code>，但是<code>p1.hashCode() != p2.hashCode()</code>，因此 p1 和 p2 对 HashMap 而言压根就是两个 key，当然互相取不到对方的 value 了。</p>
+<p>那么要如何改进这个类呢？我们再来实现它的 hashcode 方法吧。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">class PhoneNumber &#123;</div><div class="line">    protected final short countryCode;</div><div class="line">    protected final short number;</div><div class="line"></div><div class="line">    public PhoneNumber(int countryCode, int number) &#123;</div><div class="line">        this.countryCode = (short) countryCode;</div><div class="line">        this.number = (short) number;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean equals(Object obj) &#123;</div><div class="line">        // 1. check == reference</div><div class="line">        if (this == obj)</div><div class="line">            return true;</div><div class="line"></div><div class="line">        // 2. check obj instance</div><div class="line">        if (!(obj instanceof PhoneNumber))</div><div class="line">            return false;</div><div class="line"></div><div class="line">        // 3. compare logic value</div><div class="line">        PhoneNumber target = (PhoneNumber) obj;</div><div class="line">        return target.number == this.number</div><div class="line">                &amp;&amp; target.countryCode == this.countryCode;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int hashCode() &#123;</div><div class="line">        return (31 * this.countryCode) + this.number;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这时我们的测试代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">private static void test() &#123;</div><div class="line">    PhoneNumber p1 = new PhoneNumber(86, 12);</div><div class="line">    PhoneNumber p2 = new PhoneNumber(86, 12);</div><div class="line">    System.out.println(&quot;p1.equals(p2)=&quot; + p1.equals(p2));</div><div class="line">    System.out.println(&quot;p1.hashcode()=&quot; + p1.hashCode());</div><div class="line">    System.out.println(&quot;p2.hashcode()=&quot; + p2.hashCode());</div><div class="line"></div><div class="line">    HashMap&lt;PhoneNumber, String&gt; map = new HashMap&lt;&gt;(2);</div><div class="line">    map.put(p1, &quot;TheValue&quot;);</div><div class="line">    System.out.println(&quot;Result: &quot; + map.get(p2));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">p1.equals(p2)=true</div><div class="line">p1.hashcode()=88076</div><div class="line">p2.hashcode()=88076</div><div class="line">Result: TheValue</div></pre></td></tr></table></figure></p>
+<p>说明重载 hashcode 后就能保证 <code>PhoneNumber</code> 在 <code>HashMap</code> 里正常运行了，毕竟像这种 HashMap HashSet 之类的都要基于对象的 hash 值。</p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 如果存在遗漏错误欢迎读者提出。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p>如果有问题，可以给我留言或发邮件<a href="&#109;&#97;&#105;&#108;&#116;&#x6f;&#58;&#121;&#x69;&#x6e;&#x6a;&#105;&#101;&#115;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#111;&#x6d;">&#121;&#x69;&#x6e;&#x6a;&#105;&#101;&#115;&#104;&#x40;&#x31;&#x32;&#x36;&#x2e;&#99;&#111;&#x6d;</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/03/Java-技术之注解-Annotation/">Java 技术之注解 Annotation</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/29/对未来个人技术博客的一些思考/" rel="next" title="对未来个人技术博客的一些思考">
+                <i class="fa fa-chevron-left"></i> 对未来个人技术博客的一些思考
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/09/Java里如何实现线程间通信？/" rel="prev" title="Java 里如何实现线程间通信？">
+                Java 里如何实现线程间通信？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/8')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/8/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#equals- 与 -hashcode- 的用处？"><span class="nav-number">1.</span> <span class="nav-text">equals() 与 hashcode() 的用处？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#equals- 的特性"><span class="nav-number">2.</span> <span class="nav-text">equals() 的特性 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何重载 -equals- 方法呢？"><span class="nav-number">3.</span> <span class="nav-text">如何重载 equals() 方法呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java- 源码 -String- 里 -equals- 和 -hashcode- 实现"><span class="nav-number">4.</span> <span class="nav-text">Java 源码 String 里 equals() 和 hashcode() 实现 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#谨记：重载 -equals- 时要保证：两个 equal 的对象一定有相同的 hashcode"><span class="nav-number">5.</span> <span class="nav-text">谨记：重载 equals() 时要保证：两个 equal 的对象一定有相同的 hashcode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

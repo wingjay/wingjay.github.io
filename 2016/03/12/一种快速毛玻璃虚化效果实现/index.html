@@ -1,0 +1,1069 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="在 Android 上也能实现毛玻璃效果？性能如何？">
+<meta name="keywords" content="Android">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种快速毛玻璃虚化效果实现">
+<meta property="og:url" content="http://wingjay.com/2016/03/12/一种快速毛玻璃虚化效果实现/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="在 Android 上也能实现毛玻璃效果？性能如何？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/iosblur.jpg">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/androidblur_1.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/androidblur_2.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/fastblur_10.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/fastblur_20.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/fastblur_35.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/fastblur_50.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/fastblur_100.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/timeconsume_statisic.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_1.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_10.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_20.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_50.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_100.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/memory_300.png">
+<meta property="og:image" content="http://wingjay.com/img/fastblur/test_pic.jpeg">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.482Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一种快速毛玻璃虚化效果实现">
+<meta name="twitter:description" content="在 Android 上也能实现毛玻璃效果？性能如何？">
+<meta name="twitter:image" content="http://wingjay.com/img/fastblur/iosblur.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 一种快速毛玻璃虚化效果实现 | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一种快速毛玻璃虚化效果实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-motorcycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2016-03-12T09:30:50+08:00" content="2016-03-12">
+              2016-03-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/Performance/" itemprop="url" rel="index">
+                    <span itemprop="name">Performance</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            1,596 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>在 Android 上也能实现毛玻璃效果？性能如何？</p>
+</blockquote>
+<a id="more"></a>
+<p><img src="http://wingjay.com/img/fastblur/iosblur.jpg" width="300"></p>
+<p>在 iOS 设备上我们随处可见毛玻璃效果，而且最近越来越多的场合应用到了这种美观的虚化效果，包括本人的一个开源项目 <a href="https://github.com/wingjay/BlurImageView" target="_blank" rel="external">BlureImageView</a> 也是受此启发。所以，恰到好处的虚化效果能很好的改善用户体验，而且也能让你的 app 显得更加优雅。</p>
+<p>不过，我们目前在 android 上很少见到毛玻璃效果，我认为很重要的原因是性能问题，虚化一张图片所需要的时间会因设备而异，如果为了虚化使得用户需要刻意等待，那么就是弊大于利。另外，Google 官方提供的 renderScript 一般只是做一些小幅度的虚化，很难达到毛玻璃这类深度虚化效果。</p>
+<p>所以本文的角度是能够在 android 设备上快速实现毛玻璃效果。</p>
+<p><img src="/img/fastblur/androidblur_1.png" alt="blur1"><br><img src="/img/fastblur/androidblur_2.png" alt="blur2"></p>
+<h3 id="StackBlur"><a href="#StackBlur" class="headerlink" title="StackBlur"></a>StackBlur</h3><p>首先，为了实现毛玻璃效果，本文采用的是 <a href="http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html" target="_blank" rel="external"><code>StackBlur</code> 模糊算法</a>，这种算法应用非常广泛，能得到非常良好的毛玻璃效果。在这里，我们使用的是它的 Java 实现代码<a href="https://github.com/wingjay/BlurImageView/blob/master/blurimageviewlib/src/main/java/com/wingjay/blurimageviewlib/FastBlurUtil.java" target="_blank" rel="external">FastBlur.java</a>。</p>
+<pre><code>public static Bitmap doBlur(Bitmap sentBitmap, int radius, boolean canReuseInBitmap)
+</code></pre><p>可以看出，使用方法非常简单，传入待虚化的 bitmap、虚化程序(一般为 8)、和是否重用 flag。</p>
+<p>然后，如果要对上面这张图片进行虚化，我们可以通过把它转化成 bitmap 传入虚化，看起来很简单就解决了，但事实并非如此。</p>
+<h3 id="OOM"><a href="#OOM" class="headerlink" title="OOM"></a>OOM</h3><p>如果直接把一张大图传入，很容易就会发生 OOM 内存溢出</p>
+<pre><code>03-11 21:02:02.014 16727-16742/com.wingjay.jayandroid I/art: Clamp target GC heap from 109MB to 96MB
+03-11 21:02:02.026 16727-16727/com.wingjay.jayandroid I/art: Clamp target GC heap from 109MB to 96MB
+03-11 21:02:02.030 16727-16727/com.wingjay.jayandroid I/art: Clamp target GC heap from 109MB to 96MB
+03-11 21:02:02.031 16727-16727/com.wingjay.jayandroid I/art: Forcing collection of SoftReferences for 30MB allocation
+03-11 21:02:02.035 16727-16727/com.wingjay.jayandroid I/art: Clamp target GC heap from 109MB to 96MB
+03-11 21:02:02.036 16727-16727/com.wingjay.jayandroid E/art: Throwing OutOfMemoryError &quot;Failed to allocate a 32175012 byte allocation with 2648672 free bytes and 2MB until OOM&quot;
+03-11 21:02:02.036 16727-16727/com.wingjay.jayandroid D/AndroidRuntime: Shutting down VM
+</code></pre><p>这是我直接对原图进行虚化得到的 log 信息。可以看出当虚化开始时，虚拟机开始不断进行内存回收，包括把所有软引用的内存回收。然而，仍然导致了内存溢出。</p>
+<p>那就意味着我只能虚化小图，这样才能防止内存溢出。但是我并不想换其他图，那么，我们就应该把这张图 <code> 缩放</code>。</p>
+<h3 id="ReScale"><a href="#ReScale" class="headerlink" title="ReScale"></a>ReScale</h3><pre><code>public static Bitmap createScaledBitmap(Bitmap src, int dstWidth, int dstHeight, boolean filter) {}
+</code></pre><p>我们可以利用这个 function 来进行 bitmap 的缩放。其中前三个参数很明显，其中宽高我们可以选择为原图尺寸的 1/10；第四个 filter 是指缩放的效果，filter 为 true 则会得到一个边缘平滑的 bitmap，反之，则会得到边缘锯齿、pixelrelated 的 bitmap。这里我们要对缩放的图片进行虚化，所以无所谓边缘效果，<code>filter=false</code>。</p>
+<p>所以，我们要使用</p>
+<pre><code>int scaleRatio = 10;
+int blurRadius = 8;
+Bitmap scaledBitmap = Bitmap.createScaledBitmap(originBitmap,
+    originBitmap.getWidth() / scaleRatio,
+    originBitmap.getHeight() / scaleRatio,
+    false);
+Bitmap blurBitmap = FastBlur.doBlur(scaledBitmap, blurRadius, true);
+imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+imageView.setImageBitmap(blurBitmap);
+</code></pre><p>可以得到如下效果:<br><img src="/img/fastblur/fastblur_10.png" alt="scaleRatio_10"></p>
+<p>从图中可以看出，首先可以确定思路是对的；然后，可以看出毛玻璃效果还不是特别的明显。为了得到如 iOS 那样的虚化效果，我们有两种方法：</p>
+<ul>
+<li>增大 scaleRatio 缩放比，使用一样更小的 bitmap 去虚化可以得到更好的模糊效果，而且有利于占用内存的减小；</li>
+<li>增大 blurRadius，可以得到更高程度的虚化，不过会导致 CPU 更加 intensive</li>
+</ul>
+<p>这里本人通过 <code> 增大缩放比 </code> 来实验。</p>
+<ul>
+<li>scaleRatio = 20<br><img src="/img/fastblur/fastblur_20.png" alt="scaleRatio_20"></li>
+<li>scaleRatio = 35<br><img src="/img/fastblur/fastblur_35.png" alt="scaleRatio_35"></li>
+<li>scaleRatio = 50<br><img src="/img/fastblur/fastblur_50.png" alt="scaleRatio_50"></li>
+<li>scaleRatio = 100<br><img src="/img/fastblur/fastblur_100.png" alt="scaleRatio_100"></li>
+</ul>
+<p>通过上面对比图我们可以找出最适合自己的虚化效果。</p>
+<h3 id="Performance-analysis"><a href="#Performance-analysis" class="headerlink" title="Performance analysis"></a>Performance analysis</h3><p>那么，要实现这样的效果，是否具有损害用户体验的风险呢？下面，我们从 <code> 消耗时间 </code> 和<code>占据内存 </code> 的角度来进行分析。</p>
+<h4 id="Time-Consuming"><a href="#Time-Consuming" class="headerlink" title="Time Consuming"></a>Time Consuming</h4><p>为了分析虚化一张图片所消耗的时间，本文通过同时虚化 <code>100</code> 来获取平均消耗时间。以期对虚化耗时和不同缩放比对耗时的影响得到一定的认识。</p>
+<pre><code>long start = System.currentTimeMillis();
+Bitmap scaledBitmap, blurBitmap;
+int scaleRatio = 10;
+int loopCount = 100
+for (int i=0; i&lt;loopCount; i++) {
+  scaledBitmap = Bitmap.createScaledBitmap(originBitmap,
+      originBitmap.getWidth() / scaleRatio,
+      originBitmap.getHeight() / scaleRatio,
+      false);
+  blurBitmap = FastBlur.doBlur(scaledBitmap, 8, true);
+}
+Log.i(&quot;blurtime&quot;, String.valueOf(System.currentTimeMillis() - start));
+</code></pre><ul>
+<li>scaleRatio = 10: 耗时<code>887ms</code>，平均耗时<code>8.87ms</code>;</li>
+<li>scaleRatio = 20: 耗时<code>224ms</code>，平均耗时<code>2.24ms</code>;</li>
+<li>scaleRatio = 35: 耗时<code>99ms</code>，平均耗时<code>0.99ms</code>;</li>
+<li>scaleRatio = 50: 耗时<code>55ms</code>，平均耗时<code>0.55ms</code>;</li>
+<li>scaleRatio = 100: 耗时<code>29ms</code>，平均耗时<code>0.29ms</code>;</li>
+</ul>
+<p>为了方便读者了解效果，我通过多组数据拟合了下面的曲线：<br><img src="/img/fastblur/timeconsume_statisic.png" alt=""></p>
+<p>从该模拟图可以看出时间随着缩放比的增大而不断减小，当缩放比达到 30 以上时所消耗的时间不到 1ms，因此，我认为应该是完全不会产生时延破坏用户体验的。</p>
+<h4 id="Memory-Consuming"><a href="#Memory-Consuming" class="headerlink" title="Memory Consuming"></a>Memory Consuming</h4><p>既然时间没问题，那么，主要问题：内存占用就来了，所以我们需要考察生成一张虚化图片所占用的内存。</p>
+<p>为了测试对一张图片进行虚化所占用内存的变化，我们改变虚化次数，即修改上面的 <code>loopCount</code> 并观察对内存的变化。其中 scaleRatio = 10，以获得相对较大的内存消耗。</p>
+<ul>
+<li>loopCount = 1<br><img src="/img/fastblur/memory_1.png" alt=""></li>
+<li>loopCount = 10<br><img src="/img/fastblur/memory_10.png" alt=""></li>
+<li>loopCount = 20<br><img src="/img/fastblur/memory_20.png" alt=""></li>
+<li>loopCount = 50<br><img src="/img/fastblur/memory_50.png" alt=""></li>
+<li>loopCount = 100<br><img src="/img/fastblur/memory_100.png" alt=""></li>
+<li>loopCount = 300<br><img src="/img/fastblur/memory_300.png" alt=""></li>
+</ul>
+<p>从上面的内存消耗图，可以看出虚化的确会占用一定内存，如果大量的虚化同时发生，则会由于 UI 线程突然加载很多 bitmap 而导致内存抖动。</p>
+<h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>希望大家如果有其他测试方法或者意见多多留言，从而继续改进性能。</p>
+<p>附上本文所采用的<img src="/img/fastblur/test_pic.jpeg" alt="测试图"></p>
+<p>谢谢！</p>
+<p>wingjay</p>
+<p>欢迎各位关注 <br><a href="https://github.com/wingjay" target="_blank" rel="external"> 我的 Github</a>: <a href="https://github.com/wingjay" target="_blank" rel="external">https://github.com/wingjay</a><br>和 <br><a href="http://wingjay.com"> 我的个人博客 </a>: <a href="http://wingjay.com">http://wingjay.com</a><br> 和<br><a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">我的简书 </a>: <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank" rel="external">http://www.jianshu.com/users/da333fd63fe5/latest_articles</a><br> 和<br><a href="http://weibo.com/u/1625892654" target="_blank" rel="external">微博 iam_wingjay</a>: <a href="http://weibo.com/u/1625892654" target="_blank" rel="external">http://weibo.com/u/1625892654</a><br>如果有问题，可以给我留言或发邮件<a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x79;&#105;&#110;&#106;&#x69;&#x65;&#x73;&#x68;&#64;&#49;&#50;&#54;&#46;&#x63;&#111;&#x6d;">&#x79;&#105;&#110;&#106;&#x69;&#x65;&#x73;&#x68;&#64;&#49;&#50;&#54;&#46;&#x63;&#111;&#x6d;</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/20/计划清单/" rel="next" title="计划清单">
+                <i class="fa fa-chevron-left"></i> 计划清单
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/15/30条Android开发建议/" rel="prev" title="30 条 Android 开发建议">
+                30 条 Android 开发建议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/18')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/18/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#StackBlur"><span class="nav-number">1.</span> <span class="nav-text">StackBlur</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OOM"><span class="nav-number">2.</span> <span class="nav-text">OOM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ReScale"><span class="nav-number">3.</span> <span class="nav-text">ReScale</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Performance-analysis"><span class="nav-number">4.</span> <span class="nav-text">Performance analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Time-Consuming"><span class="nav-number">4.1.</span> <span class="nav-text">Time Consuming</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Memory-Consuming"><span class="nav-number">4.2.</span> <span class="nav-text">Memory Consuming</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Conclusion"><span class="nav-number">4.3.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

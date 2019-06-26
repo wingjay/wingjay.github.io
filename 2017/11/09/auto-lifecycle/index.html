@@ -1,0 +1,1017 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android,Java,Lifecycle," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="背景在 Android 开发中，我们都很熟悉 Activity 的 Lifecycle，并且会在特定的 Lifecycle 下执行特定的操作。当然，我们清楚 Lifecycle 本身是带有 Android 特质的，那尝试设想下，如果普通的 Java Class 也能自动感知  Lifecycle 呢？咋一听这个想法似乎背后意义不大，但在实际探索中，我们发现这个特性能为我们达成一些之前未考虑到或者不">
+<meta name="keywords" content="Android,Java,Lifecycle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让普通 Java 类自动感知 Activity Lifecycle">
+<meta property="og:url" content="http://wingjay.com/2017/11/09/auto-lifecycle/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="背景在 Android 开发中，我们都很熟悉 Activity 的 Lifecycle，并且会在特定的 Lifecycle 下执行特定的操作。当然，我们清楚 Lifecycle 本身是带有 Android 特质的，那尝试设想下，如果普通的 Java Class 也能自动感知  Lifecycle 呢？咋一听这个想法似乎背后意义不大，但在实际探索中，我们发现这个特性能为我们达成一些之前未考虑到或者不">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-dbf719e2d9a88946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-3d050c819f7c158e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-3c00d59f5cacebcc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-2deba2e78165c91a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-f7c747443273ebe4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-0f2d95662cd053f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/281665-3de275bde3f6a0a1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.488Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="让普通 Java 类自动感知 Activity Lifecycle">
+<meta name="twitter:description" content="背景在 Android 开发中，我们都很熟悉 Activity 的 Lifecycle，并且会在特定的 Lifecycle 下执行特定的操作。当然，我们清楚 Lifecycle 本身是带有 Android 特质的，那尝试设想下，如果普通的 Java Class 也能自动感知  Lifecycle 呢？咋一听这个想法似乎背后意义不大，但在实际探索中，我们发现这个特性能为我们达成一些之前未考虑到或者不">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/281665-dbf719e2d9a88946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> 让普通 Java 类自动感知 Activity Lifecycle | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                让普通 Java 类自动感知 Activity Lifecycle
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-bicycle"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-11-09T23:00:02+08:00" content="2017-11-09">
+              2017-11-09
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,046 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="背景"><a href="# 背景" class="headerlink" title="背景"></a>背景 </h2><p> 在 Android 开发中，我们都很熟悉 Activity 的 Lifecycle，并且会在特定的 Lifecycle 下执行特定的操作。当然，我们清楚 Lifecycle 本身是带有 Android 特质的，那尝试设想下，如果 <code> 普通的 Java Class 也能自动感知
+ Lifecycle 呢</code>？咋一听这个想法似乎背后意义不大，但在实际探索中，我们发现这个特性能为我们达成一些之前未考虑到或者不易实现的优化。</p>
+<p>本文分享下我们基于这个思想所开发的框架：<code>AutoLifecycle</code> 及其带来的一些有意思的实践。</p>
+<a id="more"></a>
+<ul>
+<li>优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回</li>
+<li>优化二：自动将网络请求时机提前到 View 渲染之前，提高页面打开速度</li>
+<li>优化三：MVP 改进，让 Presenter 和 View 自动 bind/unBind</li>
+</ul>
+<p>注：下文提到的 <code>Lifecycle-Aware</code> 就是这里指代的 <code> 让普通 Java Class 自动获取 Lifecycle</code>。</p>
+<h2 id="实践及优化"><a href="# 实践及优化" class="headerlink" title="实践及优化"></a>实践及优化 </h2><h3 id="优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回"><a href="# 优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回" class="headerlink" title="优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回"></a> 优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回 </h3><p> 在网络请求时，相信大家都有一个经验：在每个网络结果回来时，我们做的第一件事不是显示数据，而是写个 if-else 判断 Activity 还在不在。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">mTopApiObservable</div><div class="line">  ...</div><div class="line">  .subscribe(<span class="keyword">new</span> Subscriber&lt;Object&gt;() &#123;</div><div class="line">	  <span class="meta">@Override</span></div><div class="line">	  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(Object data)</span> </span>&#123;</div><div class="line">	  	<span class="keyword">if</span>(activity == <span class="keyword">null</span>) &#123;</div><div class="line">			<span class="keyword">return</span>; <span class="comment">// 判断 Activity 是否还在，不在就不去显示数据</span></div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		display(data); <span class="comment">// 显示数据</span></div><div class="line">	  &#125;</div><div class="line">	  ...</div><div class="line">  &#125;);</div></pre></td></tr></table></figure></p>
+<p>由于网络请求都是异步的，所以不得不做这样的判断，来防止不可预测的空指针问题或内存泄漏问题。</p>
+<p>既然你总是担心 <code>Activity</code> 还在不在，那么如果我们通过 <code>Lifecycle-Aware 让每个网络请求能自动感知 Activity 的 onDestroy 事件</code>，<br> 并在 <code>onDestroy</code> 时，自动把网络请求结果 <code> 取消掉不再返回</code>，那就能够消除这个担忧了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">mTopApiObservable</div><div class="line">  ...</div><div class="line">  .compose(bindUntilEvent(ActivityLifecycle.DESTROY)) <span class="comment">// 绑定 Activity 的 onDestroy 事件</span></div><div class="line">  .subscribe(<span class="keyword">new</span> Subscriber&lt;Object&gt;() &#123;</div><div class="line">	  <span class="meta">@Override</span></div><div class="line">	  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(Object data)</span> </span>&#123;</div><div class="line">		display(data); <span class="comment">// 直接去显示数据</span></div><div class="line">	  &#125;</div><div class="line">	  ...</div><div class="line">  &#125;);</div></pre></td></tr></table></figure></p>
+<p>其中最关键的就是 <code>compose(bindUntilEvent(ActivityLifecycle.DESTROY))</code> 这句，它能达到的效果是：一旦 <code>Activity</code> 发生 <code>onDestroy</code> 时，<code>Observer</code>的数据就会停止向 <code>Subscriber</code> 里流动。从而保证 <code>onNext</code> 无需担心 <code>Activity</code> 已<code>Destroy</code>这种情况。</p>
+<p><strong>在上面网络请求的实践里，你还可以根据自己的情况把 <code>Destroy</code> 换成 <code>Stop</code>/<code>Pause</code> 等，而且可以看出，这种自动取消机制可适用于任何<code>Observable</code>，不仅仅是网络请求。</strong></p>
+<h3 id="优化二：自动将网络请求提前到 View-Inflate 之前，加速页面渲染"><a href="# 优化二：自动将网络请求提前到 View-Inflate 之前，加速页面渲染" class="headerlink" title="优化二：自动将网络请求提前到 View Inflate 之前，加速页面渲染"></a>优化二：自动将网络请求提前到 View Inflate 之前，加速页面渲染 </h3><p> 先说下这项优化的原理。<br>通常，我们会在 <code>Activity</code> 的<code>onCreate</code>里依次执行下面的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">    setContentView(R.layout.XXX);   <span class="comment">// Inflate View</span></div><div class="line">    findViewByIds();                <span class="comment">// 初始化 View</span></div><div class="line">    presenter.loadDataFromServer(); <span class="comment">// 发起网络请求</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>即在 <code>Inflate View</code> 和<code>初始化 View</code>之后，才发起网络请求去加载数据。</p>
+<p>而实际上，网络请求是不占用主线程的，如果能在 <code>Inflate View</code> 之前就在其他线程发起网络请求，可以把整个页面显示耗时缩短<code>100ms-200ms</code>。</p>
+<blockquote>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-dbf719e2d9a88946.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="LoadBeforeInflate 优化效果"></p>
+</blockquote>
+<p>现在有了 <code>AutoLifecycle</code> 框架，我们就可以很轻松实现：让 Presenter 自动监听 <code>Inflate View</code> 这个生命周期，在那时发起网络请求即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewPresenter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NewPresenter</span><span class="params">(IView iView)</span> </span>&#123;</div><div class="line">        ...</div><div class="line">		<span class="comment">// 向 AutoLifecycle 注册</span></div><div class="line">        AutoLifecycle.getInstance().init(<span class="keyword">this</span>); </div><div class="line">    &#125;</div><div class="line"></div><div class="line">	<span class="comment">// 当 Activity Inflate View 前自动回调</span></div><div class="line">    <span class="meta">@AutoLifecycleEvent</span>(activity = ActivityLifecycle.PRE_INFLATE)</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onHostPreInflate</span><span class="params">()</span> </span>&#123;</div><div class="line">         loadDataFromServer(); <span class="comment">// 发起网络请求</span></div><div class="line">    &#125;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此时，我们的 Activity 也不用手动调用 <code>presenter.loadDataFromServer();</code> 了，因为 Presenter 内会在感知到 <code>Inflate View</code> 事件时自动发起网络请求。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">    setContentView(R.layout.XXX);</div><div class="line">    findViewByIds();</div><div class="line">    <span class="comment">// 无需手动启动网络请求</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>经过测试，在保证单个网络请求耗时相同的情况下，页面从 <code>onCreate</code> 到<code>显示数据 </code> 的渲染耗时可以从 <code>550ms</code> 缩短到 <code>367ms</code>，也就是<code>30%-40%</code> 的优化，效果是非常不错的，而且代码也更加简洁清晰。</p>
+<blockquote>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-3d050c819f7c158e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+</blockquote>
+<p>通过简单的注册 <code>AutoLifecycle</code>，<code>Presenter</code> 能够自动感知到所有<code>Lifecycle</code>，甚至包括自定义的特殊<code>Lifecycle</code>，如下图：<br><img src="http://upload-images.jianshu.io/upload_images/281665-3c00d59f5cacebcc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="LifecycleAwarePresenter"></p>
+<h3 id="优化三：MVP 改进，让 Presenter 和 View 自动 bind-unBind"><a href="# 优化三：MVP 改进，让 Presenter 和 View 自动 bind-unBind" class="headerlink" title="优化三：MVP 改进，让 Presenter 和 View 自动 bind/unBind"></a>优化三：MVP 改进，让 Presenter 和 View 自动 bind/unBind</h3><p>第一项优化比较直接，可以先让大家形成一个直观印象。<br>我们项目是采用 MVP 项目，对于 <code>Presenter</code> 的使用存在一段固定代码，即在 <code>onCreate</code> 时调用 <code>bindView()</code>，在<code>onDestroy</code> 时调用<code>unBindView()</code>。如下图：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OldActivity</span> <span class="keyword">extends</span> <span class="title">BaseActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    BasePresenter mPresenter = <span class="keyword">new</span> BasePresenter();</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">		mPresenter.bindView(<span class="keyword">this</span>); <span class="comment">// onCreate 时手动 bind Presenter 和 IView</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        mPresenter.unbindView(); <span class="comment">// onDestroy 时手动 unBindView</span></div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>那么，既然我们现在能 <code> 让一个普通类自动感知 Lifecycle</code>，那其实也就能让 <code>Presenter</code> 在感知到 <code>onCreate</code> 时<code>自动 bindView</code>，在感知到 <code>onDestroy</code> 时<code>自动 unBindView</code>。<br>改进后的代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewActivity</span> <span class="keyword">extends</span> <span class="title">BaseActivity</span> </span>&#123;</div><div class="line"></div><div class="line">    NewPresenter mPresenter;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</div><div class="line">        mPresenter = <span class="keyword">new</span> NewPresenter(<span class="keyword">this</span>); <span class="comment">// 只需要创建即可</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NewPresenter</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> IView mIView;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NewPresenter</span><span class="params">(IView iView)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.mIView = iView;</div><div class="line">		<span class="comment">// 向 AutoLifecycle 注册即可获得 Lifecycle 回调</span></div><div class="line">        AutoLifecycle.getInstance().init(<span class="keyword">this</span>); </div><div class="line">    &#125;</div><div class="line"></div><div class="line">	<span class="comment">// 当 Activity 进入 onCreate 后自动调用</span></div><div class="line">    <span class="meta">@AutoLifecycleEvent</span>(activity = ActivityLifecycle.CREATE)</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onHostCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        bindView(mIView); </div><div class="line">    &#125;</div><div class="line"></div><div class="line">	<span class="comment">// 当 Activity 进入 onDestroy 后自动调用</span></div><div class="line">    <span class="meta">@AutoLifecycleEvent</span>(activity = ActivityLifecycle.DESTROY)</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onHostDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        unBindView();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其实，在大家的平常开发中，还会存在许多类似 <code>Presenter</code> 的类：<code>需要在某个特定的 Lifecycle 下执行一些动作 </code>。这时就可以基于<code>Lifecycle-Aware</code> 来让这个普通类自动去执行，而不是去每个 <code>Activity/Fragment</code> 里写一遍，提高类的内聚性。</p>
+<h2 id="AutoLifecycle 的核心原理"><a href="#AutoLifecycle 的核心原理" class="headerlink" title="AutoLifecycle 的核心原理"></a>AutoLifecycle 的核心原理 </h2><p>(TL;DR)<br> 下面介绍下 <code>AutoLifecycle</code> 的关键实现部分，感兴趣的读者可以参考。</p>
+<h3 id="1- 让 Activity 对外发送 Lifecycle 事件"><a href="#1- 让 Activity 对外发送 Lifecycle 事件" class="headerlink" title="1. 让 Activity 对外发送 Lifecycle 事件"></a>1. 让 Activity 对外发送 Lifecycle 事件 </h3><p> 使用过 <code>RxJava</code> 的同学知道里面有一个 <a href="http://reactivex.io/RxJava/javadoc/rx/subjects/PublishSubject.html" target="_blank" rel="external"><code>PublishSubject</code></a>，基于观察者模式，主动发送并接受消息。这里我们用<code>PublishSubject</code> 来发送 Lifecycle 事件。见如下：<br><img src="http://upload-images.jianshu.io/upload_images/281665-2deba2e78165c91a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p><strong>这里的 Lifecycle 事件可以自己定义，比如前面提到的 <code>PRE_INFLATE</code> 事件，是在 setContentView 之前发送</strong>，类似：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/281665-f7c747443273ebe4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<h3 id="2- 感知某个 Lifecycle 的发生并自动执行回调"><a href="#2- 感知某个 Lifecycle 的发生并自动执行回调" class="headerlink" title="2. 感知某个 Lifecycle 的发生并自动执行回调"></a>2. 感知某个 Lifecycle 的发生并自动执行回调 </h3><p> 上面提了，<code>PublishSubject</code>不仅能发送消息，还能接受自己的消息。基于这个特点，我们便可以监听每一个 LifecycleEvent。如下图：<br><img src="http://upload-images.jianshu.io/upload_images/281665-0f2d95662cd053f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>这里的参数 Observable 是我们希望被回调的函数，IContextLifecycle 是指定的 Lifecycle。即当指定的 Lifecycle Event 发生时，会自动 subscribe 提供的 Observable。</p>
+<p>基于这个功能，便可以实现上面场景一和场景二里的 <code>@AutoLifecycleEvent</code> 注解了，即把 <code>@AutoLifecycleEvent</code> 标注的函数包装成一个 Observable，通过这个 <code>executeOn</code> 来注册函数的执行生命周期即可。</p>
+<h3 id="3- 监听 Lifecycle 并取消网络请求结果"><a href="#3- 监听 Lifecycle 并取消网络请求结果" class="headerlink" title="3. 监听 Lifecycle 并取消网络请求结果"></a>3. 监听 Lifecycle 并取消网络请求结果 </h3><p> 在场景三里，我们为网络请求的 <code>Observable</code> 提供了一个 <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.Transformer.html" target="_blank" rel="external"><code>Transformer</code></a>，它能在监听到某个 Lifecycle 发生时，停止数据流的向下流动。该<code>Transformer</code> 的核心实现是：<br><img src="http://upload-images.jianshu.io/upload_images/281665-3de275bde3f6a0a1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""><br>可以看出，当指定的 Lifecycle 一旦发生，我们网络请求 Observable 就会停止向下传递数据。</p>
+<h3 id="4- 支持自定义 Lifecycle，支持 Activity-Fragment-DialogFrament 等"><a href="#4- 支持自定义 Lifecycle，支持 Activity-Fragment-DialogFrament 等" class="headerlink" title="4. 支持自定义 Lifecycle，支持 Activity/Fragment/DialogFrament 等"></a>4. 支持自定义 Lifecycle，支持 Activity/Fragment/DialogFrament 等 </h3><p> 可以看出，<code>AutoLifecycle</code>除了支持常规的生命周期，还能支持自定义的特殊生命周期，比如 View Inflate 前。</p>
+<p>另外，上面都是以 Activity 为例，不过显然这套框架可以灵活扩展，不局限于 Activity，还能适用于 Fragment、DialogFrament 等。</p>
+<h2 id="源码"><a href="# 源码" class="headerlink" title="源码"></a>源码 </h2><p> 对源码感兴趣的欢迎进入我的【小专栏 <a href="https://xiaozhuanlan.com/wingjay】或者" target="_blank" rel="external">https://xiaozhuanlan.com/wingjay】或者</a> 【付费群 <a href="http://www.jianshu.com/p/655af849aaf6】" target="_blank" rel="external">http://www.jianshu.com/p/655af849aaf6】</a></p>
+<h2 id="总结"><a href="# 总结" class="headerlink" title="总结"></a>总结 </h2><p><code>Lifecycle-Aware</code> 思想是 Google 官方提出来的概念：赋予普通类自动感知生命周期的能力。而本文也是基于这个思想，提供了一些具体实践和优化的思路，读者同学可以根据自己的情况做更多的改进和尝试。</p>
+<p>——————<br>wingjay<br>谢谢。</p>
+<blockquote>
+<p>欢迎加入【阿里求职付费群】：</p>
+<ol>
+<li>及时推送集团内最新岗位空缺信息</li>
+<li>定期分享针对阿里的最新 Android 面试题及相关面试经验</li>
+<li>长期提供阿里集团内各岗位的内推。<br>详情：<a href="http://www.jianshu.com/p/655af849aaf6" target="_blank" rel="external">http://www.jianshu.com/p/655af849aaf6</a></li>
+</ol>
+</blockquote>
+<h2 id="参考"><a href="# 参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://developer.android.com/topic/libraries/architecture/lifecycle.html" target="_blank" rel="external">https://developer.android.com/topic/libraries/architecture/lifecycle.html</a><br><a href="https://www.atatech.org/articles/63098" target="_blank" rel="external">https://www.atatech.org/articles/63098</a><br><a href="https://github.com/trello/RxLifecycle" target="_blank" rel="external">https://github.com/trello/RxLifecycle</a><br><a href="http://reactivex.io/RxJava/javadoc/rx/subjects/PublishSubject.html" target="_blank" rel="external">http://reactivex.io/RxJava/javadoc/rx/subjects/PublishSubject.html</a><br><a href="http://reactivex.io/RxJava/javadoc/rx/Observable.Transformer.html" target="_blank" rel="external">http://reactivex.io/RxJava/javadoc/rx/Observable.Transformer.html</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag">#Android</a>
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+            <a href="/tags/Lifecycle/" rel="tag">#Lifecycle</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2016/07/21/带你学开源项目：OkHttp-自己动手实现okhttp/">带你学开源项目：OkHttp-- 自己动手实现 okhttp</a></li><li><a href="/2016/03/12/一种快速毛玻璃虚化效果实现/">一种快速毛玻璃虚化效果实现</a></li><li><a href="/2019/01/16/mobile-network-connection/">Android 架构之高可用移动网络连接</a></li><li><a href="/2016/07/14/RxLifecycle源码解析－当Activity被destory时自动暂停网络请求/">RxLifecycle 源码解析－当 Activity 被 destory 时自动停掉网络请求</a></li><li><a href="/2018/11/26/《亿级-Android-架构》专栏随谈/">《亿级 Android 架构》专栏随谈</a></li><li><a href="/2016/04/13/带你学开源项目：Meizhi-Android之RxJava-Retrofit最佳实践/">带你学开源项目：Meizhi Android 之 RxJava & Retrofit 最佳实践</a></li><li><a href="/2016/08/30/谈谈移动应用的安全性实践/">谈谈移动应用的安全性实践</a></li><li><a href="/2018/12/05/android-arch-long-link/">Android 架构之长连接技术</a></li><li><a href="/2017/05/14/dig_into_leakcanary/">带你学开源项目：LeakCanary- 如何检测 Activity 是否泄漏</a></li><li><a href="/2016/03/15/30条Android开发建议/">30 条 Android 开发建议</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/18/new_start_hangzhou/" rel="next" title="新的城市，新的开始">
+                <i class="fa fa-chevron-left"></i> 新的城市，新的开始
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/26/hey-2018/" rel="prev" title="Hey 2018，Farewell 2017">
+                Hey 2018，Farewell 2017 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/23')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/23/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实践及优化"><span class="nav-number">2.</span> <span class="nav-text">实践及优化 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回"><span class="nav-number">2.1.</span> <span class="nav-text"> 优化一：当 Activity 进入 onDestroy 时，自动取消网络请求返回 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化二：自动将网络请求提前到 View-Inflate 之前，加速页面渲染"><span class="nav-number">2.2.</span> <span class="nav-text">优化二：自动将网络请求提前到 View Inflate 之前，加速页面渲染 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优化三：MVP 改进，让 Presenter 和 View 自动 bind-unBind"><span class="nav-number">2.3.</span> <span class="nav-text">优化三：MVP 改进，让 Presenter 和 View 自动 bind/unBind</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AutoLifecycle 的核心原理"><span class="nav-number">3.</span> <span class="nav-text">AutoLifecycle 的核心原理 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1- 让 Activity 对外发送 Lifecycle 事件"><span class="nav-number">3.1.</span> <span class="nav-text">1. 让 Activity 对外发送 Lifecycle 事件 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2- 感知某个 Lifecycle 的发生并自动执行回调"><span class="nav-number">3.2.</span> <span class="nav-text">2. 感知某个 Lifecycle 的发生并自动执行回调 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3- 监听 Lifecycle 并取消网络请求结果"><span class="nav-number">3.3.</span> <span class="nav-text">3. 监听 Lifecycle 并取消网络请求结果 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4- 支持自定义 Lifecycle，支持 Activity-Fragment-DialogFrament 等"><span class="nav-number">3.4.</span> <span class="nav-text">4. 支持自定义 Lifecycle，支持 Activity/Fragment/DialogFrament 等 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码"><span class="nav-number">4.</span> <span class="nav-text">源码 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

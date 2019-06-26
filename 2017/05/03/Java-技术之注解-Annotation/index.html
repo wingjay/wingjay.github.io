@@ -1,0 +1,1029 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.7.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Annotation," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="wingjay" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+  <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+
+<meta name="description" content="注解这种语法本身很有意思，当前很多流行库如 Dagger、ButterKnife等都是基于注解这种语法。 熟练使用注解，既能让你的代码变得简洁易读，动态运行时执行你想要的操作，还能帮你生成代码，省去重复代码写作。 本文涉及知识点：注解的生命周期，代码编辑时注解，编译时注解代码生成，运行时注解动态反射。">
+<meta name="keywords" content="Java,Annotation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 技术之注解 Annotation">
+<meta property="og:url" content="http://wingjay.com/2017/05/03/Java-技术之注解-Annotation/index.html">
+<meta property="og:site_name" content="wingjay">
+<meta property="og:description" content="注解这种语法本身很有意思，当前很多流行库如 Dagger、ButterKnife等都是基于注解这种语法。 熟练使用注解，既能让你的代码变得简洁易读，动态运行时执行你想要的操作，还能帮你生成代码，省去重复代码写作。 本文涉及知识点：注解的生命周期，代码编辑时注解，编译时注解代码生成，运行时注解动态反射。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://wingjay.com/img/annotation/warning.png">
+<meta property="og:image" content="http://wingjay.com/img/annotation/no-warning.png">
+<meta property="og:image" content="https://avatars0.githubusercontent.com/u/9619875?v=3&s=460">
+<meta property="og:updated_time" content="2018-11-26T06:56:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 技术之注解 Annotation">
+<meta name="twitter:description" content="注解这种语法本身很有意思，当前很多流行库如 Dagger、ButterKnife等都是基于注解这种语法。 熟练使用注解，既能让你的代码变得简洁易读，动态运行时执行你想要的操作，还能帮你生成代码，省去重复代码写作。 本文涉及知识点：注解的生命周期，代码编辑时注解，编译时注解代码生成，运行时注解动态反射。">
+<meta name="twitter:image" content="http://wingjay.com/img/annotation/warning.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Java 技术之注解 Annotation | wingjay </title>
+  <!-- <link rel="canonical" href=" { { site.url } }{ { page.url } }" /> -->
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-71080154-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5bbd26412404683ce820c9bf65201e84";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">wingjay</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">仗剑天涯</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-xiaozhuanlan">
+          <a href="https://xiaozhuanlan.com/u/wingjay" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            我的小专栏
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-resume">
+          <a href="/resume" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            我的简历
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-rss">
+          <a href="/atom.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            RSS
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+            
+            跟我讲
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'dy8yyns4r9yK2d_PJbVM','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 技术之注解 Annotation
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          
+            <i class="fa fa-rocket"></i>
+            
+
+
+          <span class="post-time">
+            发表于
+            <time itemprop="dateCreated" datetime="2017-05-03T10:47:11+08:00" content="2017-05-03">
+              2017-05-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; 分类于
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/深入理解Java技术/" itemprop="url" rel="index">
+                    <span itemprop="name">深入理解Java技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+            <span id="busuanzi_container_page_pv">
+              &nbsp; | &nbsp;
+              本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+            </span>
+          
+
+          <span=>
+            &nbsp; | &nbsp;
+            2,568 字
+          </span>
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p><code>注解 </code> 这种语法本身很有意思，当前很多流行库如 <code>Dagger</code>、<code>ButterKnife</code>等都是基于注解这种语法。</p>
+<p>熟练使用 <code> 注解</code>，既能让你的代码变得简洁易读，动态运行时执行你想要的操作，还能帮你生成代码，省去重复代码写作。</p>
+<p>本文涉及知识点：注解的生命周期，代码编辑时注解，编译时注解代码生成，运行时注解动态反射。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="注解的生命周期与修饰对象"><a href="# 注解的生命周期与修饰对象" class="headerlink" title="注解的生命周期与修饰对象"></a>注解的生命周期与修饰对象 </h2><p> 对于 Java 代码从编写到运行有三个时期：代码编辑；编译成 <code>.class</code> 文件；读取到 JVM 运行。针对这三个时期有三种 <code>Annotation</code> 对应：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">RetentionPolicy.SOURCE  // 只在代码编辑期生效</div><div class="line"></div><div class="line">RetentionPolicy.CLASS  // 在编译期生效，默认值</div><div class="line"></div><div class="line">RetentionPolicy.RUNTIME // 在代码运行时生效</div></pre></td></tr></table></figure></p>
+<p>除了生命周期，我们还可以指定 <code>Annotation</code> 用来指定的对象，比如修饰方法、类、变量、参数等，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@Annotation </div><div class="line">public void getName() &#123;&#125;</div><div class="line"></div><div class="line">@Annotation </div><div class="line">String name;</div><div class="line"></div><div class="line">public void setName(@Annotation String name) &#123;&#125;</div></pre></td></tr></table></figure></p>
+<p>Java 提供了 <code>@Target</code> 这个 <code> 元注解 </code> 来指定某个 <code>Annotation</code> 修饰的目标对象。</p>
+<p>例如 <code>@Override</code> 是用来修饰方法的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@Target(ElementType.METHOD)</div><div class="line">public @interface Override &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>而 <code>@SuppressWarnings</code> 可以用来修饰很多，包括类、方法、变量等等。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Target(&#123;TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE&#125;)</div><div class="line">public @interface SuppressWarnings &#123;</div><div class="line">    String[] value();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面我们依次来看看不同生命周期的三类 Annotation。</p>
+<h2 id="1- 代码编辑时注解"><a href="#1- 代码编辑时注解" class="headerlink" title="1. 代码编辑时注解"></a>1. 代码编辑时注解 </h2><p> 这种 Annotation 只存在于代码编辑阶段（RetentionPolicy.SOURCE），主要功能是让 IDE 来为开发者提供 warning 检查。这一类注解只会在编辑代码时生效，当编译器把 .java 文件编译成 .class 文件时会自动丢弃。</p>
+<p>比较常用的有 <code>SuppressWarnings</code>，<code>Override</code>。</p>
+<p><code>SuppressWarnings</code>是抑制编译器生成警告信息，比如我们调用了某个被标记为 <code>Deprecated</code> 的方法，这时编译器会发出警告，而我们又不得不使用这个方法时，就可以用 <code>@SuppressWarnings</code> 来抑制这个警告。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Retention(RetentionPolicy.SOURCE)</div><div class="line">public @interface SuppressWarnings &#123;</div><div class="line">    String[] value();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其作用如下图，<code>@SuppressWarnings(&quot;deprecation&quot;)</code> 可以把 <code>deprecation</code> 相关的警告给抑制掉。</p>
+<p><img src="/img/annotation/warning.png" alt="warning"><br><img src="/img/annotation/no-warning.png" alt="no-warning"></p>
+<p><code>Override</code>用来标记重写父类某个方法，万一不小心写错方法名或者父类该方法发生改动，IDE 就会发出警告。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">@Retention(RetentionPolicy.SOURCE)</div><div class="line">public @interface Override &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>当然，对于开发者而言，这一类的 Annotation 我们很少自定义，更重要的是学会使用。其实 Java 和 Android 里提供了非常多有用的静态检查的 Annotation，有助于提高代码的正确率，省去人工的代码检查，方便代码给他人使用。</p>
+<p>之后的文章我会具体介绍 Android 内部 [<code>support-annotations</code>] 很多有趣有用的 Annotation。</p>
+<h2 id="2- 运行时注解"><a href="#2- 运行时注解" class="headerlink" title="2. 运行时注解"></a>2. 运行时注解 </h2><p> 这一类注解是开发者广泛使用的。基本原理是利用 <code> 反射机制 </code> 在代码运行过程中动态地执行一些操作。关于 <code>反射机制 </code> 我已经在之前的文章<a href="/2017/04/26/Java- 技术之反射 /">Java 技术之反射</a> 中细致阐述过了，不熟悉的读者可以去阅读。</p>
+<p>下面我们以两个例子来进行讲解。还是利用我们常用的 <code>UserBean</code> 对象为目标，对它内部的一些 <code>Annotation</code> 进行运行时处理。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">public class UserBean &#123;</div><div class="line"></div><div class="line">    @Alias(&quot;user_name&quot;)</div><div class="line">    public String userName;</div><div class="line"></div><div class="line">    @Alias(&quot;user_id&quot;)</div><div class="line">    private long userId;</div><div class="line"></div><div class="line">    public UserBean(String userName, long userId) &#123;</div><div class="line">        this.userName = userName;</div><div class="line">        this.userId = userId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public String getName() &#123;</div><div class="line">        return userName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public long getId() &#123;</div><div class="line">        return userId;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test(value = &quot;static_method&quot;, id = 1)</div><div class="line">    public static void staticMethod() &#123;</div><div class="line">        System.out.printf(&quot;I&apos;m a static method\n&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test(value = &quot;public_method&quot;, id = 2)</div><div class="line">    public void publicMethod() &#123;</div><div class="line">        System.out.println(&quot;I&apos;m a public method\n&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test(value = &quot;private_method&quot;, id = 3)</div><div class="line">    private void privateMethod() &#123;</div><div class="line">        System.out.println(&quot;I&apos;m a private method\n&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test(id = 4)</div><div class="line">    public void testFailure() &#123;</div><div class="line">        throw new RuntimeException(&quot;Test failure&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这次我在 <code>UserBean</code> 里面创建了两个自定义的 <code>Annotation</code>: <code>Alias</code> 和 <code>Test</code>，前者是用来设置变量的别名并在运行时打印，后者是调用所有被 <code>Test</code> 标记的方法，得出测试通过率。当然，这两个功能目前完全没有实现，只是标记了一下而已。下面我们依次来实现这两个 Annotation 的功能。</p>
+<h4 id="Alias- 功能实现：设置变量别名并在运行时打印别名"><a href="#Alias- 功能实现：设置变量别名并在运行时打印别名" class="headerlink" title="Alias 功能实现：设置变量别名并在运行时打印别名"></a>Alias 功能实现：设置变量别名并在运行时打印别名 </h4><p> 首先，我们要创建 <code>Alias</code> 这个注解。那么要明确三个方面：</p>
+<ul>
+<li>生命周期是什么？</li>
+<li>针对的目标是什么类型？</li>
+<li>内部是否有参数？</li>
+</ul>
+<p>针对 <code>Alias</code> 的功能，我们可以作如下回答：</p>
+<ul>
+<li>生命周期是 <code> 运行时</code>，因为要动态打印出变量的别名 -&gt; @Retention(RetentionPolicy.RUNTIME)</li>
+<li>针对的目标是 <code>变量</code> -&gt; @Target(ElementType.FIELD)</li>
+<li>内部需要维护一个 String 型的变量来保存别名 -&gt; String value();</li>
+</ul>
+<p>因此可以得到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Target(ElementType.FIELD)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface Alias &#123;</div><div class="line">    String value();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>Alias</code> 定义得到了，接下来我们要实现它的功能了，即在运行时取出变量的别名并打印。</p>
+<p>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * print alias during runtime</div><div class="line"> */</div><div class="line">private static void printAlias(Object userBeanObject) &#123;</div><div class="line">    for (Field field : userBeanObject.getClass().getDeclaredFields()) &#123;</div><div class="line">        if (field.isAnnotationPresent(Alias.class)) &#123;</div><div class="line">            Alias alias = field.getAnnotation(Alias.class);</div><div class="line">            System.out.println(alias.value());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>过程很简单，利用反射机制，把 <code>userBeanObject</code> 对应 Class 里所有的成员变量都找到，找出其中被 <code>Alias</code> 修饰的成员变量，然后把真实注解 <code>Alias</code> 对象取出来，把内部的 <code>value</code> 打印出来即可。 </p>
+<h4 id="Test 功能实现：调用所有被 Test 标记的方法，得出测试通过率"><a href="#Test 功能实现：调用所有被 Test 标记的方法，得出测试通过率" class="headerlink" title="Test 功能实现：调用所有被 Test 标记的方法，得出测试通过率"></a><code>Test</code>功能实现：调用所有被 <code>Test</code> 标记的方法，得出测试通过率 </h4><p> 同样我们要回答上面三个问题：生命周期，针对对象类型和内部参数，回答是：</p>
+<ul>
+<li>生命周期：由于是 <code> 动态运行时 </code> 去遍历这些 <code>Test</code> 的存在，因此是 <code>RUNTIME</code>;</li>
+<li>针对对象类型：因为是修饰 <code> 方法 </code> 的，因此是 <code>@Target(ElementType.METHOD)</code>;</li>
+<li>内部参数：由于需要记录方法的 <code> 名称 </code> 和对应的<code>id</code>，因此需要 <code>String value();</code> <code>int id;</code></li>
+</ul>
+<p>得到如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">@Target(ElementType.METHOD)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface Test &#123;</div><div class="line">    String value() default &quot;&quot;; // 如果没有设置，那么直接取函数方法名</div><div class="line">    int id();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接下来我们需要找到所有被 <code>@Test</code> 修饰的方法，并逐一调用。注意两点：</p>
+<ol>
+<li>就算是 <code>private</code> 和 <code>static</code> 修饰的方法也需要调用；</li>
+<li>在执行每个方法前后都要打印相关 log，表示开始测试该方法。打印的内容要含有 <code>value</code> 和 <code>id</code>， 如果 <code>@Test</code> 里的 <code>value</code> 没有设置值，那么就取函数名为值。</li>
+</ol>
+<p>可以看出，在 <code>UserBean</code> 里已经定义好了三个被 <code>@Test</code> 修饰的方法了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Test(value = &quot;static_method&quot;, id = 1)</div><div class="line">public static void staticMethod() &#123;</div><div class="line">    System.out.printf(&quot;I&apos;m a static method\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Test(value = &quot;public_method&quot;, id = 2)</div><div class="line">public void publicMethod() &#123;</div><div class="line">    System.out.println(&quot;I&apos;m a public method\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Test(value = &quot;private_method&quot;, id = 3)</div><div class="line">private void privateMethod() &#123;</div><div class="line">    System.out.println(&quot;I&apos;m a private method\n&quot;);</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Test(id = 4)</div><div class="line">public void testFailure() &#123;</div><div class="line">    throw new RuntimeException(&quot;Test failure&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>接下来我们实现 <code>@Test</code> 的具体功能：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Test methods which are be annotated with @Test</div><div class="line"> */</div><div class="line">private static void doTest(Object object) &#123;</div><div class="line">    Method[] methods = object.getClass().getDeclaredMethods();</div><div class="line">    for (Method method : methods) &#123;</div><div class="line">        if (method.isAnnotationPresent(Test.class)) &#123;</div><div class="line">            Test test = method.getAnnotation(Test.class);</div><div class="line">            try &#123;</div><div class="line">                String methodName = test.value().length() == 0 ? method.getName() : test.value(); // if test.value() is empty, use `method.getName()`</div><div class="line">                System.out.printf(&quot;Testing. methodName: %s, id: %s\n&quot;, methodName, test.id());</div><div class="line"></div><div class="line">                if (Modifier.isStatic(method.getModifiers())) &#123;</div><div class="line">                    method.invoke(null); // static method</div><div class="line">                &#125; else if (Modifier.isPrivate(method.getModifiers())) &#123;</div><div class="line">                    method.setAccessible(true);  // private method</div><div class="line">                    method.invoke(object);</div><div class="line">                &#125; else &#123;</div><div class="line">                    method.invoke(object);  // public method</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                System.out.printf(&quot;PASS: Method id: %s\n&quot;, test.id());</div><div class="line">            &#125; catch (Exception e) &#123;</div><div class="line">                System.out.printf(&quot;FAIL: Method id: %s\n&quot;, test.id());</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>打印结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">Testing. methodName: static_method, id: 1</div><div class="line">I&apos;m a static method</div><div class="line">PASS: Method id: 1</div><div class="line"></div><div class="line">Testing. methodName: public_method, id: 2</div><div class="line">I&apos;m a public method</div><div class="line">PASS: Method id: 2</div><div class="line"></div><div class="line">Testing. methodName: private_method, id: 3</div><div class="line">I&apos;m a private method</div><div class="line">PASS: Method id: 3</div><div class="line"></div><div class="line">Testing. methodName: testFailure, id: 4</div><div class="line">FAIL: Method id: 4</div></pre></td></tr></table></figure>
+<p>全部正常打印。其中，由于 <code>testFailure()</code> 的 <code>@Test</code> 里未设置 <code>value()</code>，因此直接打印了它的函数名；针对 <code>static</code> 方法，直接调用 <code>method.invoke(null)</code>；针对<code>private</code>，利用<code>method.setAccessible(true);</code> 获取了权限。</p>
+<p>当然这里有一点要注意，我在 <code>invoke method</code> 时，直接使用 <code>method.invoke(object);</code>，没有传任何参数。这是由于我在 <code>UserBean</code> 里写的几个方法都不用传参数。如果需要传参数的话，那就还需要再单独判断是哪个函数，并传递对应的参数进去。</p>
+<h2 id="3- 编译时注解"><a href="#3- 编译时注解" class="headerlink" title="3. 编译时注解"></a>3. 编译时注解 </h2><p> 当 .java 文件写好了准备进行编译时，我们有另一种 Annotation 可以在这时发挥效果。</p>
+<p>我们知道，Java 源代码编译的过程会对所有的文件进行扫描，而 <code> 编译时 Annotation</code> 的作用就是 <code> 在编译过程中生成代码</code>。在 Java 里提供了 apt 工具来处理注解，同时有一套 Mirror API 来描述编译时的程序语义结构，它可以在编译时获取到被注解 Java 元素的信息以方便我们处理。该处理过程的核心是编写注解处理器 <code>AnnotationProcessor</code> 接口。</p>
+<p>大概说明下整体的过程。</p>
+<p>假设我们希望用某个 <code>Annotation</code>：<code>@Inject</code> 来生成一些代码，那么我们要做下面几步：</p>
+<h5 id="定义 -Inject"><a href="# 定义 -Inject" class="headerlink" title="定义 @Inject"></a>定义 @Inject</h5><p>由于它是编译时注解，因此是 <code>RetentionPolicy.CLASS</code>，对象的话就是变量和构造函数，因此得到：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@Retention(RetentionPolicy.CLASS)</div><div class="line">@Target(&#123;ElementType.CONSTRUCTOR, ElementType.FIELD&#125;)</div><div class="line">public @interface Inject &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h5 id="定义 -Processor- 类"><a href="# 定义 -Processor- 类" class="headerlink" title="定义 Processor 类"></a>定义 Processor 类</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// Helper to define the Processor</div><div class="line">@AutoService(Processor.class)</div><div class="line">// Define the supported Java source code version</div><div class="line">@SupportedSourceVersion(SourceVersion.RELEASE_7)</div><div class="line">// Define which annotation you want to process</div><div class="line">@SupportedAnnotationTypes(&quot;com.wingjay.annotation.Inject&quot;)</div><div class="line">public class MyProcessor extends AbstractProcessor &#123;  ...  &#125;</div></pre></td></tr></table></figure>
+<h5 id="重写 -Processor- 内部的 -process- 方法"><a href="# 重写 -Processor- 内部的 -process- 方法" class="headerlink" title="重写 Processor 内部的 process 方法"></a>重写 <code>Processor</code> 内部的 <code>process</code> 方法 </h5><p> 这个 <code>process</code> 方法会在编译时被执行到，我们可以在这个方法里进行代码生成的工作。</p>
+<p>关于具体的代码生成部分，可以利用 <code>Square</code> 提供的 <code>JavaPoet</code> 工具：<a href="https://github.com/square/javapoet" target="_blank" rel="external">https://github.com/square/javapoet</a></p>
+<p>下面有一些代码片段供参考：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public boolean process(Set&lt;? extends TypeElement&gt; annotations, RoundEnvironment roundEnv) &#123;</div><div class="line">	// 扫描所有 Inject 标记过的元素</div><div class="line">    Set&lt;? extends Element&gt; elements = roundEnv.getElementsAnnotatedWith(Inject.class);</div><div class="line">    Set&lt;? extends TypeElement&gt; typeElements = ElementFilter.typesIn(elements);</div><div class="line">    for (TypeElement element : typeElements) &#123;</div><div class="line"></div><div class="line">    	// 拼接待生成代码</div><div class="line">    	ClassName currentType = ClassName.get(element);</div><div class="line">      	MethodSpec.Builder builder = MethodSpec.methodBuilder(&quot;fromCursor&quot;)</div><div class="line">	       .returns(currentType)</div><div class="line">	       .addModifiers(Modifier.STATIC)</div><div class="line">	       .addModifiers(Modifier.PUBLIC)</div><div class="line">	       .addParameter(ClassName.get(&quot;android.database&quot;, &quot;Cursor&quot;), &quot;cursor&quot;);</div><div class="line"></div><div class="line">	    // 将这些拼接代码写入文件</div><div class="line">        String className = ... // 设置你要生成的代码 class 名字</div><div class="line">        JavaFileObject sourceFile =   processingEnv.getFiler().createSourceFile(className, element);</div><div class="line">        Writer writer = sourceFile.openWriter();</div><div class="line">        javaFile.writeTo(writer);</div><div class="line">        writer.close();  </div><div class="line">	&#125;</div><div class="line">	return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="小结"><a href="# 小结" class="headerlink" title="小结"></a>小结 </h2><p> 本文在前文 <a href="/2017/04/26/Java- 技术之反射 /">Java 技术之反射</a> 的基础上，对 Java 的注解 <code>Annotation</code> 做了一定的介绍。</p>
+<p>熟练使用 <code>Annotation</code> 能在很多时候帮助代码变得更简洁，也能帮我们生成很多代码，免除重复写作相同代码，是一种很高效的编程方式。</p>
+<p>下一篇我会为 Android 的小伙伴介绍不少你可能不太知道但非常好用的 <code>Android Annotation</code>。</p>
+<p>谢谢。</p>
+<p>wingjay</p>
+<p><a href="http://wingjay.com">http://wingjay.com</a></p>
+<p><img src="https://avatars0.githubusercontent.com/u/9619875?v=3&amp;s=460" alt=""></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+            <a href="/tags/Annotation/" rel="tag">#Annotation</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <h3>相关文章：</h3><ul class="related-posts"><li><a href="/2017/05/08/java_classloader/">Java 技术之类加载机制</a></li><li><a href="/2018/02/11/java-dynamic-proxy/">Java 技术之动态代理机制</a></li><li><a href="/2017/04/26/Java-技术之反射/">Java 技术之反射</a></li><li><a href="/2017/05/24/Java-技术之垃圾回收机制/">Java 技术之垃圾回收机制</a></li><li><a href="/2017/03/29/Java的equals与hashcode对比分析/">Java 的 equals 与 hashcode 对比分析</a></li><li><a href="/2017/04/09/Java里如何实现线程间通信？/">Java 里如何实现线程间通信？</a></li><li><a href="/2017/11/09/auto-lifecycle/">让普通 Java 类自动感知 Activity Lifecycle</a></li></ul>
+        </div>  
+      
+      
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/26/Java-技术之反射/" rel="next" title="Java 技术之反射">
+                <i class="fa fa-chevron-left"></i> Java 技术之反射
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/08/java_classloader/" rel="prev" title="Java 技术之类加载机制">
+                Java 技术之类加载机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+        <!doctype html>
+<html>
+<div class="clearfix"></div>
+<br>
+<div id="comments">
+<div class="post-header bg-">
+  <h1 class="h1 post-title">评论</h1>
+</div>
+
+<article class="post-content">
+<p>本站评论搭建在 Github Issue 上（就是这么神奇），请点击下面按钮进行评论。<br/>
+Comment on Github Issue for this article(Yup I know it's cool)! click below button!</p>
+</article>
+</div>
+
+<script type="text/javascript">
+  function loadComments(data) {
+  	var commentUrl = "window.open('https://github.com/wingjay/wingjay.github.io/issues/5')"
+    $("#comments").append('<div class="submit-comment" style="text-align: center"><button onclick=' + commentUrl + ' class="btn btn-primary">评论</button></div>')
+
+    for (var i=0; i<data.length; i++) {
+      var cuser = data[i].user.login;
+      var cuserlink = data[i].user.html_url;
+      var avatarlink = data[i].user.avatar_url;
+      var clink = data[i].html_url;
+      var cbody = data[i].body_html;
+      var cavatarlink = data[i].user.avatar_url;      
+      var cdate = new Date(data[i].created_at);
+      var dopts = { month: 'short', day: 'numeric', year: 'numeric' }
+
+      $("#comments").append('<div class="timeline-comment-wrapper"><div class="avatar-parent-child timeline-comment-avatar"><a href="' + cuserlink +'"><img width="44" height="44" class="avatar rounded-1" src="' + avatarlink + '"></a></div><div class="timeline-comment current-user"><div class="timeline-comment-header"><h3 class="timeline-comment-header-text text-normal f5"><strong>' + cuser + '</strong><span class="post-meta">' + cdate.toLocaleDateString("en", dopts) + '</span></h3></div><div style="display: block !important; padding: 15px;"><article class="post-content">' + cbody + '</article></div></div></div>');
+    }
+  }
+  $.ajax("https://api.github.com/repos/wingjay/wingjay.github.io/issues/5/comments", {
+    headers: {Accept: "application/vnd.github.v3.html+json"},
+    dataType: "json",
+    success: function(msg){
+      console.log(msg);
+      loadComments(msg);
+   }
+  });
+</script>
+
+
+<style type="text/css">
+.timeline-comment-wrapper {
+    margin-top: 0;
+    position: relative;
+    padding-left: 60px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-top: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+}
+.timeline-comment-avatar {
+    float: left;
+    margin-left: -60px;
+    border-radius: 3px;
+}
+.avatar-parent-child {
+    position: relative;
+}
+.timeline-comment-wrapper a {
+    color: #0366d6;
+    text-decoration: none;
+    background-color: transparent;
+}
+.timeline-comment-wrapper .avatar {
+    display: inline-block;
+    overflow: hidden;
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 3px;
+}
+.timeline-comment-wrapper .rounded-1 {
+    border-radius: 3px !important;
+}
+.timeline-comment.current-user {
+    border-color: #c0d3eb;
+}
+.timeline-comment {
+	position: relative;
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+.timeline-comment.current-user .timeline-comment-header {
+    background-color: #f1f8ff;
+    border-bottom-color: #c0d3eb;
+}
+.timeline-comment-header {
+	padding-right: 15px;
+    padding-left: 15px;
+    color: #586069;
+    background-color: #f6f8fa;
+    border-bottom: 1px solid #d1d5da;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.timeline-comment-header-text {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.timeline-comment-header h3 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.timeline-comment-header-text .post-meta {
+	margin-left: 6px;
+}
+.timeline-comment article p {
+	margin: 0px;
+}
+.text-normal {
+    font-weight: normal !important;
+}
+.f5 {
+    font-size: 14px !important;
+}
+.submit-comment .btn {
+    position: relative;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-repeat: repeat-x;
+    background-position: -1px -1px;
+    background-size: 110% 110%;
+    border: 1px solid rgba(27,31,35,0.2);
+    border-radius: 0.25em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.submit-comment .btn-primary {
+    color: #fff;
+    background-color: #28a745;
+    background-image: -webkit-linear-gradient(270deg, #34d058 0%, #28a745 90%);
+    background-image: linear-gradient(-180deg, #34d058 0%, #28a745 90%);
+}
+</style>
+
+</html>
+
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="https://avatars2.githubusercontent.com/u/9619875?v=3&s=400" alt="wingjay" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">wingjay</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">用艺术的眼光发现技术的美</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">36</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">分类</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/wingjay" target="_blank">
+                  
+                    <i class="fa fa-github"></i> GitHub
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.jianshu.com/users/da333fd63fe5/latest_articles" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 简书
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1625892654" target="_blank">
+                  
+                    <i class="fa fa-weibo"></i> Weibo
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#注解的生命周期与修饰对象"><span class="nav-number">1.</span> <span class="nav-text">注解的生命周期与修饰对象 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1- 代码编辑时注解"><span class="nav-number">2.</span> <span class="nav-text">1. 代码编辑时注解 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2- 运行时注解"><span class="nav-number">3.</span> <span class="nav-text">2. 运行时注解 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Alias- 功能实现：设置变量别名并在运行时打印别名"><span class="nav-number">3.0.1.</span> <span class="nav-text">Alias 功能实现：设置变量别名并在运行时打印别名 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Test 功能实现：调用所有被 Test 标记的方法，得出测试通过率"><span class="nav-number">3.0.2.</span> <span class="nav-text">Test功能实现：调用所有被 Test 标记的方法，得出测试通过率 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3- 编译时注解"><span class="nav-number">4.</span> <span class="nav-text">3. 编译时注解 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#定义 -Inject"><span class="nav-number">4.0.0.1.</span> <span class="nav-text">定义 @Inject</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#定义 -Processor- 类"><span class="nav-number">4.0.0.2.</span> <span class="nav-text">定义 Processor 类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#重写 -Processor- 内部的 -process- 方法"><span class="nav-number">4.0.0.3.</span> <span class="nav-text">重写 Processor 内部的 process 方法 </span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结 </span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wingjay</span>
+</div>
+
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
+<div class="powered-by" style="display:none">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info" style="display:none">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+<span>
+  这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
+</span>
+<br>
+<span id="busuanzi_container_site_pv">
+    本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+</span>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>
