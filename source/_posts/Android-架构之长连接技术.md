@@ -9,9 +9,8 @@ tags:
 	- 架构
 	- 长连接
 	- 网络
-commentIssueId:
+commentIssueId: 32
 ---
-> 本文首发于小专栏《[Android 架构之长连接技术](https://xiaozhuanlan.com/topic/3758142906)》，更多Android架构文章欢迎关注《[亿级Android架构](https://xiaozhuanlan.com/AndroidArch)》
 
 上一篇文章[《Android 架构之网络框架（上）》](https://xiaozhuanlan.com/topic/6982074351)中，我们谈过了网络框架OkHttp、网络加速方案如HttpDNS、数据压缩与序列化等技术点。本文我们结合[腾讯Mars框架](https://github.com/Tencent/mars)和[美团Shark体系](https://tech.meituan.com/Shark_SDK.html)等业内主流长连接方案，谈一谈长连接技术的各个方面。
 
@@ -177,6 +176,32 @@ DHCP 租期过期，如果没有及时续约，同样会导致IP地址失效。
 谢谢。
 wingjay
 
+---
+### 《亿级Android架构》小专栏介绍
+业务的快速增长离不开稳定可靠的架构。[《亿级Android架构》](https://xiaozhuanlan.com/AndroidArch)小专栏会基于作者实际工作经验，结合国内大厂如阿里、腾讯、美团等基础架构现状，尝试谈谈如何设计一套好的架构来支持业务从0到1，甚至到亿，希望与大家多多探讨。
+
+本专栏主要内容：
+1. 当前大厂有哪些Android架构；
+2. 这些架构能解决什么问题；
+3. 这些架构的原理是什么；
+4. 学习这些架构对我们自身的意义。
+
+**[《亿级Android架构》](https://xiaozhuanlan.com/AndroidArch)小专栏文章列表：**
+
+[《亿级 Android 架构》专栏随谈》](https://xiaozhuanlan.com/topic/1934527806)
+
+[《Android 架构之网络连接与加速》](https://xiaozhuanlan.com/topic/6982074351)
+
+[《Android 架构之长连接技术》](https://xiaozhuanlan.com/topic/3758142906)
+
+[《Android 架构之高可用移动网络连接》](https://xiaozhuanlan.com/topic/2130768549)
+
+[《Android 架构之网络安全演进》](https://xiaozhuanlan.com/topic/8159302674)
+
+[《Android 架构之高性能移动端日志系统》](https://xiaozhuanlan.com/topic/2694081375)
+
+---
+ 
 ## 参考：
 [《移动端IM实践：实现Android版微信的智能心跳机制》](http://www.52im.net/thread-120-1-1.html)
 [《Android端消息推送总结：实现原理、心跳保活、遇到的问题等》](http://www.52im.net/thread-341-1-1.html)

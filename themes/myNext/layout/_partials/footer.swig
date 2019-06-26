@@ -8,6 +8,8 @@
   <span class="author" itemprop="copyrightHolder">{{ config.author }}</span>
 </div>
 
+<div><a href="http://www.beian.gov.cn/portal/registerSystemInfo">沪ICP备14053719号</a></div>
+
 <div class="powered-by" style="display:none">
   {{ __('footer.powered', '<a class="theme-link" href="http://hexo.io">Hexo</a>') }}
 </div>
@@ -19,6 +21,7 @@
   </a>
 </div>
 
+
 <span>
   这都被你发现了，欢迎 wingjay.com 的第 <span id="busuanzi_value_site_uv"></span> 个小伙伴
 </span>
@@ -29,6 +32,7 @@
 <span class="with-love">
     <i class="icon-next-heart fa fa-heart"></i>
 </span>
+
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256921957'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256921957' type='text/javascript'%3E%3C/script%3E"));</script>
 <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
 </script>

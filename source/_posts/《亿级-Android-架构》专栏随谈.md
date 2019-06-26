@@ -9,8 +9,6 @@ tags:
 	- 架构
 commentIssueId: 31
 ---
-> [《亿级 Android 架构》](https://xiaozhuanlan.com/AndroidArch) 小专栏地址：https://xiaozhuanlan.com/AndroidArch
-
 各位好，很久没空来写点东西（忙+懒），快年底了，准备抽空写一写。由于今年一直在做一些Android架构方面的工作，所以准备以这个角度为切入点。
 
 本篇文章随谈一些关于Android架构的东西，包括写这个专栏的初衷、具体包括哪些技术点等。
@@ -109,3 +107,29 @@ commentIssueId: 31
     - 移动端的加密算法之对称与非对称，防篡改
     - 常规编码方式一览 md5 base64
     - ...等
+
+---
+### 《亿级Android架构》小专栏介绍
+业务的快速增长离不开稳定可靠的架构。[《亿级Android架构》](https://xiaozhuanlan.com/AndroidArch)小专栏会基于作者实际工作经验，结合国内大厂如阿里、腾讯、美团等基础架构现状，尝试谈谈如何设计一套好的架构来支持业务从0到1，甚至到亿，希望与大家多多探讨。
+
+本专栏主要内容：
+1. 当前大厂有哪些Android架构；
+2. 这些架构能解决什么问题；
+3. 这些架构的原理是什么；
+4. 学习这些架构对我们自身的意义。
+
+**[《亿级Android架构》](https://xiaozhuanlan.com/AndroidArch)小专栏文章列表：**
+
+[《亿级 Android 架构》专栏随谈》](https://xiaozhuanlan.com/topic/1934527806)
+
+[《Android 架构之网络连接与加速》](https://xiaozhuanlan.com/topic/6982074351)
+
+[《Android 架构之长连接技术》](https://xiaozhuanlan.com/topic/3758142906)
+
+[《Android 架构之高可用移动网络连接》](https://xiaozhuanlan.com/topic/2130768549)
+
+[《Android 架构之网络安全演进》](https://xiaozhuanlan.com/topic/8159302674)
+
+[《Android 架构之高性能移动端日志系统》](https://xiaozhuanlan.com/topic/2694081375)
+
+---    
